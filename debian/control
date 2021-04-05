@@ -9,6 +9,6 @@ Homepage: https://github.com/45Drives/ceph-deploy
 
 Package: cockpit-ceph-deploy
 Architecture: amd64
-Depends: cockpit, cockpit-ws, cockpit-bridge, python3
+Depends: cockpit, cockpit-ws, cockpit-bridge, python3, ceph-ansible-45d
 Description: A cockpit module for deploying ceph using Ansible Playbooks.
  A cockpit module capable of deploying ceph using cockpit.

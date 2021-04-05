@@ -19,6 +19,7 @@ Requires: cockpit
 Requires: cockpit-ws
 Requires: cockpit-bridge
 Requires: python3
+Requires: ceph-ansible-45d
 
 Provides: cockpit-ceph-deploy
 
