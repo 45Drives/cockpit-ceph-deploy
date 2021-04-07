@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+###############################################################################
+# core_params: used to store variables required for deploying ceph via cockpit
+#              for cockpit-ceph-deploy
+#
+# Copyright (C) 2021, Mark Hooper   <mhooper@45drives.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+###############################################################################
+
+from optparse import OptionParser
+import json
+import sys
+import io
+import subprocess
+import os
+from contextlib import redirect_stdout
+
+g_ceph_core_params = {
+	"hosts":[],
+	"roles":[],
+	"options":[],
+}
+
+g_param_file_content = None
+g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
+g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
+
+def print_to_string(item):
+	with io.StringIO() as buf, redirect_stdout(buf):
+		print(item)
+		output = buf.getvalue().rstrip("\n")
+		return output
+
+def load_param_file():
+	# check to see if file needs to be created.
+	if not os.path.exists(g_param_file_path):
+		# file doesn't exist
+		if not os.path.exists(g_param_file_dir):
+			# file directory doesn't exist, make required directories
+			os.makedirs(g_param_file_dir)
+		#create new parameter file with default parameters
+		param_file = open(g_param_file_path,"w")
+		param_file.write(json.dumps(g_ceph_core_params,indent=4))
+		param_file.close()
+		# return the default json object
+		return json.loads(json.dumps(g_ceph_core_params,indent=4))
+
+	else:
+		#file exists on disk, load contents and return json object.
+		f = open(g_param_file_path,"r")
+		param_file_content = print_to_string(f.read());
+		f.close()
+		try:
+			parsed_json = json.loads(param_file_content)
+		except ValueError as err:
+			# failed to get json from command line arguments
+			error_string = print_to_string(err)
+			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p="") + error_string }
+			print(json.dumps(error_msg,indent=4))
+			sys.exit(1)
+		return parsed_json
+
+def check_root():
+	# Check to see if user has root access
+	root_test =	subprocess.run(["ls","/root"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode
+	if root_test:
+		error_msg = {"error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params must be run with root privileges"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(root_test)
+
+def main():
+	check_root()
+	parser = OptionParser()
+	parser.add_option("-p","--params",action="store",dest="params",default=None,help="parameters for deploying ceph.")
+	parser.add_option("-o","--overwrite",action="store_true",dest="overwrite",default=False,help="overwrite existing parameters")
+	parser.add_option("-a","--add",action="store_true",dest="add",default=False,help="add parameters to existing parameters file")
+	parser.add_option("-s","--show-existing",action="store_true",dest="show_existing",default=False,help="show existing parameter file contents")
+	parser.add_option("-r","--remove",action="store_true",dest="remove",default=False,help="remove parameters from existing parameters file")
+	(options, args) = parser.parse_args()
+
+	# load existing param file content
+	g_param_file_content = load_param_file()
+
+	if options.show_existing:
+		# show existing file content and exit
+		print(json.dumps(g_param_file_content,indent=4))
+		sys.exit(0)
+
+	if options.add and options.remove:
+		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-a,--add) and remove (-r,--remove) a parameter at the same time"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	if options.params != None:
+		# parameters have been provided
+		try:
+			# Load in json
+			params = json.loads(options.params)
+		except ValueError as err:
+			# failed to get json from command line arguments
+			error_string = print_to_string(err)
+			error_msg = { "error_msg":"Error parsing provided parameters as JSON: " + error_string }
+			print(json.dumps(error_msg,indent=4))
+			sys.exit(1)
+		
+		#we have parsed json objects
+		if "hosts" in params.keys():
+			# user has provided information on hosts
+			if isinstance(params["hosts"],list):
+				for host in params["hosts"]:
+					if isinstance(host,str):
+						g_ceph_core_params["hosts"].append(host)
+					else:
+						error_msg = { "error_msg":"Invalid format, each entry in \"hosts\" must be a string" }
+						print(json.dumps(error_msg,indent=4))
+						sys.exit(1)
+
+				print(json.dumps(g_ceph_core_params,indent=4))
+
+
+
+if __name__ == "__main__":
+	main()
