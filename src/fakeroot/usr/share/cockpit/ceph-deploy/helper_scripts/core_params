@@ -2,7 +2,7 @@
 
 ###############################################################################
 # core_params: used to store variables required for deploying ceph via cockpit
-#              for cockpit-ceph-deploy
+#              for cockpit-ceph-deploy.
 #
 # Copyright (C) 2021, Mark Hooper   <mhooper@45drives.com>
 #
@@ -21,16 +21,99 @@ import subprocess
 import os
 from contextlib import redirect_stdout
 
-g_ceph_core_params = {
-	"hosts":[],
-	"roles":[],
-	"options":[],
-}
+from dataclasses import dataclass, asdict, field
+import sys
+import json
 
+#####################################
+# DATA CLASSES
+#####################################
+
+@dataclass()
+class Host:
+	hostname: str = ""
+	ip: str = ""
+	monitor_interface: str = ""
+
+	def load_dictionary(self, dict_variable: dict):
+		ret_val = False
+		if isinstance(dict_variable,dict):
+			for key in dict_variable.keys():
+				if key in asdict(self).keys():
+					if type(dict_variable[key]) == type(getattr(self,key)):
+						setattr(self,key,dict_variable[key])
+						ret_val = True
+		else:
+			error_msg = {"error_msg": "unable to load dictionary."}
+			print(json.dumps(error_msg,indent=4))
+		return ret_val
+
+@dataclass()
+class Roles:
+	mons: list[str] = field(default_factory=list)
+	mgrs: list[str] = field(default_factory=list)
+	osds: list[str] = field(default_factory=list)
+	metrics: list[str] = field(default_factory=list)
+	mdss: list[str] = field(default_factory=list)
+	smbs: list[str] = field(default_factory=list)
+	nfss: list[str] = field(default_factory=list)
+	iscsigws: list[str] = field(default_factory=list)
+	rgws: list[str] = field(default_factory=list)
+	rgwloadbalancers: list[str] = field(default_factory=list)
+	client: list[str] = field(default_factory=list)
+
+	def load_dictionary(self, dict_variable: dict):
+		ret_val = False
+		if isinstance(dict_variable,dict):
+			for key in dict_variable.keys():
+				if key in asdict(self).keys():
+					if isinstance(dict_variable[key],list):
+						for hostname in dict_variable[key]:
+							if isinstance(hostname,str):
+								getattr(self,key).append(hostname)
+								ret_val = True
+		else:
+			error_msg = {"error_msg": "unable to load dictionary."}
+			print(json.dumps(error_msg,indent=4))
+		return ret_val
+
+@dataclass()
+class Options:
+	monitor_interface: str = ""
+	public_network: str = ""
+	cluster_network: str = ""
+	hybrid_cluster: bool = False
+
+	def load_dictionary(self, dict_variable: dict):
+		ret_val = False
+		if isinstance(dict_variable,dict):
+			for key in dict_variable.keys():
+				if key in asdict(self).keys():
+					if type(dict_variable[key]) == type(getattr(self,key)):
+						setattr(self,key,dict_variable[key])
+						ret_val = True
+		else:
+			error_msg = {"error_msg": "unable to load dictionary."}
+			print(json.dumps(error_msg,indent=4))
+		return ret_val
+
+#####################################
+# GLOBALS
+#####################################
+global g_ceph_core_params
+global g_param_file_content
+global g_param_file_path
+global g_param_file_dir
+
+g_ceph_core_params = {}
 g_param_file_content = None
 g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
 g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 
+
+#####################################
+# FUNCTIONS
+#####################################
 def print_to_string(item):
 	with io.StringIO() as buf, redirect_stdout(buf):
 		print(item)
@@ -46,6 +129,13 @@ def load_param_file():
 			os.makedirs(g_param_file_dir)
 		#create new parameter file with default parameters
 		param_file = open(g_param_file_path,"w")
+
+		g_ceph_core_params["hosts"] = []
+		default_roles = Roles()
+		g_ceph_core_params["roles"] = asdict(default_roles).copy()
+		default_options = Options()
+		g_ceph_core_params["options"] = asdict(default_options).copy()
+		
 		param_file.write(json.dumps(g_ceph_core_params,indent=4))
 		param_file.close()
 		# return the default json object
@@ -54,14 +144,14 @@ def load_param_file():
 	else:
 		#file exists on disk, load contents and return json object.
 		f = open(g_param_file_path,"r")
-		param_file_content = print_to_string(f.read());
+		param_file_content = print_to_string(f.read())
 		f.close()
 		try:
 			parsed_json = json.loads(param_file_content)
 		except ValueError as err:
 			# failed to get json from command line arguments
 			error_string = print_to_string(err)
-			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p="") + error_string }
+			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
 			print(json.dumps(error_msg,indent=4))
 			sys.exit(1)
 		return parsed_json
@@ -74,6 +164,10 @@ def check_root():
 		print(json.dumps(error_msg,indent=4))
 		sys.exit(root_test)
 
+
+#####################################
+# MAIN
+#####################################
 def main():
 	check_root()
 	parser = OptionParser()
@@ -82,6 +176,7 @@ def main():
 	parser.add_option("-a","--add",action="store_true",dest="add",default=False,help="add parameters to existing parameters file")
 	parser.add_option("-s","--show-existing",action="store_true",dest="show_existing",default=False,help="show existing parameter file contents")
 	parser.add_option("-r","--remove",action="store_true",dest="remove",default=False,help="remove parameters from existing parameters file")
+	parser.add_option("-d","--debug",action="store_true",dest="debug",default=False,help="run in debug mode")
 	(options, args) = parser.parse_args()
 
 	# load existing param file content
@@ -89,11 +184,23 @@ def main():
 
 	if options.show_existing:
 		# show existing file content and exit
-		print(json.dumps(g_param_file_content,indent=4))
+		success_msg = { "success_msg":" parameter file loaded."}
+		success_msg["param_file_content"] = g_param_file_content
+		print(json.dumps(success_msg,indent=4))
 		sys.exit(0)
 
 	if options.add and options.remove:
 		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-a,--add) and remove (-r,--remove) a parameter at the same time"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+	
+	elif options.add and options.overwrite:
+		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-a,--add) and (-o --overwrite) at the same time"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	elif options.remove and options.overwrite:
+		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-r,--remove) and (-o --overwrite) at the same time"}
 		print(json.dumps(error_msg,indent=4))
 		sys.exit(1)
 
@@ -110,18 +217,140 @@ def main():
 			sys.exit(1)
 		
 		#we have parsed json objects
+		#####################################
+		# HOSTS
+		#####################################
 		if "hosts" in params.keys():
 			# user has provided information on hosts
 			if isinstance(params["hosts"],list):
+				g_ceph_core_params["hosts"] = []
 				for host in params["hosts"]:
-					if isinstance(host,str):
-						g_ceph_core_params["hosts"].append(host)
+					if isinstance(host,dict):
+						new_host = Host()
+						new_host.load_dictionary(host)
+						g_ceph_core_params["hosts"].append(asdict(new_host))
 					else:
-						error_msg = { "error_msg":"Invalid format, each entry in \"hosts\" must be a string" }
+						error_msg = { "error_msg":"Invalid format, host must be a JSON object." }
 						print(json.dumps(error_msg,indent=4))
 						sys.exit(1)
+			else:
+				error_msg = { "error_msg":"Invalid format, \"hosts\" must be an array of JSON objects." }
+				print(json.dumps(error_msg,indent=4))
+				sys.exit(1)
 
-				print(json.dumps(g_ceph_core_params,indent=4))
+		#####################################
+		# ROLES
+		#####################################
+		if "roles" in params.keys():
+			# user has provided information on roles.
+			if isinstance(params["roles"],dict):
+				new_roles = Roles()
+				new_roles.load_dictionary(params["roles"])
+				g_ceph_core_params["roles"] = asdict(new_roles)
+
+
+		#####################################
+		# OPTIONS
+		#####################################
+		if "options" in params.keys():
+			if isinstance(params["options"],dict):
+				new_options = Options()
+				new_options.load_dictionary(params["options"])
+				g_ceph_core_params["options"] = asdict(new_options)
+
+
+		####################################################################################################################
+		#                                              MODIFICATION BEHAVIOR
+		####################################################################################################################
+		#####################################
+		# OVERWRITE
+		#####################################
+		if options.overwrite:
+			# user wants us to overwrite the existing options file.
+			# check to see if file needs to be created.
+			if not os.path.exists(g_param_file_path):
+				# file doesn't exist
+				if not os.path.exists(g_param_file_dir):
+					# file directory doesn't exist, make required directories
+					os.makedirs(g_param_file_dir)
+			#create new parameter file using supplied parameters
+			param_file = open(g_param_file_path,"w")
+			param_file.write(json.dumps(g_ceph_core_params,indent=4))
+			param_file.close()
+			success_msg = { "success_msg":"Parameter file has been overwritten"}
+			file_content = load_param_file()
+			success_msg["param_file_content"] = file_content
+			print(json.dumps(success_msg,indent=4))
+			sys.exit(0)
+
+		#####################################
+		# ADD
+		#####################################
+		if options.add:
+			# user wants us to add the supplied parameters to the existing parameter file.
+			# g_ceph_core_params -> dict of valid parameters sent by user
+			# g_param_file_content -> dict of parameters in parameter file
+			default_options = {}
+			default_options["hosts"] = []
+			default_options["roles"] = asdict(Roles())
+			default_options["options"] = asdict(Options())
+			merged_params = g_param_file_content.copy()
+			for key in g_ceph_core_params.keys():
+				# look at the keys sent by the user.
+				if key in merged_params.keys():
+					#key already exists in parameter file
+					if key == "hosts":
+						for host in g_ceph_core_params[key]:
+							if len(merged_params[key]) != 0:
+								for existing_host in merged_params[key]:
+									if existing_host["hostname"] == host["hostname"]:
+										existing_host = host.copy()
+							else:
+								merged_params[key].append(host.copy())
+					#elif key == "roles":
+					#	for role in merged_params[key].keys():
+					#		if g_ceph_core_params[key][role] != default_options[key][role] and g_ceph_core_params[key][role] != merged_params[key][role]:
+					#			merged_params[key][role] = list(set(merged_params[key][role].copy() + g_ceph_core_params[key][role].copy()))
+					#elif key == "options":
+					#	for option in merged_params[key].keys():
+					#		if g_ceph_core_params[key][option] != default_options[key][option] and g_ceph_core_params[key][option] != merged_params[key][option]:
+					#			merged_params[key][option] = g_ceph_core_params[key][option]
+			print("----------------------------------------------------------------------------------")
+			print("MERGED PARAMS:")
+			print(json.dumps(merged_params,indent=4))
+			print("----------------------------------------------------------------------------------")
+			print("----------------------------------------------------------------------------------")
+			print("PARAM FILE CONTENT AFTER ADD:")
+			print(json.dumps(g_param_file_content,indent=4))
+			print("----------------------------------------------------------------------------------")
+
+		#####################################
+		# DEBUG MODE
+		#####################################
+		if options.debug:
+			print("----------------------------------------------------------------------------------")
+			print("COMMAND LINE ARGUMENTS:")
+			print("----------------------------------------------------------------------------------")
+			arg_string = ""
+			for arg in sys.argv:
+				arg_string += " " +str(arg)
+			print(arg_string)
+			print("----------------------------------------------------------------------------------")
+
+			print("----------------------------------------------------------------------------------")
+			print("PARSED JSON FROM COMMAND LINE:")
+			print(json.dumps(g_ceph_core_params,indent=4))
+			print("----------------------------------------------------------------------------------")
+
+			print("----------------------------------------------------------------------------------")
+			print("PARAM FILE CONTENT:")
+			print(json.dumps(g_param_file_content,indent=4))
+			print("----------------------------------------------------------------------------------")
+
+	else:
+		error_msg = { "error_msg": "Invalid CLI options provided." }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
 
 
 

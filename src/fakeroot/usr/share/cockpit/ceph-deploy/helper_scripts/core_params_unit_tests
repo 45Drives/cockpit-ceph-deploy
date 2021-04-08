@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+import json
+
+def run_core_params(options = ["--show-existing"],params = None):
+	script_path = "/home/mark/dev/cockpit-ceph-deploy/src/fakeroot/usr/share/cockpit/ceph-deploy/helper_scripts/core_params"
+	if params != None:
+		command_list = [script_path,"-p",json.dumps(params)]
+		for option in options:
+			command_list.append(option)
+		try:
+			return_code = subprocess.run(command_list).returncode
+		except:
+			print("####################################################################")
+			print("FAILED TO RUN SCRIPT")
+			print("####################################################################")
+			sys.exit(1)
+		if return_code != 0:
+			print("####################################################################")
+			print("SCRIPT FAILED")
+			print("####################################################################")
+			sys.exit(1)
+	else:
+		command_list = [script_path]
+		for option in options:
+			command_list.append(option)
+		try:
+			return_code = subprocess.run(command_list).returncode
+		except:
+			print("####################################################################")
+			print("FAILED TO RUN SCRIPT")
+			print("####################################################################")
+			sys.exit(1)
+		if return_code != 0:
+			print("####################################################################")
+			print("SCRIPT FAILED")
+			print("####################################################################")
+			sys.exit(1)
+
+def main():
+	param_reference = {
+		"hosts": [
+			{
+				"hostname": "ubuntuosd1",
+				"ip": "192.168.13.13/16",
+				"monitor_interface": "ens3"
+			},
+			{
+				"hostname": "ubuntuosd2",
+				"ip": "192.168.13.14/16",
+				"monitor_interface": "ens3"
+			},
+			{
+				"hostname": "ubuntuosd3",
+				"ip": "192.168.13.15/16",
+				"monitor_interface": "ens3"
+			}
+		],
+		"roles": {
+			"mons": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"mgrs": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"osds": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"metrics": [
+				"ubuntuosd1"
+			],
+			"mdss": [],
+			"smbs": [],
+			"nfss": [],
+			"iscsigws": [],
+			"rgws": [],
+			"rgwloadbalancers": [],
+			"client": []
+		},
+		"options": {
+			"monitor_interface": "ens3",
+			"public_network": "192.168.0.0/16",
+			"cluster_network": "192.168.0.0/16",
+			"hybrid_cluster": None
+		}
+	}
+
+	test_params = {
+		"hosts": [
+			{
+				"hostname": "ubuntuosd4",
+			}
+		],
+		"roles": {
+			"mons": [
+				"ubuntuosd4"
+			],
+			"mgrs": [
+				"ubuntuosd4"
+			]
+		},
+		"options": {
+			"monitor_interface": "ens3",
+			"public_network": "192.168.0.0/16",
+			"cluster_network": "10.0.0.1",
+			"hybrid_cluster": True
+		}
+	}
+
+	test_count = 1
+	test_options = ["-a","-d"]
+	print("############################  TEST {t}  ##############################".format(t=test_count))
+	run_core_params(test_options,test_params)
+	print("####################################################################")
+
+
+if __name__ == "__main__":
+	main()
