@@ -3,6 +3,7 @@
 import sys
 import subprocess
 import json
+import os
 
 def run_core_params(options = ["--show-existing"],params = None):
 	script_path = "/home/mark/dev/cockpit-ceph-deploy/src/fakeroot/usr/share/cockpit/ceph-deploy/helper_scripts/core_params"
@@ -21,7 +22,6 @@ def run_core_params(options = ["--show-existing"],params = None):
 			print("####################################################################")
 			print("SCRIPT FAILED")
 			print("####################################################################")
-			sys.exit(1)
 	else:
 		command_list = [script_path]
 		for option in options:
@@ -37,27 +37,26 @@ def run_core_params(options = ["--show-existing"],params = None):
 			print("####################################################################")
 			print("SCRIPT FAILED")
 			print("####################################################################")
-			sys.exit(1)
 
 def main():
 	param_reference = {
-		"hosts": [
-			{
+		"hosts": {
+			"ubuntuosd1":{
 				"hostname": "ubuntuosd1",
 				"ip": "192.168.13.13/16",
 				"monitor_interface": "ens3"
 			},
-			{
+			"ubuntuosd2":{
 				"hostname": "ubuntuosd2",
 				"ip": "192.168.13.14/16",
 				"monitor_interface": "ens3"
 			},
-			{
+			"ubuntuosd3":{
 				"hostname": "ubuntuosd3",
 				"ip": "192.168.13.15/16",
 				"monitor_interface": "ens3"
 			}
-		],
+		},
 		"roles": {
 			"mons": [
 				"ubuntuosd1",
@@ -93,33 +92,116 @@ def main():
 		}
 	}
 
+	#############################################################################################################
+	# SETUP
+	#############################################################################################################
+	test_count = 0
+	if os.path.exists("/usr/share/cockpit/ceph-deploy/params/core_params.json"):
+		os.remove("/usr/share/cockpit/ceph-deploy/params/core_params.json")
+
+	#############################################################################################################
+	# TEST 1
+	#############################################################################################################
 	test_params = {
-		"hosts": [
-			{
-				"hostname": "ubuntuosd4",
+		"hosts":{
+			"ubuntuosd1":{
+				"hostname":"ubuntuosd1",
+				"ip":"192.168.13.13/16",
+				"monitor_interface":"ens3"
 			}
-		],
+		},
 		"roles": {
 			"mons": [
-				"ubuntuosd4"
+				"ubuntuosd1",
 			],
 			"mgrs": [
-				"ubuntuosd4"
+				"ubuntuosd1",
+			],
+			"osds": [
+				"ubuntuosd1"
 			]
 		},
-		"options": {
-			"monitor_interface": "ens3",
-			"public_network": "192.168.0.0/16",
-			"cluster_network": "10.0.0.1",
-			"hybrid_cluster": True
+		"options":{
+			"monitor_interface":"eno1"
 		}
 	}
 
-	test_count = 1
-	test_options = ["-a","-d"]
+	test_options = ["-h",json.dumps(test_params["hosts"]),"-r",json.dumps(test_params["roles"]),"-o",json.dumps(test_params["options"]),"-w"]
+
+	test_count += 1
 	print("############################  TEST {t}  ##############################".format(t=test_count))
-	run_core_params(test_options,test_params)
+	run_core_params(test_options)
 	print("####################################################################")
+
+	#############################################################################################################
+	# TEST 2
+	#############################################################################################################
+	test_params = {
+		"hosts":{
+			"ubuntuosd2":{
+			}
+		},
+		"roles": {
+			"mons": [
+				"ubuntuosd2",
+			],
+			"mgrs": [
+				"ubuntuosd2",
+			],
+			"osds": [
+				"ubuntuosd2"
+			]
+		}
+	}
+
+	test_options = ["-h",json.dumps(test_params["hosts"]),"-r",json.dumps(test_params["roles"]),"-w"]
+
+	test_count += 1
+	print("############################  TEST {t}  ##############################".format(t=test_count))
+	run_core_params(test_options)
+	print("####################################################################")
+
+
+	#############################################################################################################
+	# TEST 3
+	#############################################################################################################
+	test_params = {
+		"roles": {
+			"mons": [
+				"ubuntuosd2",
+			],
+			"mgrs": [
+				"ubuntuosd2",
+			]
+		}
+	}
+
+	test_options = ["-r",json.dumps(test_params["roles"]),"-x"]
+
+	test_count += 1
+	print("############################  TEST {t}  ##############################".format(t=test_count))
+	run_core_params(test_options)
+	print("####################################################################")
+
+	#############################################################################################################
+	# TEST 4
+	#############################################################################################################
+	test_params = {
+		"roles": {
+			"metrics": [
+				"ubuntuosd1"
+			]
+		}
+	}
+
+	test_options = ["-r",json.dumps(test_params["roles"]),"-w"]
+
+	test_count += 1
+	print("############################  TEST {t}  ##############################".format(t=test_count))
+	run_core_params(test_options)
+	print("####################################################################")
+
+
 
 
 if __name__ == "__main__":

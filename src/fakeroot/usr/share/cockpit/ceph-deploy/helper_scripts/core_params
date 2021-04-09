@@ -24,6 +24,7 @@ from contextlib import redirect_stdout
 from dataclasses import dataclass, asdict, field
 import sys
 import json
+import copy
 
 #####################################
 # DATA CLASSES
@@ -100,16 +101,12 @@ class Options:
 #####################################
 # GLOBALS
 #####################################
-global g_ceph_core_params
-global g_param_file_content
-global g_param_file_path
-global g_param_file_dir
-
 g_ceph_core_params = {}
+g_default_params = {}
 g_param_file_content = None
 g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
 g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
-
+g_debug_flag = False
 
 #####################################
 # FUNCTIONS
@@ -120,6 +117,23 @@ def print_to_string(item):
 		output = buf.getvalue().rstrip("\n")
 		return output
 
+def debug_print(item,tag):
+	if g_debug_flag:
+		print("****************************************************************")
+		print("* {t}".format(t=tag))
+		print("****************************************************************")
+		print(item)
+		print("****************************************************************")
+
+def get_default_params():
+	default_params = {}
+	default_params["hosts"] = {}
+	default_roles = Roles()
+	default_params["roles"] = copy.deepcopy(asdict(default_roles))
+	default_options = Options()
+	default_params["options"] = copy.deepcopy(asdict(default_options))
+	return default_params.copy()
+
 def load_param_file():
 	# check to see if file needs to be created.
 	if not os.path.exists(g_param_file_path):
@@ -129,17 +143,12 @@ def load_param_file():
 			os.makedirs(g_param_file_dir)
 		#create new parameter file with default parameters
 		param_file = open(g_param_file_path,"w")
-
-		g_ceph_core_params["hosts"] = []
-		default_roles = Roles()
-		g_ceph_core_params["roles"] = asdict(default_roles).copy()
-		default_options = Options()
-		g_ceph_core_params["options"] = asdict(default_options).copy()
-		
-		param_file.write(json.dumps(g_ceph_core_params,indent=4))
+		d_params = get_default_params()
+		param_file.write(json.dumps(d_params,indent=4))
 		param_file.close()
+		debug_print(json.dumps(json.loads(json.dumps(d_params,indent=4)),indent=4),"PARAM_FILE_CREATED")
 		# return the default json object
-		return json.loads(json.dumps(g_ceph_core_params,indent=4))
+		return json.loads(json.dumps(d_params,indent=4))
 
 	else:
 		#file exists on disk, load contents and return json object.
@@ -154,6 +163,7 @@ def load_param_file():
 			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
 			print(json.dumps(error_msg,indent=4))
 			sys.exit(1)
+		debug_print(json.dumps(parsed_json,indent=4),"PARAM_FILE_LOADED_FROM_DISK")
 		return parsed_json
 
 def check_root():
@@ -164,194 +174,227 @@ def check_root():
 		print(json.dumps(error_msg,indent=4))
 		sys.exit(root_test)
 
+def load_hosts(host_string):
+	# parameters have been provided
+	try:
+		# Load in json
+		hosts_obj = json.loads(host_string)
+	except ValueError as err:
+		# failed to get json from command line arguments
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":"Error parsing hosts JSON" + error_string }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	hosts_dict = {}
+
+	if len(hosts_obj.keys()) > 0:
+		for hostname in hosts_obj.keys():
+			if isinstance(hosts_obj[hostname],dict):
+				if "hostname" in hosts_obj[hostname].keys() and hosts_obj[hostname]["hostname"] != hostname:
+					error_msg = { "error_msg":"Invalid hostname parameter provided for {h} (JSON)".format(h=hostname)}
+					print(json.dumps(error_msg,indent=4))
+					sys.exit(1)
+				else:
+					new_host = Host()
+					new_host.load_dictionary(hosts_obj[hostname])
+					valid_host_dict = asdict(new_host)
+					valid_host_dict["hostname"] = hostname
+					hosts_dict[hostname] = copy.deepcopy(valid_host_dict)
+			else:
+				error_msg = { "error_msg":"Invalid format, host must be a JSON object." }
+				print(json.dumps(error_msg,indent=4))
+				sys.exit(1)
+	else:
+		error_msg = { "error_msg":"Cannot operate on empty hosts (JSON)" }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	return copy.deepcopy(hosts_dict)
+
+def load_roles(roles_string,hosts,param_file_content):
+	debug_print(json.dumps(param_file_content,indent=4),"PARAM FILE CONTENT IN load_roles()")
+	try:
+		roles_obj = json.loads(roles_string)
+	except ValueError as err:
+		# failed to get json from command line arguments
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":"Error parsing roles (JSON)" + error_string }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	roles_dict = {}
+
+	if len(roles_obj.keys()) > 0:
+		new_roles = Roles()
+		new_roles.load_dictionary(roles_obj)
+		for role_name in roles_obj.keys():
+			if role_name not in asdict(new_roles).keys():
+				error_msg = { "error_msg":"Invalid role name {r}".format(r=role_name) }
+				print(json.dumps(error_msg,indent=4))
+				sys.exit(1)
+		valid_roles_dict = copy.deepcopy(roles_obj)
+		roles_dict = copy.deepcopy(valid_roles_dict)
+		for role_name in roles_dict.keys():
+			for hostname in roles_dict[role_name]:
+				if hostname not in hosts.keys() and hostname not in param_file_content["hosts"].keys():
+					error_msg = { "error_msg":"Cannot give host '{h}' a '{r}' role. '{h}' does not exist.".format(h=hostname,r=role_name) }
+					print(json.dumps(error_msg,indent=4))
+					sys.exit(1)
+	else:
+		error_msg = { "error_msg":"Cannot operate on empty roles object (JSON)"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	return copy.deepcopy(roles_dict)
+
+def load_opts(options_string):
+	try:
+		opts_obj = json.loads(options_string)
+	except ValueError as err:
+		# failed to get json from command line arguments
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":"Error parsing options (JSON)" + error_string }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	opts_dict = {}
+
+	if len(opts_obj.keys()) > 0:
+		new_opts = Options()
+		new_opts.load_dictionary(opts_obj)
+		for opt_name in opts_obj.keys():
+			if opt_name not in asdict(new_opts).keys():
+				error_msg = { "error_msg":"Invalid option name {o}".format(o=opt_name) }
+				print(json.dumps(error_msg,indent=4))
+				sys.exit(1)
+		valid_opts_dict = copy.deepcopy(opts_obj)
+		opts_dict = copy.deepcopy(valid_opts_dict)
+	else:
+		error_msg = { "error_msg":"Cannot operate on empty roles object (JSON)"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	return copy.deepcopy(opts_dict)
+
+
+def delete_items(hosts,roles,opts,param_file_content):
+	if bool(opts):
+		for option_field in opts.keys():
+			param_file_content["options"][option_field] = ""
+	if bool(roles):
+		for role_name in roles.keys():
+			for hostname in roles[role_name]:
+				if hostname in param_file_content["roles"][role_name]:
+					param_file_content["roles"][role_name].remove(hostname)
+	if bool(hosts):
+		for host in hosts.keys():
+			if host in param_file_content["hosts"].keys():
+				del param_file_content["hosts"][host]
+			for role_name in param_file_content["roles"].keys():
+				if host in param_file_content["roles"][role_name]:
+					param_file_content["roles"][role_name].remove(host)
+
+	result_msg = write_to_parameter_file(param_file_content)
+	if "success_msg" in result_msg.keys():
+		result_msg["success_msg"] = "Items have been removed"
+		print(json.dumps(result_msg,indent=4))
+		sys.exit(0)
+
+def write_to_parameter_file(new_content):
+	global g_param_file_content
+	global g_param_file_path
+	global g_param_file_dir
+
+	if not os.path.exists(g_param_file_path):
+		# file doesn't exist
+		if not os.path.exists(g_param_file_dir):
+			# file directory doesn't exist, make required directories
+			os.makedirs(g_param_file_dir)
+	#create new parameter file using supplied parameters
+	param_file = open(g_param_file_path,"w")
+	param_file.write(json.dumps(new_content,indent=4))
+	param_file.close()
+	success_msg = { "success_msg":"Parameter file has been updated"}
+	success_msg["old_file_content"] = copy.deepcopy(g_param_file_content)
+	g_param_file_content = load_param_file()
+	success_msg["new_file_content"] = g_param_file_content
+	return success_msg
+
+def merge_with_existing(hosts,roles,opts,param_file_content):
+	debug_print(json.dumps(param_file_content,indent=4),"param_file_content (before merge)")
+	for hostname in hosts.keys():
+		param_file_content["hosts"][hostname] = copy.deepcopy(hosts[hostname])
+	for role_name in roles.keys():
+		param_file_content["roles"][role_name] = copy.deepcopy(list(set(param_file_content["roles"][role_name] + roles[role_name])))
+	for opt_name in opts.keys():
+		param_file_content["options"][opt_name] = copy.deepcopy(opts[opt_name])
+	debug_print(json.dumps(param_file_content,indent=4),"param_file_content (after merge)")
+
+	result_msg = write_to_parameter_file(param_file_content)
+	if "success_msg" in result_msg.keys():
+		print(json.dumps(result_msg,indent=4))
+		sys.exit(0)
+
+def show_existing_file(param_file_content):
+	success_msg = { "success_msg":" parameter file loaded."}
+	success_msg["old_file_content"] = param_file_content
+	print(json.dumps(success_msg,indent=4))
+	sys.exit(0)
 
 #####################################
 # MAIN
 #####################################
 def main():
 	check_root()
-	parser = OptionParser()
-	parser.add_option("-p","--params",action="store",dest="params",default=None,help="parameters for deploying ceph.")
-	parser.add_option("-o","--overwrite",action="store_true",dest="overwrite",default=False,help="overwrite existing parameters")
-	parser.add_option("-a","--add",action="store_true",dest="add",default=False,help="add parameters to existing parameters file")
-	parser.add_option("-s","--show-existing",action="store_true",dest="show_existing",default=False,help="show existing parameter file contents")
-	parser.add_option("-r","--remove",action="store_true",dest="remove",default=False,help="remove parameters from existing parameters file")
-	parser.add_option("-d","--debug",action="store_true",dest="debug",default=False,help="run in debug mode")
+	parser = OptionParser(add_help_option = False)
+	parser.add_option("-h","--hosts",action="store",dest="hosts",default=None)
+	parser.add_option("-r","--roles",action="store",dest="roles",default=None)
+	parser.add_option("-o","--options",action="store",dest="opts",default=None)
+	parser.add_option("-s","--show-existing",action="store_true",dest="show_existing",default=False)
+	parser.add_option("-w","--write",action="store_true",dest="write",default=False)
+	parser.add_option("-x","--delete",action="store_true",dest="delete_items",default=False)
+	parser.add_option("-d","--debug",action="store_true",dest="debug",default=False)
 	(options, args) = parser.parse_args()
+
+	global g_ceph_core_params
+	global g_default_params
+	global g_param_file_content
+	global g_param_file_path
+	global g_param_file_dir
+	global g_debug_flag
+
+	if options.debug:
+		g_debug_flag = True
 
 	# load existing param file content
 	g_param_file_content = load_param_file()
+	g_default_params = get_default_params()
+	hosts = {}
+	roles = {}
+	opts = {}
 
 	if options.show_existing:
 		# show existing file content and exit
-		success_msg = { "success_msg":" parameter file loaded."}
-		success_msg["param_file_content"] = g_param_file_content
-		print(json.dumps(success_msg,indent=4))
-		sys.exit(0)
+		show_existing_file(g_param_file_content)
 
-	if options.add and options.remove:
-		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-a,--add) and remove (-r,--remove) a parameter at the same time"}
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
-	
-	elif options.add and options.overwrite:
-		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-a,--add) and (-o --overwrite) at the same time"}
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
+	if options.hosts != None:
+		hosts = load_hosts(options.hosts)
+		debug_print(json.dumps(hosts,indent=4),"hosts")
 
-	elif options.remove and options.overwrite:
-		error_msg = { "error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params: cannot add (-r,--remove) and (-o --overwrite) at the same time"}
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
+	if options.roles != None:
+		roles = load_roles(options.roles,hosts,g_param_file_content)
+		debug_print(json.dumps(roles,indent=4),"roles")
 
-	if options.params != None:
-		# parameters have been provided
-		try:
-			# Load in json
-			params = json.loads(options.params)
-		except ValueError as err:
-			# failed to get json from command line arguments
-			error_string = print_to_string(err)
-			error_msg = { "error_msg":"Error parsing provided parameters as JSON: " + error_string }
-			print(json.dumps(error_msg,indent=4))
-			sys.exit(1)
-		
-		#we have parsed json objects
-		#####################################
-		# HOSTS
-		#####################################
-		if "hosts" in params.keys():
-			# user has provided information on hosts
-			if isinstance(params["hosts"],list):
-				g_ceph_core_params["hosts"] = []
-				for host in params["hosts"]:
-					if isinstance(host,dict):
-						new_host = Host()
-						new_host.load_dictionary(host)
-						g_ceph_core_params["hosts"].append(asdict(new_host))
-					else:
-						error_msg = { "error_msg":"Invalid format, host must be a JSON object." }
-						print(json.dumps(error_msg,indent=4))
-						sys.exit(1)
-			else:
-				error_msg = { "error_msg":"Invalid format, \"hosts\" must be an array of JSON objects." }
-				print(json.dumps(error_msg,indent=4))
-				sys.exit(1)
+	if options.opts != None:
+		opts = load_opts(options.opts)
+		debug_print(json.dumps(opts,indent=4),"opts")
 
-		#####################################
-		# ROLES
-		#####################################
-		if "roles" in params.keys():
-			# user has provided information on roles.
-			if isinstance(params["roles"],dict):
-				new_roles = Roles()
-				new_roles.load_dictionary(params["roles"])
-				g_ceph_core_params["roles"] = asdict(new_roles)
+	if options.delete_items:
+		delete_items(hosts,roles,opts,copy.deepcopy(g_param_file_content))
 
-
-		#####################################
-		# OPTIONS
-		#####################################
-		if "options" in params.keys():
-			if isinstance(params["options"],dict):
-				new_options = Options()
-				new_options.load_dictionary(params["options"])
-				g_ceph_core_params["options"] = asdict(new_options)
-
-
-		####################################################################################################################
-		#                                              MODIFICATION BEHAVIOR
-		####################################################################################################################
-		#####################################
-		# OVERWRITE
-		#####################################
-		if options.overwrite:
-			# user wants us to overwrite the existing options file.
-			# check to see if file needs to be created.
-			if not os.path.exists(g_param_file_path):
-				# file doesn't exist
-				if not os.path.exists(g_param_file_dir):
-					# file directory doesn't exist, make required directories
-					os.makedirs(g_param_file_dir)
-			#create new parameter file using supplied parameters
-			param_file = open(g_param_file_path,"w")
-			param_file.write(json.dumps(g_ceph_core_params,indent=4))
-			param_file.close()
-			success_msg = { "success_msg":"Parameter file has been overwritten"}
-			file_content = load_param_file()
-			success_msg["param_file_content"] = file_content
-			print(json.dumps(success_msg,indent=4))
-			sys.exit(0)
-
-		#####################################
-		# ADD
-		#####################################
-		if options.add:
-			# user wants us to add the supplied parameters to the existing parameter file.
-			# g_ceph_core_params -> dict of valid parameters sent by user
-			# g_param_file_content -> dict of parameters in parameter file
-			default_options = {}
-			default_options["hosts"] = []
-			default_options["roles"] = asdict(Roles())
-			default_options["options"] = asdict(Options())
-			merged_params = g_param_file_content.copy()
-			for key in g_ceph_core_params.keys():
-				# look at the keys sent by the user.
-				if key in merged_params.keys():
-					#key already exists in parameter file
-					if key == "hosts":
-						for host in g_ceph_core_params[key]:
-							if len(merged_params[key]) != 0:
-								for existing_host in merged_params[key]:
-									if existing_host["hostname"] == host["hostname"]:
-										existing_host = host.copy()
-							else:
-								merged_params[key].append(host.copy())
-					#elif key == "roles":
-					#	for role in merged_params[key].keys():
-					#		if g_ceph_core_params[key][role] != default_options[key][role] and g_ceph_core_params[key][role] != merged_params[key][role]:
-					#			merged_params[key][role] = list(set(merged_params[key][role].copy() + g_ceph_core_params[key][role].copy()))
-					#elif key == "options":
-					#	for option in merged_params[key].keys():
-					#		if g_ceph_core_params[key][option] != default_options[key][option] and g_ceph_core_params[key][option] != merged_params[key][option]:
-					#			merged_params[key][option] = g_ceph_core_params[key][option]
-			print("----------------------------------------------------------------------------------")
-			print("MERGED PARAMS:")
-			print(json.dumps(merged_params,indent=4))
-			print("----------------------------------------------------------------------------------")
-			print("----------------------------------------------------------------------------------")
-			print("PARAM FILE CONTENT AFTER ADD:")
-			print(json.dumps(g_param_file_content,indent=4))
-			print("----------------------------------------------------------------------------------")
-
-		#####################################
-		# DEBUG MODE
-		#####################################
-		if options.debug:
-			print("----------------------------------------------------------------------------------")
-			print("COMMAND LINE ARGUMENTS:")
-			print("----------------------------------------------------------------------------------")
-			arg_string = ""
-			for arg in sys.argv:
-				arg_string += " " +str(arg)
-			print(arg_string)
-			print("----------------------------------------------------------------------------------")
-
-			print("----------------------------------------------------------------------------------")
-			print("PARSED JSON FROM COMMAND LINE:")
-			print(json.dumps(g_ceph_core_params,indent=4))
-			print("----------------------------------------------------------------------------------")
-
-			print("----------------------------------------------------------------------------------")
-			print("PARAM FILE CONTENT:")
-			print(json.dumps(g_param_file_content,indent=4))
-			print("----------------------------------------------------------------------------------")
-
-	else:
-		error_msg = { "error_msg": "Invalid CLI options provided." }
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
-
+	if options.write:
+		merge_with_existing(hosts,roles,opts,copy.deepcopy(g_param_file_content))
 
 
 if __name__ == "__main__":
