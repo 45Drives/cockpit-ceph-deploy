@@ -38,6 +38,24 @@ def run_core_params(options = ["--show-existing"],params = None):
 			print("SCRIPT FAILED")
 			print("####################################################################")
 
+def make_test_options(params,flags):
+	test_options = []
+	if "hosts" in params.keys():
+		test_options.append("-h")
+		test_options.append(json.dumps(params["hosts"]))
+	if "roles" in params.keys():
+		test_options.append("-r")
+		test_options.append(json.dumps(params["roles"]))
+	if "options" in params.keys():
+		test_options.append("-o")
+		test_options.append(json.dumps(params["options"]))
+
+	for flag in flags.keys():
+		if flags[flag] == True:
+			test_options.append(flag)
+	return test_options
+
+
 def main():
 	param_reference = {
 		"hosts": {
@@ -126,8 +144,18 @@ def main():
 		}
 	}
 
-	test_options = ["-h",json.dumps(test_params["hosts"]),"-r",json.dumps(test_params["roles"]),"-o",json.dumps(test_params["options"]),"-w"]
-
+	# -w = write to parameter file
+	# -d = debug mode
+	# -x = delete from parameter file
+	# -s = show existing parameter file
+	test_flags = {
+		"-w":True,
+		"-d":False,
+		"-x":False,
+		"-s":False
+	}
+	
+	test_options = make_test_options(test_params,test_flags)
 	test_count += 1
 	print("############################  TEST {t}  ##############################".format(t=test_count))
 	run_core_params(test_options)
@@ -139,6 +167,7 @@ def main():
 	test_params = {
 		"hosts":{
 			"ubuntuosd2":{
+				"hostname": "ubuntuosd2"
 			}
 		},
 		"roles": {
@@ -154,8 +183,14 @@ def main():
 		}
 	}
 
-	test_options = ["-h",json.dumps(test_params["hosts"]),"-r",json.dumps(test_params["roles"]),"-w"]
+	test_flags = {
+		"-w":True,
+		"-d":False,
+		"-x":False,
+		"-s":False
+	}
 
+	test_options = make_test_options(test_params,test_flags)
 	test_count += 1
 	print("############################  TEST {t}  ##############################".format(t=test_count))
 	run_core_params(test_options)
@@ -176,8 +211,14 @@ def main():
 		}
 	}
 
-	test_options = ["-r",json.dumps(test_params["roles"]),"-x"]
+	test_flags = {
+		"-w":False,
+		"-d":False,
+		"-x":True,
+		"-s":False
+	}
 
+	test_options = make_test_options(test_params,test_flags)
 	test_count += 1
 	print("############################  TEST {t}  ##############################".format(t=test_count))
 	run_core_params(test_options)
@@ -194,14 +235,89 @@ def main():
 		}
 	}
 
-	test_options = ["-r",json.dumps(test_params["roles"]),"-w"]
+	test_flags = {
+		"-w":True,
+		"-d":False,
+		"-x":False,
+		"-s":False
+	}
+
+	test_options = make_test_options(test_params,test_flags)
 
 	test_count += 1
 	print("############################  TEST {t}  ##############################".format(t=test_count))
 	run_core_params(test_options)
 	print("####################################################################")
 
+	#############################################################################################################
+	# TEST 5
+	#############################################################################################################
+	test_params = {
+		"hosts": {
+			"ubuntuosd1":{
+				"hostname": "ubuntuosd1",
+				"ip": "192.168.13.13/16",
+				"monitor_interface": "ens3"
+			},
+			"ubuntuosd2":{
+				"hostname": "ubuntuosd2",
+				"ip": "192.168.13.14/16",
+				"monitor_interface": "ens3"
+			},
+			"ubuntuosd3":{
+				"hostname": "ubuntuosd3",
+				"ip": "192.168.13.15/16",
+				"monitor_interface": "ens3"
+			}
+		},
+		"roles": {
+			"mons": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"mgrs": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"osds": [
+				"ubuntuosd1",
+				"ubuntuosd2",
+				"ubuntuosd3"
+			],
+			"metrics": [
+				"ubuntuosd1"
+			],
+			"mdss": [],
+			"smbs": [],
+			"nfss": [],
+			"iscsigws": [],
+			"rgws": [],
+			"rgwloadbalancers": [],
+			"client": []
+		},
+		"options": {
+			"monitor_interface": "ens3",
+			"public_network": "192.168.0.0/16",
+			"cluster_network": "192.168.0.0/16",
+			"hybrid_cluster": None
+		}
+	}
 
+	test_flags = {
+		"-w":True,
+		"-d":False,
+		"-x":False,
+		"-s":False
+	}
+
+	test_options = make_test_options(test_params,test_flags)
+
+	test_count += 1
+	print("############################  TEST {t}  ##############################".format(t=test_count))
+	run_core_params(test_options)
+	print("####################################################################")
 
 
 if __name__ == "__main__":
