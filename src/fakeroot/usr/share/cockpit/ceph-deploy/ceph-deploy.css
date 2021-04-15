@@ -54,35 +54,56 @@
 }
 
 .cd-host-list-header-row {
+	background-color: #f5f5f5;
 	display: flex;
-	flex-direction: row;
-	align-items:center;
-	background-color: #ddd;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
 }
 
 .cd-host-list-header-text {
-	flex-grow: 3;
-	list-style: none;
-	margin: 15px 10px 10px 10px;
 	font-weight: bold;
+	box-sizing: border-box;
+	flex-grow: 1;
+	width: 30%;  
+	padding: 0.8em 1.2em;
+	overflow: hidden; 
+	list-style: none;
 }
 
 .cd-host-list-header-icon {
+	box-sizing: border-box;
 	flex-grow: 1;
+	width: 5%;  
+	padding: 0.8em 1.2em;
+	overflow: hidden; 
 	list-style: none;
-	margin: 10px 10px 10px 10px;
 }
 
 .cd-host-list-entry {
 	display: flex;
-	flex-direction: row;
-	align-items:center;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+	border-color: #f5f5f5;
 }
 
 .cd-host-list-entry-text {
-	flex-grow: 3;
+	box-sizing: border-box;
+	flex-grow: 1;
+	width: 30%;  
+	padding: 0.8em 1.2em;
+	overflow: hidden; 
 	list-style: none;
-	margin: 10px 10px 10px 10px;
+}
+
+.cd-host-list-entry-icon {
+	box-sizing: border-box;
+	flex-grow: 1;
+	width: 5%;  
+	padding: 0.8em 1.2em;
+	overflow: hidden; 
+	list-style: none;
 }
 
 .cd-host-list-entry-placeholder {
@@ -105,3 +126,87 @@
 	max-width: 25%;
 	margin: 30px 30px 30px 30px;
 }
+
+.modal {
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+}
+
+.cd-field-label {
+	font-weight: bold;
+	margin-right: 5px;
+}
+
+.cd-field {
+	margin-left: 5px;
+	margin-right: 10px;
+}
+
+.cd-form-row {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 5px;
+}
+
+.cd-field-feedback {
+	color: #b22222;
+	margin-left: 5px;
+}
+
+.cd-result-msg {
+	display: none;
+}
+
+.cd-text-output {
+	border:1px solid black;
+	height:50%;
+	width:100%;
+	overflow-y:hidden;
+	overflow-x:scroll;
+}
+
+ #snackbar {
+	visibility: hidden; /* Hidden by default. Visible on click */
+	min-width: 250px; /* Set a default minimum width */
+	margin-left: -125px; /* Divide value of min-width by 2 */
+	background-color: #333; /* Black background color */
+	color: #fff; /* White text color */
+	text-align: center; /* Centered text */
+	border-radius: 2px; /* Rounded borders */
+	padding: 16px; /* Padding */
+	position: fixed; /* Sit on top of the screen */
+	z-index: 1; /* Add a z-index if needed */
+	left: 50%; /* Center the snackbar */
+	bottom: 30px; /* 30px from the bottom */
+  }
+  
+  /* Show the snackbar when clicking on a button (class added with JavaScript) */
+  #snackbar.show {
+	visibility: visible; /* Show the snackbar */
+	/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+	However, delay the fade out process for 5.0 seconds */
+	-webkit-animation: fadein 0.5s, fadeout 0.5s 5.0s;
+	animation: fadein 0.5s, fadeout 0.5s 5.0s;
+  }
+  
+  /* Animations to fade the snackbar in and out */
+  @-webkit-keyframes fadein {
+	from {bottom: 0; opacity: 0;}
+	to {bottom: 30px; opacity: 1;}
+  }
+  
+  @keyframes fadein {
+	from {bottom: 0; opacity: 0;}
+	to {bottom: 30px; opacity: 1;}
+  }
+  
+  @-webkit-keyframes fadeout {
+	from {bottom: 30px; opacity: 1;}
+	to {bottom: 0; opacity: 0;}
+  }
+  
+  @keyframes fadeout {
+	from {bottom: 30px; opacity: 1;}
+	to {bottom: 0; opacity: 0;}
+  } 

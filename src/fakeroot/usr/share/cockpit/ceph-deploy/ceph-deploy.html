@@ -22,14 +22,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
-  <link rel="stylesheet" href="ceph-deploy.css">
-  <!-- <link rel="stylesheet" href="w3.css"> -->
+  <link rel="stylesheet" href="ceph-deploy.css" type="text/css">
   <script src="../base1/cockpit.js"></script>
   <script src="../manifests.js"></script>
   <script src="../*/po.js"></script>
   <script defer src="ceph-deploy.js"></script>
-
 </head>
+
 <body>
   <div id="cd_host_configuration_content">
     <div class="cd-block">
@@ -38,7 +37,7 @@
         <div class="panel-heading cd-row">
           <h3 class="panel-title cd-row-child">Host Information</h3>
           <div class="cd-row-right cd-row-child">
-            <button class="button-fallback-default pf-c-button pf-m-secondary" id="new-host-btn">
+            <button class="button button-fallback-default pf-c-button pf-m-secondary" id="new-host-btn">
               <span class="button-symbol">+</span>New Host
             </button>
           </div>
@@ -52,7 +51,7 @@
               <div class="cd-host-list-header-icon"></div>
               <div class="cd-host-list-header-icon"></div>
             </div>
-            <div class="cd-host-list">
+            <div class="cd-host-list" id="cd-host-list">
               <div class="cd-host-list-entry-placeholder" id="cd-host-placeholder">
                 No hosts have been configured. Click the "+New Host" button to add a new host.
               </div>
@@ -60,35 +59,10 @@
           </div>
         </div>
       </div>
-  
-      <!--
-        <div class="cd-col-50 cd-row-child">
-          <form role="form">
-            <div class="form-group">
-              <label for="hostname_field">
-                hostname
-              </label>
-              <input type="text" class="form-control" id="hostname_field" />
-            </div>
-            <div class="form-group">
-              <label for="ip_field">
-                IP Address
-              </label>
-              <input type="text" class="form-control" id="ip_field" />
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Submit
-            </button>
-          </form>
-        </div>
-      
-      -->
-  
+      <div class="cd-bottom-nav-button-group">
+          <button type="button" class="btn active btn-primary disabled"> Prev </button>
+          <button type="button" class="btn btn-primary"> Next </button>
       </div>
-        <div class="cd-bottom-nav-button-group">
-            <button type="button" class="btn active btn-primary disabled"> Prev </button>
-            <button type="button" class="btn btn-primary"> Next </button>
-        </div>
     </div>
   </div>
 
@@ -96,33 +70,39 @@
 
   <!-- Add Host Modal Menu -->
 
-  <div id="add_host_modal" class="modal" role="dialog">
+  <div id="add-host-modal" class="modal" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <span class="close" id="close-add-host">&times;</span>
           <h4 class="modal-title">Add New Host</h4>
         </div>
+
         <div class="modal-body col-45d flex-45d-stretch">
-          <div class="form-row">
-            <label class="label-45d" for="new-host-name">hostname</label>
-            <div class="input-feedback-hostname">
-              <input class="ct-input" type="text" aria-invalid="false" id="new-host-name"/>
-              <div class="input-feedback" id="add-host-modal-feedback"></div>
-            </div>
+
+          <div class="cd-form-row">
+            <label class="cd-field-label" for="new-hostname-field">hostname</label>
+              <input class="ct-input cd-field" type="text" aria-invalid="false" id="new-hostname-field"/>
+              <div class="cd-field-feedback" id="new-hostname-field-feedback"></div>
           </div>
-          <div id="add-host-modal-info">
-            <span id="add-host-modal-info-icon"></span>
-            <span id="add-host-modal-info-text"></span>
+
+          <div class="cd-row cd-result-msg" id="add-host-result-msg">
+            <h3 class="cd-field-label" id="add-host-result-msg-label"></h3>
+            <div class="cd-text-output" id="add-host-result-msg-content"></div>
           </div>
+
         </div>
-        <div class="modal-footer row-45d flex-align-right">
+        
+        <div class="modal-footer cd-row-right">
           <button type="button" class="button-fallback-default pf-c-button pf-m-secondary" id="cancel-add-host">Cancel</button>
           <button type="button" class="button-fallback-primary pf-c-button pf-m-primary" id="continue-add-host">Add</button>
         </div>
+      
       </div>
     </div>
   </div>
+
+  <div id="snackbar"></div>
 
 </body>
 </html>

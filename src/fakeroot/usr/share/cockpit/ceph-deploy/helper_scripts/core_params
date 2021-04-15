@@ -14,17 +14,15 @@
 ###############################################################################
 
 from optparse import OptionParser
-import json
+from contextlib import redirect_stdout
+from dataclasses import dataclass, asdict, field
 import sys
 import io
 import subprocess
 import os
-from contextlib import redirect_stdout
-
-from dataclasses import dataclass, asdict, field
-import sys
 import json
 import copy
+from typing import List
 
 #####################################
 # DATA CLASSES
@@ -51,17 +49,28 @@ class Host:
 
 @dataclass()
 class Roles:
-	mons: list[str] = field(default_factory=list)
-	mgrs: list[str] = field(default_factory=list)
-	osds: list[str] = field(default_factory=list)
-	metrics: list[str] = field(default_factory=list)
-	mdss: list[str] = field(default_factory=list)
-	smbs: list[str] = field(default_factory=list)
-	nfss: list[str] = field(default_factory=list)
-	iscsigws: list[str] = field(default_factory=list)
-	rgws: list[str] = field(default_factory=list)
-	rgwloadbalancers: list[str] = field(default_factory=list)
-	client: list[str] = field(default_factory=list)
+	mons: List = field(default_factory=lambda: [])
+	mgrs: List = field(default_factory=lambda: [])
+	osds: List = field(default_factory=lambda: [])
+	metrics: List = field(default_factory=lambda: [])
+	mdss: List = field(default_factory=lambda: [])
+	smbs: List = field(default_factory=lambda: [])
+	nfss: List = field(default_factory=lambda: [])
+	iscsigws: List = field(default_factory=lambda: [])
+	rgws: List = field(default_factory=lambda: [])
+	rgwloadbalancers: List = field(default_factory=lambda: [])
+	client: List = field(default_factory=lambda: [])
+	#mons: list[str] = field(default_factory=list)
+	#mgrs: list[str] = field(default_factory=list)
+	#osds: list[str] = field(default_factory=list)
+	#metrics: list[str] = field(default_factory=list)
+	#mdss: list[str] = field(default_factory=list)
+	#smbs: list[str] = field(default_factory=list)
+	#nfss: list[str] = field(default_factory=list)
+	#iscsigws: list[str] = field(default_factory=list)
+	#rgws: list[str] = field(default_factory=list)
+	#rgwloadbalancers: list[str] = field(default_factory=list)
+	#client: list[str] = field(default_factory=list)
 
 	def load_dictionary(self, dict_variable: dict):
 		ret_val = False
@@ -104,8 +113,8 @@ class Options:
 g_ceph_core_params = {}
 g_default_params = {}
 g_param_file_content = None
-g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
-g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
+g_param_file_path = "/usr/share/ceph-ansible/ceph-deploy/params/core_params.json"
+g_param_file_dir = "/usr/share/ceph-ansible/ceph-deploy/params"
 g_debug_flag = False
 
 #####################################
@@ -342,6 +351,14 @@ def show_existing_file(param_file_content):
 	print(json.dumps(success_msg,indent=4))
 	sys.exit(0)
 
+def print_args_to_string():
+	arguments = len(sys.argv) - 1
+	position = 1
+	arg_string = ""
+	while (arguments >= position):
+		arg_string += "Parameter %i: %s\n" % (position, sys.argv[position])
+		position = position + 1
+
 #####################################
 # MAIN
 #####################################
@@ -366,6 +383,8 @@ def main():
 
 	if options.debug:
 		g_debug_flag = True
+		debug_print(print_args_to_string(),"command line args: ")
+
 
 	# load existing param file content
 	g_param_file_content = load_param_file()

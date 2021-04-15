@@ -6,7 +6,7 @@ import json
 import os
 
 def run_core_params(options = ["--show-existing"],params = None):
-	script_path = "/home/mark/dev/cockpit-ceph-deploy/src/fakeroot/usr/share/cockpit/ceph-deploy/helper_scripts/core_params"
+	script_path = "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params"
 	if params != None:
 		command_list = [script_path,"-p",json.dumps(params)]
 		for option in options:
