@@ -86,37 +86,67 @@ function add_host_request(){
 
 function add_host(){
     show_modal_dialog("add-host-modal");
-    document.getElementById("new-hostname-field").addEventListener("input",check_host_name);
+    document.getElementById("new-hostname-field").addEventListener("input",function(){
+		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
+	document.getElementById("new-ip-field").addEventListener("input",function(){
+		check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
+	document.getElementById("new-interface-field").addEventListener("input",function(){
+		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
     document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("continue-add-host").addEventListener("click",add_host_request);
 }
 
-function check_host_name() {
-	var host_name = document.getElementById("new-hostname-field").value;
-	var button = document.getElementById("continue-add-host");
-	var info_message = document.getElementById("new-hostname-field-feedback");
+function check_name_field(name_field_id,feedback_field_id,button_id,label_name,required_flag) {
+	var field_text = document.getElementById(name_field_id).value;
+	var button = document.getElementById(button_id);
+	var info_message = document.getElementById(feedback_field_id);
 	info_message.innerText = " ";
-	if(host_name.length === 0){
+	if(field_text.length === 0 && required_flag){
 		button.disabled = true;
-		info_message.innerText = "hostname cannot be empty.";
+		info_message.innerText = label_name + " cannot be empty.";
 		return false;
-	}else if(!host_name.match(/^[a-z_][a-z0-9_-]*[$]?$/)){
+	}else if(field_text.length > 0 && !field_text.match(/^[a-z_][a-z0-9_-]*[$]?$/)){
 		button.disabled = true;
 		var invalid_chars = [];
-		if(host_name[0].match(/[^a-z_]/))
-			invalid_chars.push("'"+host_name[0]+"'");
-		for(let char of host_name.slice(1,-1))
+		if(field_text[0].match(/[^a-z_]/))
+			invalid_chars.push("'"+field_text[0]+"'");
+		for(let char of field_text.slice(1,-1))
 			if(char.match(/[^a-z0-9_-]/))
 				invalid_chars.push("'"+char+"'");
-		if(host_name[host_name.length - 1].match(/[^a-z0-9_\-$]/))
-			invalid_chars.push("'"+host_name[host_name.length - 1]+"'");
-		info_message.innerText = "hostname contains invalid characters: " + invalid_chars.join(", ");
+		if(field_text[field_text.length - 1].match(/[^a-z0-9_\-$]/))
+			invalid_chars.push("'"+field_text[field_text.length - 1]+"'");
+		info_message.innerText = label_name + " contains invalid characters: \n" + invalid_chars.join(", ");
 		return false;
 	}
 	button.disabled = false;
 	return true;
 }
+
+function check_ip_field(field_id,feedback_field_id,button_id,label_name,required_flag) {
+	var ip_string = document.getElementById(field_id).value;
+	var button = document.getElementById(button_id);
+	var info_message = document.getElementById(feedback_field_id);
+	info_message.innerText = " ";
+	if(ip_string.length === 0 && required_flag){
+		button.disabled = true;
+		info_message.innerText = label_name + " cannot be empty.";
+		return false;
+	}else if(ip_string.length > 0 && !validate_ip_address(ip_string)){
+		info_message.innerText = label_name + " invalid ip format.";
+		button.disabled = true;
+		return false;
+	}
+	button.disabled = false;
+	return true;
+}
+
+function validate_ip_address(ipaddress) {  
+	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {  
+	  return (true)  
+	}  
+	return (false)  
+}  
 
 function show_modal_dialog(id){
     var modal = document.getElementById(id);
