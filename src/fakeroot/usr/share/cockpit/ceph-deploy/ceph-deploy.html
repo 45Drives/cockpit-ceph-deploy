@@ -30,7 +30,28 @@
 </head>
 
 <body>
-  <div id="cd_host_configuration_content">
+
+  <div id="step-0" class="hidden">
+    <div class="cd-block">
+      <h3 class="cd-header">ceph-deploy: requirements</h3>
+      <div class="panel panel-default cd-panel">
+        <div class="panel-heading cd-row">
+          <h3 class="panel-title cd-row-child">Pre-configuration</h3>
+        </div>
+        <div class="panel-body">
+          <p class="preconfig-heading">Please ensure that the following network steps are completed before proceeding:</p>
+          <ul>
+            <li class="preconfig-step"><i class="fa fa-sitemap"></i> Each host should be able to ping all other hosts using a hostname.</li>
+            <li class="preconfig-step"><i class="fa fa-wrench"></i> Any bonds that are required have already been configured and tested.</li>
+            <li class="preconfig-step"><i class="fa fa-key"></i> ssh keys have been generated on the administrator node and passwordless ssh to all hosts is working.</li>
+            <li class="preconfig-step"><i class="fa fa-download"></i> The ceph-ansible package is installed on the administrator node.</li>
+          </ul>
+          <p class="preconfig-heading">Once these requirements are met, click "Next" to move to Step 1: Host Configuration.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="step-1" class="hidden">
     <div class="cd-block">
       <h3 class="cd-header">Step 1: Configure Hosts</h3>
       <div class="panel panel-default cd-panel">
@@ -52,18 +73,34 @@
               <div class="cd-host-list-header-icon"></div>
             </div>
             <div class="cd-host-list" id="cd-host-list">
-              <div class="cd-host-list-entry-placeholder" id="cd-host-placeholder">
-                No hosts have been configured. Click the "+New Host" button to add a new host.
-              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="cd-bottom-nav-button-group">
-          <button type="button" class="btn active btn-primary disabled"> Prev </button>
-          <button type="button" class="btn btn-primary"> Next </button>
+    </div>
+  </div>
+  <div id="step-2" class="hidden">
+    <div class="cd-block">
+      <h3 class="cd-header">Step 2: Assign Roles</h3>
+      <div class="panel panel-default cd-panel">
+        <div class="panel-heading cd-row">
+          <h3 class="panel-title cd-row-child">Role Assignment</h3>
+          <div class="cd-row-right cd-row-child">
+            <button class="button button-fallback-default pf-c-button pf-m-secondary" id="new-role-btn">
+              <span class="button-symbol">+</span>New Roles
+            </button>
+          </div>
+        </div>
+        <div class="panel-body">
+          PLACEHOLDER TEXT...
+        </div>
       </div>
     </div>
+  </div>
+
+  <div class="cd-bottom-nav-button-group">
+    <button type="button" class="btn active btn-primary" id="prev-step-btn"> Prev </button>
+    <button type="button" class="btn btn-primary" id="next-step-btn"> Next </button>
   </div>
 
   <!-- Modal Menus -->
@@ -75,35 +112,33 @@
       <div class="modal-content">
         <div class="modal-header">
           <span class="close" id="close-add-host">&times;</span>
-          <h4 class="modal-title">Add New Host</h4>
+          <h4 class="modal-title" id="add-host-modal-title">Add New Host</h4>
         </div>
-
-        <div class="modal-body col-45d flex-45d-stretch">
-
-          <div class="cd-form-row">
-            <label class="cd-field-label" for="new-hostname-field">hostname</label>
+        <div class="modal-body">
+          <div class="ct-form">
+            <label class="control-label" for="new-hostname-field">hostname</label>
+            <div class="ct-validation-wrapper">
               <input class="ct-input cd-field" type="text" aria-invalid="false" id="new-hostname-field"/>
               <div class="cd-field-feedback" id="new-hostname-field-feedback"></div>
-          </div>
-
-          <div class="cd-form-row">
-            <label class="cd-field-label" for="new-ip-field">ip</label>
+            </div>
+  
+            <label class="control-label" for="new-ip-field">ip (optional)</label>
+            <div class="ct-validation-wrapper">
               <input class="ct-input cd-field" type="text" aria-invalid="false" id="new-ip-field"/>
               <div class="cd-field-feedback" id="new-ip-field-feedback"></div>
-          </div>
+            </div>
 
-
-          <div class="cd-form-row">
-            <label class="cd-field-label" for="new-interface-field">monitor_interface</label>
+            <label class="control-label" for="new-interface-field">monitor_interface (optional)</label>
+            <div class="ct-validation-wrapper">
               <input class="ct-input cd-field" type="text" aria-invalid="false" id="new-interface-field"/>
               <div class="cd-field-feedback" id="new-interface-field-feedback"></div>
+            </div>
           </div>
 
           <div class="cd-row cd-result-msg" id="add-host-result-msg">
             <h3 class="cd-field-label" id="add-host-result-msg-label"></h3>
             <div class="cd-text-output" id="add-host-result-msg-content"></div>
           </div>
-
         </div>
         
         <div class="modal-footer cd-row-right">
@@ -116,6 +151,7 @@
   </div>
 
   <div id="snackbar"></div>
+  <div id="add-host-snackbar"></div>
 
 </body>
 </html>
