@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import subprocess
+import io
+from shutil import copyfile
+from contextlib import redirect_stdout
+
+g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
+g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
+g_host_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/hosts"
+g_host_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
+g_ansible_file_path = "/usr/share/ceph-ansible/hosts"
+
+def print_to_string(item):
+	with io.StringIO() as buf, redirect_stdout(buf):
+		print(item)
+		output = buf.getvalue().rstrip("\n")
+		return output
+
+def get_parameters(path):
+	if os.path.exists(path) and os.path.isfile(path):
+		#file exists on disk, load contents and return json object.
+		f = open(path,"r")
+		param_file_content = print_to_string(f.read())
+		f.close()
+		try:
+			parsed_json = json.loads(param_file_content)
+		except ValueError as err:
+			# failed to get json from command line arguments
+			error_string = print_to_string(err)
+			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
+			print(json.dumps(error_msg,indent=4))
+			sys.exit(1)
+		return parsed_json
+	else:
+		error_msg = { "error_msg":"File not found ({p}): ".format(p=path) }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+def make_host_file(roles_dict,path,dir,ansible_path):
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	if os.path.exists(path) and os.path.isfile(path):
+		os.remove(path)
+	
+	host_file = open(path,"w")
+	for role in roles_dict.keys():
+		comment = "#" if (len(roles_dict[role]) == 0) else "" 
+		host_file.write("{c}[{r}]\n".format(c=comment,r=role))
+		for host in roles_dict[role]:
+			host_file.write(host + "\n")
+		host_file.write("\n")
+	host_file.write("\n")
+	host_file.close()
+
+	# overwrite the hosts file in the ceph-ansible directory
+	try:
+		copyfile(path,ansible_path)
+	except OSError as err:
+		# print json formatted error
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":error_string}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+def main():
+	global g_param_file_path
+	global g_param_file_dir
+	global g_host_file_path
+	global g_ansible_file_path
+	params = get_parameters(g_param_file_path)
+	make_host_file(params["roles"],g_host_file_path,g_host_file_dir,g_ansible_file_path)
+	success_msg = { "success_msg":"hosts file created successfully","path":g_ansible_file_path}
+	print(json.dumps(success_msg,indent=4))
+	sys.exit(0)
+
+if __name__ == "__main__":
+	main()

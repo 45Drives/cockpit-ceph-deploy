@@ -108,6 +108,7 @@ function add_host(){
     document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("continue-add-host").addEventListener("click",add_host_request);
+	document.getElementById("continue-add-host").innerText = "Add";
 }
 
 function check_name_field(name_field_id,feedback_field_id,button_id,label_name,required_flag) {
@@ -173,6 +174,80 @@ function hide_modal_dialog(id) {
 	document.getElementById("new-hostname-field").value = "";
 }
 
+function update_role_info(hosts_json,roles_json){
+	//clear out the role-div element
+	let role_div = document.getElementById("role-div");
+	if(role_div != null){role_div.innerHTML = "";}
+
+	//create the new role table
+	let role_table = document.createElement("table");
+	role_table.classList.add("role-table");
+	role_table.id = "role-table";
+
+	//create a blank th entry to start then create a header for each role
+	let role_table_header_row = document.createElement("tr");
+	role_table_header_row.appendChild(document.createElement("th"));
+	for (let key of Object.keys(roles_json)){
+		let th = document.createElement("th");
+		th.innerText = key;
+		role_table_header_row.appendChild(th);
+	}
+	role_table.appendChild(role_table_header_row); //add header row to table
+
+	//create a new row for each host
+	for (let host_key of Object.keys(hosts_json)) {
+		let role_table_host_row = document.createElement("tr");
+		role_table_host_row.id = "role-table-host-row-" + host_key; // eg: id="role-table-host-row-hostname1"
+		role_table_host_row.classList.add("role-table-host-row");
+		let role_table_host_name = document.createElement("td");
+		role_table_host_name.innerText = host_key;
+		role_table_host_row.appendChild(role_table_host_name);
+		for (let role_key of Object.keys(roles_json)){
+			//create a cell and checkbox for each role.
+			let role_checkbox_td = document.createElement("td");
+			let role_checkbox = document.createElement("input");
+			role_checkbox.type = "checkbox";
+			role_checkbox.id = role_key + "-" + host_key + "-checkbox"; //eg "osds-hostname1-checkbox"
+			if(roles_json[role_key].includes(host_key)){
+				// ensure that checkbox is pre-checked if hostname is found in role list.
+				role_checkbox.checked = true; 
+			}
+			role_checkbox_td.appendChild(role_checkbox);
+			role_table_host_row.appendChild(role_checkbox_td);
+		}
+		role_table.appendChild(role_table_host_row); // add row to table
+	}
+	role_div.appendChild(role_table); // add table to div
+}
+
+function update_options_info(options_json){
+	let monitor_interface_field = document.getElementById("options-interface-field");
+	let cluster_network_field = document.getElementById("options-cluster-network-field");
+	let public_network_field = document.getElementById("options-public-network-field");
+	let hybrid_cluster_checkbox = document.getElementById("options-hybrid-cluster-checkbox");
+
+	document.getElementById("global-options-btn").disabled = true;
+
+	if(monitor_interface_field && cluster_network_field && public_network_field && hybrid_cluster_checkbox){
+		monitor_interface_field.value = options_json["monitor_interface"];
+		cluster_network_field.value = options_json["cluster_network"];
+		public_network_field.value = options_json["public_network"];
+		hybrid_cluster_checkbox.checked = options_json["hybrid_cluster"];
+
+		cluster_network_field.addEventListener("input",function(){
+			check_ip_field("options-cluster-network-field","options-cluster-network-field-feedback","global-options-btn","cluster_network",true)});
+
+		public_network_field.addEventListener("input",function(){
+			check_ip_field("options-public-network-field","options-public-network-field-feedback","global-options-btn","public_network",false)});
+		
+		monitor_interface_field.addEventListener("input",function(){
+			check_name_field("options-interface-field","options-interface-field-feedback","global-options-btn","monitor_interface",true)});
+
+		hybrid_cluster_checkbox.addEventListener("change",function(){
+			document.getElementById("global-options-btn").removeAttribute("disabled")});
+	}
+}
+
 function get_param_file_content(){
 	var core_params = null;
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-s"];
@@ -195,6 +270,8 @@ function get_param_file_content(){
 			msg_content = result_json.success_msg;
 			if(result_json.hasOwnProperty("old_file_content")){
 				update_host_info(result_json.old_file_content.hosts);
+				update_role_info(result_json.old_file_content.hosts, result_json.old_file_content.roles);
+				update_options_info(result_json.old_file_content.options);
 				core_params = result_json.old_file_content;
 			}
 		}else{
@@ -223,7 +300,6 @@ function remove_host(hostname){
 			var msg_label = "";
 			var msg_content = "";
 			var msg_color = "";
-			console.log("Result: ",data);
 			try {
 				result_json = JSON.parse(data);
 			} catch (e) {
@@ -233,7 +309,7 @@ function remove_host(hostname){
 			}
 			if (result_json.hasOwnProperty("success_msg")){
 				msg_color = "#20a030";
-				msg_label = "Add Host: ";
+				msg_label = "Remove Host: ";
 				msg_content = result_json.success_msg;
 			}else{
 				msg_color = "#bd3030";
@@ -283,6 +359,7 @@ function edit_host(hostname,ip,monitor_interface){
 	document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
 	document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
 	document.getElementById("continue-add-host").addEventListener("click",add_host_request);
+	document.getElementById("continue-add-host").innerText = "Save";
 }
 
 function update_host_info(hosts_json){
@@ -354,6 +431,155 @@ function show_step_content(step){
 	if(step_content != null){step_content.classList.remove("hidden");}
 }
 
+function update_role_request(){
+
+	// we can update the roles assigned to each host by performing two subsequent requests.
+	// we can remove any unchecked roles first, then we can add in all of the checked roles.
+
+	let role_request_template = {
+        "mons": [],
+        "mgrs": [],
+        "osds": [],
+        "metrics": [],
+        "mdss": [],
+        "smbs": [],
+        "nfss": [],
+        "iscsigws": [],
+        "rgws": [],
+        "rgwloadbalancers": [],
+        "client": []
+	}
+
+	let add_role_request_json = {
+        "mons": [],
+        "mgrs": [],
+        "osds": [],
+        "metrics": [],
+        "mdss": [],
+        "smbs": [],
+        "nfss": [],
+        "iscsigws": [],
+        "rgws": [],
+        "rgwloadbalancers": [],
+        "client": []
+	}
+
+	let remove_role_request_json = {
+        "mons": [],
+        "mgrs": [],
+        "osds": [],
+        "metrics": [],
+        "mdss": [],
+        "smbs": [],
+        "nfss": [],
+        "iscsigws": [],
+        "rgws": [],
+        "rgwloadbalancers": [],
+        "client": []
+	}
+
+	//look through the role table and determine the state of each checkbox. 
+	let role_table_host_rows = document.getElementsByClassName("role-table-host-row");
+	for(let i = 0; i<role_table_host_rows.length; i++){
+		// get the hostname from the id string of the tr element.
+		let hostname = role_table_host_rows[i].id.substring("role-table-host-row-".length);
+		for (let role_key of Object.keys(role_request_template)) {
+			//construct the id string of the checkbox: example "mons-hostname1-checkbox"
+			let checkbox_id_string = role_key + "-" + hostname + "-checkbox";
+			let role_checkbox = document.getElementById(checkbox_id_string);
+			if(role_checkbox != null){
+				if(role_checkbox.checked){
+					// The checkbox is checked, add the hostname to the add_role_request
+					add_role_request_json[role_key].push(hostname);
+				}else{
+					// The checkbox is not checked, add the hostname to the remove_role_request
+					remove_role_request_json[role_key].push(hostname);
+				}
+			}
+		}
+	}
+
+	// perform the remove request first
+	var remove_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-r",JSON.stringify(remove_role_request_json),"-x"];
+	var remove_result_json = null;
+	var remove_role_proc = cockpit.spawn(remove_spawn_args, {superuser: "require"});
+	remove_role_proc.done(function(data) {
+		// removal was successful, now perform the add role request.
+		var add_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-r",JSON.stringify(add_role_request_json),"-w"];
+		var add_result_json = null;
+		var add_role_proc = cockpit.spawn(add_spawn_args, {superuser: "require"});
+		add_role_proc.done(function(data) {
+			show_snackbar_msg("Message: ","Roles have been updated.", "#20a030","update-roles-snackbar");
+			get_param_file_content();
+		});
+		add_role_proc.fail(function(ex, data) {
+			console.log("add_role_proc (FAIL): ",data);
+			show_snackbar_msg("Error: ","Failed to add role(s)","#bd3030","update-roles-snackbar");
+		});
+	});
+	remove_role_proc.fail(function(ex, data) {
+		console.log("remove_role_proc (FAIL): ",data);
+		show_snackbar_msg("Error: ","Failed to remove role(s)","#bd3030","update-roles-snackbar");
+	});
+}
+
+function update_options_request(){
+
+	let options_request_json = {
+		"monitor_interface": document.getElementById("options-interface-field").value,
+		"cluster_network": document.getElementById("options-cluster-network-field").value,
+		"public_network": document.getElementById("options-public-network-field").value,
+		"hybrid_cluster": document.getElementById("options-hybrid-cluster-checkbox").checked
+	};
+
+	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
+	var result_json = null;
+	var options_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	options_proc.done(function(data){
+		show_snackbar_msg("Message: ","Global options have been updated", "#20a030","update-options-snackbar");
+		get_param_file_content();
+	});
+	options_proc.fail(function(ex, data) {
+		console.log("options_proc (FAIL): ",data);
+		show_snackbar_msg("Error: ","Failed to modify global options","#bd3030","update-roles-snackbar");
+	});
+}
+
+function generate_host_file(){
+	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_hosts"];
+	var result_json = null;
+	var generate_host_file_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	generate_host_file_proc.done(function(data){
+		let msg_color = "";
+		let msg_label = "";
+		let msg_content = "";
+		try {
+			result_json = JSON.parse(data);
+		} catch (e) {
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		if (result_json.hasOwnProperty("success_msg")){
+			msg_color = "#20a030";
+			msg_label = "Message: ";
+			msg_content = result_json.success_msg;
+			var host_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
+			host_file_content_proc.done(function(data){
+				document.getElementById("host-file-content").innerText = data;
+			});
+			host_file_content_proc.fail(function(ex,data){
+				console.log("host_file_content_proc (FAIL): ",data);
+			});
+		}else{
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		show_snackbar_msg(msg_label,msg_content,msg_color,"snackbar");
+	});
+}
+
 function main()
 {
 	let root_check = cockpit.permission({ admin: true });
@@ -370,6 +596,9 @@ function main()
 				get_param_file_content();
 				
 				document.getElementById("new-host-btn").addEventListener("click",add_host);
+				document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
+				document.getElementById("global-options-btn").addEventListener("click",update_options_request);
+				document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
 
 				document.getElementById("next-step-btn").addEventListener("click",() => {
 					var next_step = Number(localStorage.getItem("current_step")??"0") + 1;

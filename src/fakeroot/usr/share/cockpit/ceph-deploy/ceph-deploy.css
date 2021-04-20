@@ -205,7 +205,7 @@
 	bottom: 30px; /* 30px from the bottom */
   }
 
-  #add-host-snackbar {
+  #add-host-snackbar, #update-roles-snackbar, #update-options-snackbar {
 	visibility: hidden; /* Hidden by default. Visible on click */
 	min-width: 250px; /* Set a default minimum width */
 	margin-left: -125px; /* Divide value of min-width by 2 */
@@ -225,16 +225,16 @@
 	visibility: visible; /* Show the snackbar */
 	/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
 	However, delay the fade out process for 5.0 seconds */
-	-webkit-animation: fadein 0.5s, fadeout 0.5s 5.0s;
-	animation: fadein 0.5s, fadeout 0.5s 5.0s;
+	-webkit-animation: fadein 0.5s, fadeout 0.5s 10.0s;
+	animation: fadein 0.5s, fadeout 0.5s 10.0s;
   }
 
-  #add-host-snackbar.show {
+  #add-host-snackbar.show , #update-roles-snackbar.show, #update-options-snackbar.show{
 	visibility: visible; /* Show the snackbar */
 	/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
 	However, delay the fade out process for 5.0 seconds */
-	-webkit-animation: fadein 0.5s, fadeout 0.5s 5.0s;
-	animation: fadein 0.5s, fadeout 0.5s 5.0s;
+	-webkit-animation: fadein 0.5s, fadeout 0.5s 10.0s;
+	animation: fadein 0.5s, fadeout 0.5s 10.0s;
   }
   
   /* Animations to fade the snackbar in and out */
@@ -547,4 +547,27 @@
 .preconfig-heading {
 	font-weight: bold;
 	padding: 1em;
+}
+
+.role-table {
+    width: 100%;
+}
+
+th,td {
+    padding: 1em 0 0 1em;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.cd-field-checkbox {
+    justify-self: flex-start;
+    align-self: flex-start;
+}
+
+#host-file-content {
+    font-size: small;
 }

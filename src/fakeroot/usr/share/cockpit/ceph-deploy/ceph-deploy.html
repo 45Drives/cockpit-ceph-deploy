@@ -31,6 +31,8 @@
 
 <body>
 
+  <!-- STEP 0: -->
+
   <div id="step-0" class="hidden">
     <div class="cd-block">
       <h3 class="cd-header">ceph-deploy: requirements</h3>
@@ -51,6 +53,9 @@
       </div>
     </div>
   </div>
+  
+  <!-- STEP 1: -->
+  
   <div id="step-1" class="hidden">
     <div class="cd-block">
       <h3 class="cd-header">Step 1: Configure Hosts</h3>
@@ -79,24 +84,98 @@
       </div>
     </div>
   </div>
+
+  <!-- STEP 2: -->
+
   <div id="step-2" class="hidden">
     <div class="cd-block">
       <h3 class="cd-header">Step 2: Assign Roles</h3>
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
           <h3 class="panel-title cd-row-child">Role Assignment</h3>
-          <div class="cd-row-right cd-row-child">
-            <button class="button button-fallback-default pf-c-button pf-m-secondary" id="new-role-btn">
-              <span class="button-symbol">+</span>New Roles
-            </button>
-          </div>
         </div>
         <div class="panel-body">
-          PLACEHOLDER TEXT...
+          <div id="role-div">
+          </div>
+
+          <div class="cd-row-right cd-row-child">
+            <button class="btn active btn-primary" id="update-roles-btn">
+              Update Roles
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- STEP 3: -->
+
+  <div id="step-3" class="hidden">
+    <div class="cd-block">
+      <h3 class="cd-header">Step 3: Global Options</h3>
+      <div class="panel panel-default cd-panel">
+        <div class="panel-heading cd-row">
+          <h3 class="panel-title cd-row-child">Global Options</h3>
+        </div>
+        <div class="panel-body">
+          <div class="ct-form">
+            <label class="control-label" for="options-interface-field">monitor_interface</label>
+            <div class="ct-validation-wrapper">
+              <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-interface-field"/>
+              <div class="cd-field-feedback" id="options-interface-field-feedback"></div>
+            </div>
+
+            <label class="control-label" for="options-cluster-network-field">cluster_network</label>
+            <div class="ct-validation-wrapper">
+              <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-cluster-network-field"/>
+              <div class="cd-field-feedback" id="options-cluster-network-field-feedback"></div>
+            </div>
+
+            <label class="control-label" for="options-public-network-field">public_network (optional)</label>
+            <div class="ct-validation-wrapper">
+              <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-public-network-field"/>
+              <div class="cd-field-feedback" id="options-public-network-field-feedback"></div>
+            </div>
+
+            <label class="control-label" for="options-hybrid-cluster-checkbox">hybrid_cluster</label>
+            <div class="ct-validation-wrapper">
+              <input class="ct-input cd-field-checkbox" type="checkbox" aria-invalid="false" id="options-hybrid-cluster-checkbox"/>
+            </div>
+
+          </div>
+
+          <div class="cd-row-right cd-row-child">
+            <button class="btn active btn-primary" id="global-options-btn" disabled>
+              Update Options
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: -->
+  <div id="step-4" class="hidden">
+    <div class="cd-block">
+      <h3 class="cd-header">Step 4: Generate Ansible Inventory Files</h3>
+      <div class="panel panel-default cd-panel">
+        <div class="panel-heading cd-row">
+          <h3 class="panel-title cd-row-child">/usr/share/ceph-ansible/hosts</h3>
+        </div>
+        <div class="panel-body">
+<pre id="host-file-content">
+Click "Generate" to display the "hosts" file content.
+</pre>
+          <div class="cd-row-right cd-row-child">
+            <button class="btn active btn-primary" id="generate-host-file-btn">
+              Generate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
   <div class="cd-bottom-nav-button-group">
     <button type="button" class="btn active btn-primary" id="prev-step-btn"> Prev </button>
@@ -152,6 +231,8 @@
 
   <div id="snackbar"></div>
   <div id="add-host-snackbar"></div>
+  <div id="update-roles-snackbar"></div>
+  <div id="update-options-snackbar"></div>
 
 </body>
 </html>

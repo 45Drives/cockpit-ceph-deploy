@@ -113,8 +113,8 @@ class Options:
 g_ceph_core_params = {}
 g_default_params = {}
 g_param_file_content = None
-g_param_file_path = "/usr/share/ceph-ansible/ceph-deploy/params/core_params.json"
-g_param_file_dir = "/usr/share/ceph-ansible/ceph-deploy/params"
+g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
+g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 g_debug_flag = False
 
 #####################################

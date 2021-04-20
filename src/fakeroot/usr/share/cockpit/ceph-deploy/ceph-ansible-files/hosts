@@ -1,0 +1,26 @@
+# CORE
+[mons]
+
+[mgrs]
+
+[osds]
+
+# METRIC STACK
+[metrics]
+
+# CEPHFS
+[mdss]
+
+# SAMBA 
+[smbs]
+
+# NFS
+[nfss]
+
+# ISCSI GATEWAYS
+[iscsigws]
+
+# RADOS GATEWAYS & LOADBALANCERS
+[rgws]
+
+[rgwloadbalancers]
