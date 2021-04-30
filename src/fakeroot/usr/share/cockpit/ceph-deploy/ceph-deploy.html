@@ -125,16 +125,16 @@
               <div class="cd-field-feedback" id="options-interface-field-feedback"></div>
             </div>
 
-            <label class="control-label" for="options-cluster-network-field">cluster_network</label>
-            <div class="ct-validation-wrapper">
-              <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-cluster-network-field"/>
-              <div class="cd-field-feedback" id="options-cluster-network-field-feedback"></div>
-            </div>
-
-            <label class="control-label" for="options-public-network-field">public_network (optional)</label>
+            <label class="control-label" for="options-public-network-field">public_network</label>
             <div class="ct-validation-wrapper">
               <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-public-network-field"/>
               <div class="cd-field-feedback" id="options-public-network-field-feedback"></div>
+            </div>
+
+            <label class="control-label" for="options-cluster-network-field">cluster_network (optional)</label>
+            <div class="ct-validation-wrapper">
+              <input class="ct-input cd-field" type="text" aria-invalid="false" id="options-cluster-network-field"/>
+              <div class="cd-field-feedback" id="options-cluster-network-field-feedback"></div>
             </div>
 
             <label class="control-label" for="options-hybrid-cluster-checkbox">hybrid_cluster</label>
@@ -173,9 +173,46 @@ Click "Generate" to display the "hosts" file content.
           </div>
         </div>
       </div>
+      <div class="panel panel-default cd-panel">
+        <div class="panel-heading cd-row">
+          <h3 class="panel-title cd-row-child">/usr/share/ceph-ansible/group_vars/all.yml</h3>
+        </div>
+        <div class="panel-body">
+<pre id="all-file-content">
+Click "Generate" to display the "all.yml" file content.
+</pre>
+          <div class="cd-row-right cd-row-child">
+            <button class="btn active btn-primary" id="generate-all-file-btn">
+              Generate
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   
+    <!-- STEP 5: -->
+
+    <div id="step-5" class="hidden">
+      <div class="cd-block">
+        <h3 class="cd-header">Step 5: Ansible Playbook - Ping</h3>
+        <div class="panel panel-default cd-panel">
+          <div class="panel-heading cd-row">
+            <h3 class="panel-title cd-row-child">Ansible Ping</h3>
+          </div>
+          <div class="panel-body">
+<pre id="ansible-ping-output">
+Click 'Run' to ping all hosts using Ansible.
+</pre>            
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-ping-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
   <div class="cd-bottom-nav-button-group">
     <button type="button" class="btn active btn-primary" id="prev-step-btn"> Prev </button>

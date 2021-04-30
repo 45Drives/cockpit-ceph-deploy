@@ -570,4 +570,14 @@ tr:hover {
 
 #host-file-content {
     font-size: small;
+    overflow-y: scroll;
+    max-height: 400px;
+    min-height: 50px;
+}
+
+#all-file-content {
+    font-size: small;
+    overflow-y: scroll;
+    max-height: 600px;
+    min-height: 50px;
 }

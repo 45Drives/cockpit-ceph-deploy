@@ -156,10 +156,9 @@ function check_ip_field(field_id,feedback_field_id,button_id,label_name,required
 }
 
 function validate_ip_address(ipaddress) {  
-	if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress)) {  
-	  return (true)  
-	}  
-	return (false)  
+	let ipv6 = /^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?((\/){1}(1?2?[0-8]|1?[0-1][0-9]|[1-9]?[0-9]))?\s*$/.test(ipaddress);
+	let ipv4 = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)((\/){1}([1-2]?[0-9]|3[0-2]))?$/.test(ipaddress);
+	return (ipv4 || ipv6)
 }  
 
 function show_modal_dialog(id){
@@ -235,10 +234,10 @@ function update_options_info(options_json){
 		hybrid_cluster_checkbox.checked = options_json["hybrid_cluster"];
 
 		cluster_network_field.addEventListener("input",function(){
-			check_ip_field("options-cluster-network-field","options-cluster-network-field-feedback","global-options-btn","cluster_network",true)});
+			check_ip_field("options-cluster-network-field","options-cluster-network-field-feedback","global-options-btn","cluster_network",false)});
 
 		public_network_field.addEventListener("input",function(){
-			check_ip_field("options-public-network-field","options-public-network-field-feedback","global-options-btn","public_network",false)});
+			check_ip_field("options-public-network-field","options-public-network-field-feedback","global-options-btn","public_network",true)});
 		
 		monitor_interface_field.addEventListener("input",function(){
 			check_name_field("options-interface-field","options-interface-field-feedback","global-options-btn","monitor_interface",true)});
@@ -531,7 +530,7 @@ function update_options_request(){
 		"public_network": document.getElementById("options-public-network-field").value,
 		"hybrid_cluster": document.getElementById("options-hybrid-cluster-checkbox").checked
 	};
-
+	if (options_request_json["hybrid_cluster"] === null){options_request_json["hybrid_cluster"] = false;}
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
 	var result_json = null;
 	var options_proc = cockpit.spawn(spawn_args, {superuser: "require"});
@@ -580,6 +579,53 @@ function generate_host_file(){
 	});
 }
 
+function generate_all_file(){
+	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_all"];
+	var result_json = null;
+	var generate_all_file_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	generate_all_file_proc.done(function(data){
+		let msg_color = "";
+		let msg_label = "";
+		let msg_content = "";
+		try {
+			result_json = JSON.parse(data);
+		} catch (e) {
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		if (result_json.hasOwnProperty("success_msg")){
+			msg_color = "#20a030";
+			msg_label = "Message: ";
+			msg_content = result_json.success_msg;
+			var all_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
+			all_file_content_proc.done(function(data){
+				document.getElementById("all-file-content").innerText = data;
+			});
+			all_file_content_proc.fail(function(ex,data){
+				console.log("all_file_content_proc (FAIL): ",data);
+			});
+		}else{
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		show_snackbar_msg(msg_label,msg_content,msg_color,"snackbar");
+	});
+}
+
+function ansible_ping(){
+	document.getElementById("ansible-ping-output").innerHTML = "Running..."
+	var spawn_args = ["ansible","all","-m","ping"];
+	var result_json = null;
+	var ansible_ping_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	ansible_ping_proc.done(function(data){
+		let output = document.getElementById("ansible-ping-output");
+		output.innerHTML = data;
+	});
+
+}
+
 function main()
 {
 	let root_check = cockpit.permission({ admin: true });
@@ -599,6 +645,8 @@ function main()
 				document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
 				document.getElementById("global-options-btn").addEventListener("click",update_options_request);
 				document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
+				document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
+				document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
 
 				document.getElementById("next-step-btn").addEventListener("click",() => {
 					var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
