@@ -615,13 +615,17 @@ function generate_all_file(){
 }
 
 function ansible_ping(){
-	document.getElementById("ansible-ping-output").innerHTML = "Running..."
+	document.getElementById("ansible-ping-output").innerHTML = (
+		"--------------------------------------------------------------------------------\n" +
+		"  > ansible all -m ping\n" +
+		"--------------------------------------------------------------------------------\n"
+		);
 	var spawn_args = ["ansible","all","-m","ping"];
 	var result_json = null;
 	var ansible_ping_proc = cockpit.spawn(spawn_args, {superuser: "require"});
-	ansible_ping_proc.done(function(data){
+	ansible_ping_proc.stream(function(data){
 		let output = document.getElementById("ansible-ping-output");
-		output.innerHTML = data;
+		output.innerHTML += data;
 	});
 
 }
