@@ -614,20 +614,21 @@ function generate_all_file(){
 	});
 }
 
-function ansible_ping(){
-	document.getElementById("ansible-ping-output").innerHTML = (
-		"--------------------------------------------------------------------------------\n" +
-		"  > ansible all -m ping\n" +
-		"--------------------------------------------------------------------------------\n"
-		);
-	var spawn_args = ["ansible","all","-m","ping"];
-	var result_json = null;
-	var ansible_ping_proc = cockpit.spawn(spawn_args, {superuser: "require"});
-	ansible_ping_proc.stream(function(data){
-		let output = document.getElementById("ansible-ping-output");
-		output.innerHTML += data;
-	});
+function makeTerminal(termID){
+	let term = document.createElement("iframe");
+	term.setAttribute("width","100%");
+	term.setAttribute("height","500px");
+	term.id=termID;
+	term.title="Terminal";
+	term.src="terminal.html";
+	return term;
+}
 
+function ansible_ping(){
+	localStorage.setItem("terminal-command","ansible all -m ping\n");
+	let ping_term = document.getElementById("terminal-ping");
+	if(!ping_term){ping_term = makeTerminal("terminal-ping");}
+	document.getElementById("terminal-ping-iframe").appendChild(ping_term);
 }
 
 function main()
