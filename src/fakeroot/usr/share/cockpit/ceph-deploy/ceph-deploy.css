@@ -571,7 +571,7 @@ tr:hover {
 #host-file-content {
     font-size: small;
     overflow-y: scroll;
-    max-height: 400px;
+    max-height: 600px;
     min-height: 50px;
 }
 
@@ -593,4 +593,24 @@ tr:hover {
     height:500px;
     width:100%;
     overflow:auto;
+    padding-left: 1em;
+}
+
+#terminal-device-alias {
+    height:500px;
+    width:100%;
+    overflow:auto;
+    padding-left: 1em;
+}
+
+#terminal-core {
+    height:500px;
+    width:100%;
+    overflow:auto;
+    padding-left: 1em;
+}
+
+.cd-para {
+	font-weight: bold;
+	padding: 1em;
 }

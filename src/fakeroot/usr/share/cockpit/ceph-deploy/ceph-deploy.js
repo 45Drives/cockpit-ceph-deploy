@@ -631,6 +631,20 @@ function ansible_ping(){
 	document.getElementById("terminal-ping-iframe").appendChild(ping_term);
 }
 
+function ansible_device_alias(){
+	localStorage.setItem("terminal-command","ansible-playbook /usr/share/ceph-ansible/device-alias.yml\n");
+	let device_alias_term = document.getElementById("terminal-device-alias");
+	if(!device_alias_term){device_alias_term = makeTerminal("terminal-device-alias");}
+	document.getElementById("terminal-device-alias-iframe").appendChild(device_alias_term);
+}
+
+function ansible_core(){
+	localStorage.setItem("terminal-command","cd /usr/share/ceph-ansible ; ansible-playbook core.yml\n");
+	let core_term = document.getElementById("terminal-core");
+	if(!core_term){core_term = makeTerminal("terminal-core");}
+	document.getElementById("terminal-core-iframe").appendChild(core_term);
+}
+
 function main()
 {
 	let root_check = cockpit.permission({ admin: true });
@@ -652,7 +666,10 @@ function main()
 				document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
 				document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
 				document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
+				document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
+				document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
 
+				
 				document.getElementById("next-step-btn").addEventListener("click",() => {
 					var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
 					var current_step = next_step -1;
@@ -671,6 +688,7 @@ function main()
 					else{document.getElementById("prev-step-btn").disabled = true;}
 					localStorage.setItem("current_step",prev_step.toString());
 				});
+				
 			}else{
 				//user is not an administrator, inform them of this by
 				//displaying a message on each tab page. 

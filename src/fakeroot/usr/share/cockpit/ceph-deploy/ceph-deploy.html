@@ -35,10 +35,10 @@
 
   <div id="step-0" class="hidden">
     <div class="cd-block">
-      <h3 class="cd-header">ceph-deploy: requirements</h3>
+      <!-- <h3 class="cd-header">ceph-deploy: requirements</h3> -->
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Pre-configuration</h3>
+          <h3 class="panel-title cd-row-child">ceph-deploy: Pre-configuration Requirements</h3>
         </div>
         <div class="panel-body">
           <p class="preconfig-heading">Please ensure that the following network steps are completed before proceeding:</p>
@@ -58,10 +58,10 @@
   
   <div id="step-1" class="hidden">
     <div class="cd-block">
-      <h3 class="cd-header">Step 1: Configure Hosts</h3>
+      <!--<h3 class="cd-header">Step 1: Configure Hosts</h3>-->
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Host Information</h3>
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Host Information</h3>
           <div class="cd-row-right cd-row-child">
             <button class="button button-fallback-default pf-c-button pf-m-secondary" id="new-host-btn">
               <span class="button-symbol">+</span>New Host
@@ -89,10 +89,10 @@
 
   <div id="step-2" class="hidden">
     <div class="cd-block">
-      <h3 class="cd-header">Step 2: Assign Roles</h3>
+      <!--<h3 class="cd-header">Step 2: Assign Roles</h3>-->
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Role Assignment</h3>
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Role Assignment</h3>
         </div>
         <div class="panel-body">
           <div id="role-div">
@@ -112,10 +112,10 @@
 
   <div id="step-3" class="hidden">
     <div class="cd-block">
-      <h3 class="cd-header">Step 3: Global Options</h3>
+      <!--<h3 class="cd-header">Step 3: Global Options</h3>-->
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Global Options</h3>
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Global Options</h3>
         </div>
         <div class="panel-body">
           <div class="ct-form">
@@ -157,14 +157,14 @@
   <!-- STEP 4: -->
   <div id="step-4" class="hidden">
     <div class="cd-block">
-      <h3 class="cd-header">Step 4: Generate Ansible Inventory Files</h3>
+      <!--<h3 class="cd-header">Step 4: Generate Ansible Inventory Files</h3>-->
       <div class="panel panel-default cd-panel">
         <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">/usr/share/ceph-ansible/hosts</h3>
+          <h3 class="panel-title cd-row-child">Ansible Inventory File Generation: hosts (/usr/share/ceph-ansible/hosts)</h3>
         </div>
         <div class="panel-body">
 <pre id="host-file-content">
-Click "Generate" to display the "hosts" file content.
+Click "Generate" to create and display the "hosts" file content.
 </pre>
           <div class="cd-row-right cd-row-child">
             <button class="btn active btn-primary" id="generate-host-file-btn">
@@ -173,35 +173,42 @@ Click "Generate" to display the "hosts" file content.
           </div>
         </div>
       </div>
-      <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">/usr/share/ceph-ansible/group_vars/all.yml</h3>
-        </div>
-        <div class="panel-body">
-<pre id="all-file-content">
-Click "Generate" to display the "all.yml" file content.
-</pre>
-          <div class="cd-row-right cd-row-child">
-            <button class="btn active btn-primary" id="generate-all-file-btn">
-              Generate
-            </button>
+    </div>
+  </div>
+
+    <!-- STEP 5: -->
+    <div id="step-5" class="hidden">
+      <div class="cd-block">
+        <!--<h3 class="cd-header">Step 4: Generate Ansible Inventory Files</h3>-->
+        <div class="panel panel-default cd-panel">
+          <div class="panel-heading cd-row">
+            <h3 class="panel-title cd-row-child">Ansible Inventory File Generation: all.yml (/usr/share/ceph-ansible/group_vars/all.yml)</h3>
+          </div>
+          <div class="panel-body">
+  <pre id="all-file-content">
+  Click "Generate" to create and display the "all.yml" file content.
+  </pre>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-all-file-btn">
+                Generate
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   
-    <!-- STEP 5: -->
+    <!-- STEP 6: -->
 
-    <div id="step-5" class="hidden">
+    <div id="step-6" class="hidden">
       <div class="cd-block">
-        <h3 class="cd-header">Step 5: Ansible Playbook - Ping</h3>
+        <!--<h3 class="cd-header">Step 5: Ansible Playbook - Ping</h3>-->
         <div class="panel panel-default cd-panel">
           <div class="panel-heading cd-row">
-            <h3 class="panel-title cd-row-child">Ansible Ping</h3>
+            <h3 class="panel-title cd-row-child">Ansible: Ping Test</h3>
           </div>
           <div class="panel-body">
-            Click "Run" to run the ansible ping playbook.<br>
+            <p class="cd-para">Click "Run" to test Ansible Connectivity using Ansible Ping.</p>
             <div id="terminal-ping-iframe">
             </div>
             <div class="cd-row-right cd-row-child">
@@ -213,6 +220,51 @@ Click "Generate" to display the "all.yml" file content.
         </div>
       </div>
     </div>
+
+    <!-- STEP 7: -->
+
+    <div id="step-7" class="hidden">
+      <div class="cd-block">
+        <!--<h3 class="cd-header">Step 7: Ansible Playbook - device-alias.yml</h3>-->
+        <div class="panel panel-default cd-panel">
+          <div class="panel-heading cd-row">
+            <h3 class="panel-title cd-row-child">Ansible Playbook: device-alias.yml</h3>
+          </div>
+          <div class="panel-body">
+            <p class="cd-para">click "run" to perform the device-alias.yml playbook</p>
+            <div id="terminal-device-alias-iframe">
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-device-alias-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- STEP 8: -->
+
+        <div id="step-8" class="hidden">
+          <div class="cd-block">
+            <div class="panel panel-default cd-panel">
+              <div class="panel-heading cd-row">
+                <h3 class="panel-title cd-row-child">Ansible Playbook: core.yml</h3>
+              </div>
+              <div class="panel-body">
+                <p class="cd-para">click "run" to perform the core.yml playbook</p>
+                <div id="terminal-core-iframe">
+                </div>
+                <div class="cd-row-right cd-row-child">
+                  <button class="btn active btn-primary" id="ansible-core-btn">
+                    Run
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
   <div class="cd-bottom-nav-button-group">
     <button type="button" class="btn active btn-primary" id="prev-step-btn"> Prev </button>
