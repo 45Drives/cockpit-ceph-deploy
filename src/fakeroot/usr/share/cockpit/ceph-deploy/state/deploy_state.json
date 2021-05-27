@@ -1,0 +1,8 @@
+{
+    "ping_all": {
+        "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
+        "cwd": null,
+        "result": 0,
+        "time_stamp": "2021-05-27-18-32"
+    }
+}

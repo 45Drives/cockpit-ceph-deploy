@@ -2,19 +2,29 @@
     "hosts": {
         "ubuntuosd1": {
             "hostname": "ubuntuosd1",
-            "ip": "192.168.13.13/16",
+            "ip": "192.168.13.13",
             "monitor_interface": "ens3"
         },
         "ubuntuosd2": {
             "hostname": "ubuntuosd2",
-            "ip": "192.168.13.14/16",
+            "ip": "192.168.13.14",
             "monitor_interface": "ens3"
         },
         "ubuntuosd3": {
             "hostname": "ubuntuosd3",
-            "ip": "192.168.13.15/16",
+            "ip": "192.168.13.15",
             "monitor_interface": "ens3"
-        }
+        },
+	"ubuntugw1":{
+	    "hostname":"ubuntugw1",
+	    "ip":"192.168.13.16",
+	    "monitor_interface":"ens3"
+	},
+	"ubuntugw2":{
+	    "hostname":"ubuntugw2",
+	    "ip":"192.168.13.17",
+	    "monitor_interface":"ens3"
+	}
     },
     "roles": {
         "mons": [
@@ -33,20 +43,45 @@
             "ubuntuosd1"
         ],
         "metrics": [
-            "ubuntuosd1"
+            "ubuntuosd1",
+	    "ubuntuosd2",
+	    "ubuntuosd3",
+	    "ubuntugw1",
+	    "ubuntugw2"
         ],
-        "mdss": [],
-        "smbs": [],
-        "nfss": [],
-        "iscsigws": [],
-        "rgws": [],
-        "rgwloadbalancers": [],
-        "client": []
+        "mdss": [
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "smbs": [
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "nfss": [
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "iscsigws": [	
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "rgws": [
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "rgwloadbalancers": [
+	    "ubuntugw1",
+	    "ubuntugw2"
+	],
+        "client": [	
+	    "ubuntugw1",
+	    "ubuntugw2"
+	]
     },
     "options": {
         "monitor_interface": "ens3",
         "public_network": "192.168.0.0/16",
-        "cluster_network": "192.168.0.0/16",
+        "cluster_network": "",
         "hybrid_cluster": null
     }
 }

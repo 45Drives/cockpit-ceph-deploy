@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+import os
+import subprocess
+from optparse import OptionParser
+from datetime import datetime
+import copy
+import json
+import io
+from contextlib import redirect_stdout
+import shlex
+import sys
+
+ansible_commands = {
+    "ping_all": {
+        "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
+        "cwd": None,
+        "result": None,
+        "time_stamp": None
+    },
+    "device_alias": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts device-alias.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "deploy_core": {
+        "command": "ansible-playbook core.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "remove_core": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-cluster.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "remove_vg": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts vg-remove.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "ping_mdss": {
+        "command": "ansible -i /usr/share/ceph-ansible/hosts -m ping mdss",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    }
+}
+
+def print_to_string(item):
+    with io.StringIO() as buf, redirect_stdout(buf):
+        print(item)
+        output = buf.getvalue().rstrip("\n")
+        return output
+
+def update_ceph_deploy_state(cmd):
+    state_file_path = "/usr/share/cockpit/ceph-deploy/state/deploy_state.json"
+    state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
+    state_dict = {}
+
+    # check to see if file needs to be created.
+    if not os.path.exists(state_file_path):
+        # file doesn't exist
+        if not os.path.exists(state_file_dir):
+            # file directory doesn't exist, make required directories
+            os.makedirs(state_file_dir)
+        #create new parameter file with default parameters
+        state_file = open(state_file_path,"w")
+        state_file.write(json.dumps(state_dict,indent=4))
+        state_file.close()
+
+    else:
+        #file exists on disk, load contents and return json object.
+        state_file = open(state_file_path,"r")
+        state_file_content = print_to_string(state_file.read())
+        state_file.close()
+        state_dict = json.loads(state_file_content)
+    
+    state_dict[cmd] = copy.deepcopy(ansible_commands[cmd])
+    state_file = open(state_file_path,"w")
+    state_file.write(json.dumps(state_dict,indent=4))
+    state_file.close()
+
+
+def run_ansible_command(cmd):
+    split_command = shlex.split(ansible_commands[cmd]["command"])
+    #current_dir = os.path.abspath(os.getcwd())
+    #print("Curent Dir: ",current_dir)
+    #print("Desired Dir: ", os.path.abspath(ansible_commands[cmd]["cwd"]))
+    #os.chdir(os.path.abspath(ansible_commands[cmd]["cwd"]))
+    #current_dir = os.path.abspath(os.getcwd())
+    #print("Curent Dir: ",current_dir)
+    #subcall_stream(split_command)
+    command = subprocess.run(
+        split_command,
+        cwd=ansible_commands[cmd]["cwd"],
+        stdout=sys.stdout,
+        stderr=sys.stdout,
+        universal_newlines=True,
+        bufsize=1
+        )
+    ansible_commands[cmd]["result"] = command.returncode
+    ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
+    update_ceph_deploy_state(cmd)
+
+def subcall_stream(cmd, fail_on_error=True):
+    # Run a shell command, streaming output to STDOUT in real time
+    # Expects a list style command, e.g. `["docker", "pull", "ubuntu"]`
+    p = subprocess.run(cmd, stdout=sys.stdout, stderr=sys.stdout, bufsize=1, universal_newlines=True)
+    #for line in p.stdout:
+    #    sys.stdout.write(line)
+    #p.wait()
+    exit_code = p.returncode
+    print("EXIT_CODE: ", exit_code)
+    #if exit_code != 0 and fail_on_error:
+    #    raise RuntimeError(f"Shell command failed with exit code {exit_code}. Command: `{cmd}`")
+    #return(exit_code)
+
+
+def main():
+    cmd_lst_str = "["
+    for key in ansible_commands.keys():
+        cmd_lst_str += key + ","
+    cmd_lst_str = cmd_lst_str[:-1] + "]"
+
+    parser = OptionParser()
+    parser.add_option("-c","--command",action="store",dest="command",default=None, help="The ansible command to run. {c}".format(c=cmd_lst_str))
+    (options, args) = parser.parse_args()
+
+    if options.command != None and options.command in ansible_commands.keys():
+        run_ansible_command(options.command)
+
+
+if __name__ == "__main__":
+    main()

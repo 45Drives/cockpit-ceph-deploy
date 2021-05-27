@@ -16,6 +16,7 @@
 */
 
 let g_core_params = null;
+let g_deploy_file = null;
 
 
 function show_snackbar_msg(msg_label,msg_content,msg_color,id) {
@@ -29,13 +30,13 @@ function show_snackbar_msg(msg_label,msg_content,msg_color,id) {
   } 
 
 function add_host_request(){
-	hostname = document.getElementById("new-hostname-field").value;
-	monitor_interface = document.getElementById("new-interface-field").value;
-	ip = document.getElementById("new-ip-field").value;
+	let hostname = document.getElementById("new-hostname-field").value;
+	let monitor_interface = document.getElementById("new-interface-field").value;
+	//let ip = document.getElementById("new-ip-field").value;
 	if(hostname != null && hostname != ""){
 		host_request_json = {[hostname]:{"hostname":""}};
 		host_request_json[hostname]["hostname"] = hostname;
-		host_request_json[hostname]["ip"] = (ip != null) ? ip:"";
+		//host_request_json[hostname]["ip"] = (ip != null) ? ip:"";
 		host_request_json[hostname]["monitor_interface"] = (monitor_interface != null) ? monitor_interface:"";
 		var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-h",JSON.stringify(host_request_json),"-w"];
 		var result_json = null;
@@ -91,17 +92,17 @@ function add_host(){
 	document.getElementById("add-host-modal-title").innerText = "Add New Host";
 	
 	let hostname_field = document.getElementById("new-hostname-field");
-	let ip_field = document.getElementById("new-ip-field");
+	//let ip_field = document.getElementById("new-ip-field");
 	let interface_field = document.getElementById("new-interface-field");
 	hostname_field.value = "";
-	ip_field.value = "";
+	//ip_field.value = "";
 	interface_field.value = "";
 
     show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	ip_field.addEventListener("input",function(){
-		check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
+	//ip_field.addEventListener("input",function(){
+	//	check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
 	interface_field.addEventListener("input",function(){
 		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
 
@@ -336,22 +337,22 @@ function remove_host(hostname){
 		});
 }
 
-function edit_host(hostname,ip,monitor_interface){
+function edit_host(hostname,monitor_interface){
 	document.getElementById("add-host-modal-title").innerText = "Edit Host";
 	
 	let hostname_field = document.getElementById("new-hostname-field");
-	let ip_field = document.getElementById("new-ip-field");
+	//let ip_field = document.getElementById("new-ip-field");
 	let interface_field = document.getElementById("new-interface-field");
 	
 	hostname_field.value = hostname;
-	ip_field.value = ip;
+	//ip_field.value = ip;
 	interface_field.value = monitor_interface;
 
 	show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	ip_field.addEventListener("input",function(){
-		check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
+	//ip_field.addEventListener("input",function(){
+	//	check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
 	interface_field.addEventListener("input",function(){
 		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
 
@@ -369,7 +370,7 @@ function update_host_info(hosts_json){
 	if(Object.keys(hosts_json).length > 0){	
 		for (let key of Object.keys(hosts_json)) {
 			let hostname = hosts_json[key]["hostname"];
-			let ip = hosts_json[key]["ip"];
+			//let ip = hosts_json[key]["ip"];
 			let monitor_interface = hosts_json[key]["monitor_interface"];
 			
 			var new_host_entry = document.createElement("div");
@@ -379,9 +380,9 @@ function update_host_info(hosts_json){
 			host_entry_hostname.classList.add("cd-host-list-entry-text");
 			host_entry_hostname.innerText = hostname;
 
-			var host_entry_ip = document.createElement("div");
-			host_entry_ip.classList.add("cd-host-list-entry-text");
-			host_entry_ip.innerText = ip;
+			//var host_entry_ip = document.createElement("div");
+			//host_entry_ip.classList.add("cd-host-list-entry-text");
+			//host_entry_ip.innerText = ip;
 
 			var host_entry_monitor_interface = document.createElement("div");
 			host_entry_monitor_interface.classList.add("cd-host-list-entry-text");
@@ -392,9 +393,9 @@ function update_host_info(hosts_json){
 
 			host_entry_edit_icon.addEventListener("click", function(){
 				let hns = hostname.valueOf();
-				let ips = ip.valueOf();
+				//let ips = ip.valueOf();
 				let mis = monitor_interface.valueOf();
-				edit_host(hns,ips,mis);
+				edit_host(hns,mis);
 			});
 
 			var host_entry_delete_icon = document.createElement("div");
@@ -402,7 +403,7 @@ function update_host_info(hosts_json){
 			host_entry_delete_icon.addEventListener("click", function(){let arg = hostname.valueOf();remove_host(arg)});
 
 			new_host_entry.appendChild(host_entry_hostname);
-			new_host_entry.appendChild(host_entry_ip);
+			//new_host_entry.appendChild(host_entry_ip);
 			new_host_entry.appendChild(host_entry_monitor_interface);
 			new_host_entry.appendChild(host_entry_edit_icon);
 			new_host_entry.appendChild(host_entry_delete_icon);
@@ -523,7 +524,6 @@ function update_role_request(){
 }
 
 function update_options_request(){
-
 	let options_request_json = {
 		"monitor_interface": document.getElementById("options-interface-field").value,
 		"cluster_network": document.getElementById("options-cluster-network-field").value,
@@ -624,22 +624,55 @@ function makeTerminal(termID){
 	return term;
 }
 
+function update_deploy_state(content,playbook){
+	console.log("deploy_state_file_updated: ",playbook);
+	let prev_state = (localStorage.getItem("deploy_state")??"{}");
+	let prev_state_json = JSON.parse(prev_state);
+	if(content && prev_state_json != content){
+		localStorage.setItem("deploy_state",JSON.stringify(content));
+		if(content.hasOwnProperty(playbook) && content[playbook].hasOwnProperty("result")){
+			let checkmark = document.getElementById(playbook);
+			if(checkmark && content[playbook].result === 0){
+				checkmark.classList.remove("fa-exclamation-triangle");
+				checkmark.classList.remove("deploy-step-failed");
+				checkmark.classList.remove("deploy-step-incomplete");
+				checkmark.classList.add("fa-check-square");
+				checkmark.classList.add("deploy-step-complete");
+			}else if (checkmark){
+				checkmark.classList.remove("deploy-step-incomplete");
+				checkmark.classList.remove("fa-check-square");
+				checkmark.classList.remove("deploy-step-complete");
+				checkmark.classList.add("deploy-step-failed");
+				checkmark.classList.add("fa-exclamation-triangle");
+			}
+		}
+	}
+}
+
+function monitor_deploy_state(playbook){
+	g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
+	g_deploy_file.watch(function(content){update_deploy_state(content,playbook);});
+}
+
 function ansible_ping(){
-	localStorage.setItem("terminal-command","ansible all -m ping\n");
+	monitor_deploy_state("ping_all");
+	localStorage.setItem("terminal-command","ansible_runner -c ping_all\n");
 	let ping_term = document.getElementById("terminal-ping");
 	if(!ping_term){ping_term = makeTerminal("terminal-ping");}
 	document.getElementById("terminal-ping-iframe").appendChild(ping_term);
 }
 
 function ansible_device_alias(){
-	localStorage.setItem("terminal-command","ansible-playbook /usr/share/ceph-ansible/device-alias.yml\n");
+	monitor_deploy_state("device_alias");
+	localStorage.setItem("terminal-command","ansible_runner -c device_alias\n");
 	let device_alias_term = document.getElementById("terminal-device-alias");
 	if(!device_alias_term){device_alias_term = makeTerminal("terminal-device-alias");}
 	document.getElementById("terminal-device-alias-iframe").appendChild(device_alias_term);
 }
 
 function ansible_core(){
-	localStorage.setItem("terminal-command","cd /usr/share/ceph-ansible ; ansible-playbook core.yml\n");
+	monitor_deploy_state("deploy_core");
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_core\n");
 	let core_term = document.getElementById("terminal-core");
 	if(!core_term){core_term = makeTerminal("terminal-core");}
 	document.getElementById("terminal-core-iframe").appendChild(core_term);
@@ -659,6 +692,25 @@ function main()
 
 				show_step_content(current_step);
 				get_param_file_content();
+				deploy_state_json = (localStorage.getItem("deploy_state")??"{}");
+				deploy_state_obj = JSON.parse(deploy_state_json);
+
+				Object.entries(deploy_state_obj).forEach(([playbook, obj]) => {
+					let checkmark = document.getElementById(playbook);
+					if(checkmark && deploy_state_obj[playbook].result === 0){
+						checkmark.classList.remove("fa-exclamation-triangle");
+						checkmark.classList.remove("deploy-step-failed");
+						checkmark.classList.remove("deploy-step-incomplete");
+						checkmark.classList.add("fa-check-square");
+						checkmark.classList.add("deploy-step-complete");
+					}else if (checkmark){
+						checkmark.classList.remove("deploy-step-incomplete");
+						checkmark.classList.remove("fa-check-square");
+						checkmark.classList.remove("deploy-step-complete");
+						checkmark.classList.add("deploy-step-failed");
+						checkmark.classList.add("fa-exclamation-triangle");
+					}
+        		});
 				
 				document.getElementById("new-host-btn").addEventListener("click",add_host);
 				document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
