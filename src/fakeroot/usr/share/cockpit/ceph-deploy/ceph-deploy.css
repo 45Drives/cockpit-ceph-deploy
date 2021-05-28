@@ -1,3 +1,111 @@
+:root {
+	/* white style */
+	--container: #fff;
+    --container-header: #e0e0e0;
+	--border: #bebebe;
+	--navigation: #f0f0f0;
+	--font: #1c1c1c;
+	--selected: #f0f0f0;
+	--toggle-light: #151515;
+	--toggle-dark: #ccc;
+	--scrollbar-thumb: var(--border);
+	--scrollbar-bg: var(--navigation);
+	--scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+	--loading-bg-color: rgba(255, 255, 255, 0.5);
+	--textarea-bg: var(--navigation);
+	--logo-45: #333;
+}
+[data-theme="dark"] {
+	/* Dark style */
+	--container: #212427;
+    --container-header: #303030;
+	--border: #3c3f42;
+	--navigation: #151515;
+	--font: #fff;
+	--selected: #191a1b;
+	--scrollbar-thumb: var(--container);
+	--scrollbar-bg: var(--navigation);
+	--scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+	--loading-bg-color: rgba(33, 36, 39, 0.5);
+	--textarea-bg: var(--navigation);
+	--logo-45: #fff;
+}
+
+body {
+    background-color: var(--container);
+}
+
+/* START - SWITCH THEME */
+.nav-toggle {
+	justify-self: flex-end;
+}
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 30px;
+	height: 17px;
+}
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--toggle-light);
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 13px;
+	width: 13px;
+	left: 2px;
+	bottom: 2px;
+	background-color: white;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+input:checked + .slider {
+	background-color: var(--toggle-dark);
+}
+input:focus + .slider {
+	box-shadow: 0 0 1px var(--toggle-dark);
+}
+input:checked + .slider:before {
+	-webkit-transform: translateX(13px);
+	-ms-transform: translateX(13px);
+	transform: translateX(13px);
+}
+.slider.round {
+	border-radius: 17px;
+}
+.slider.round:before {
+	border-radius: 50%;
+}
+
+.horizontal-spacer-sm {
+	margin-right: 0.25em;
+}
+.nav-btn-group {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-end;
+	align-items: flex-start;
+}
+
+#houston-theme-icon {
+    color: var(--font);
+}
+
+/* END - SWITCH THEME */
+
 .hidden {
 	display: none;
 }
@@ -44,6 +152,24 @@
 
 .cd-panel {
 	max-width: 80%;
+    background-color: var(--container);
+	border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.cd-panel-body {
+    padding: 15px;
+    color: var(--font);
+}
+
+.cd-panel-heading {
+    background-color: var(--container-header);
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-bottom-color: transparent;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    color: var(--font);
 }
 
 .cd-host-box {
@@ -52,19 +178,23 @@
 }
 
 .cd-host-list-header-row {
-	background-color: #f5f5f5;
 	display: flex;
 	flex-wrap: wrap;
 	margin: 0;
 	padding: 1em;
-    width: 80%;
+    width: 100%;
+    background-color: var(--container-header);
+	border: 1px solid var(--border);
+    color: var(--font);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .cd-host-list-header-text {
 	font-weight: bold;
 	box-sizing: border-box;
 	flex-grow: 1;
-	width: 30%;  
+	width: 45%;  
 	padding: 0 0.25em 0.25em 0;
 	overflow: hidden; 
 	list-style: none;
@@ -74,7 +204,6 @@
 	box-sizing: border-box;
 	flex-grow: 1;
 	width: 1%;  
-	/*padding: 0.8em 1.2em;*/
 	padding: 0;
 	overflow: hidden; 
 	list-style: none;
@@ -85,16 +214,19 @@
 	flex-wrap: wrap;
 	margin: 0;
 	padding: 1em;
-	border-style: solid;
-	border-color: #f5f5f5;
+	border: 1px solid var(--border);
+    color: var(--font);
 	align-items: stretch;
-    width: 80%;
+    width: 100%;
+}
+.cd-host-list-entry:hover {
+    background-color: var(--selected);
 }
 
 .cd-host-list-entry-text {
 	box-sizing: border-box;
 	flex-grow: 1;
-	width: 30%;  
+	width: 45%;  
 	padding: 0 0.25em 0.25em 0;
 	overflow: hidden; 
 	list-style: none;
@@ -103,33 +235,27 @@
 .cd-host-list-entry-icon-del {
 	box-sizing: border-box;
 	flex-grow: 1;
-	width: 1%;
+	width: 2%;
 	padding: 0.25em 0.25em 0.25em 0.25em;
 	text-align: center;
 	overflow: hidden; 
 	list-style: none;
 	cursor: pointer;
-	background-color: #ffffff;
 }
 
 .cd-host-list-entry-icon-del:hover {
-	background-color: #dc143c;
+	color: #dc143c;
 }
 
 .cd-host-list-entry-icon {
 	box-sizing: border-box;
 	flex-grow: 1;
-	width: 1%;  
+	width: 2%;  
 	padding: 0.25em 0.25em 0.25em 0.25em;
 	text-align: center;
 	overflow: hidden; 
 	list-style: none;
 	cursor: pointer;
-	background-color: #ffffff;
-}
-
-.cd-host-list-entry-icon:hover {
-	background-color:#d3d3d3;
 }
 
 .cd-host-list-entry-placeholder {
@@ -161,11 +287,15 @@
 .cd-field-label {
 	font-weight: bold;
 	margin-right: 5px;
+    color: var(--font);
 }
 
 .cd-field {
 	margin-left: 5px;
 	margin-right: 10px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border-radius: 4px;
 }
 
 .cd-form-row {
@@ -551,18 +681,35 @@
 	padding: 1em;
 }
 
+#role-div {
+    overflow: auto;
+}
+
 .role-table {
     width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.cd-table-header-row {
+    background-color: var(--container-header);
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
 }
 
 th,td {
     padding: 1em 0 0 1em;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
 }
 
-tr:hover {
-    background-color: #f5f5f5;
+.role-table-host-row:hover {
+    background-color: var(--selected);
+}
+
+.cd-checkbox {
+    background-color: var(--container-header);
+    color: var(--selected);
 }
 
 .cd-field-checkbox {
@@ -575,6 +722,10 @@ tr:hover {
     overflow-y: scroll;
     max-height: 600px;
     min-height: 50px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border: 1px solid var(--border);
+    border-radius: 4px;
 }
 
 #all-file-content {
@@ -582,6 +733,10 @@ tr:hover {
     overflow-y: scroll;
     max-height: 600px;
     min-height: 50px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border: 1px solid var(--border);
+    border-radius: 4px;
 }
 
 #ansible-ping-output {

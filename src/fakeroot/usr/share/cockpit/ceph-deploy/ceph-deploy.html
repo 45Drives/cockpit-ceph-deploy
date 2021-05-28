@@ -23,6 +23,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="../base1/cockpit.css" type="text/css" rel="stylesheet">
   <link rel="stylesheet" href="ceph-deploy.css" type="text/css">
+  <link href="fontawesome/css/all.min.css" rel="stylesheet">
   <script src="../base1/cockpit.js"></script>
   <script src="../manifests.js"></script>
   <script src="../*/po.js"></script>
@@ -30,14 +31,26 @@
 </head>
 
 <body>
+
+  <div class="nav-toggle">
+    <div class="nav-btn-group">
+      <i class="fas fa-sun" id="houston-theme-icon"></i>
+      <div class="horizontal-spacer-sm"></div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-theme">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+
   <!-- PRE-CONFIGURATION -->
   <div id="step-0" class="hidden">
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">ceph-deploy: Pre-configuration Requirements</h3>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <p class="preconfig-heading">Please ensure that the following network steps are completed before proceeding:</p>
           <ul>
             <li class="preconfig-step"><i class="fa fa-sitemap"></i> Each host should be able to ping all other hosts using a hostname.</li>
@@ -56,7 +69,7 @@
     <!-- HOST INFORMATION -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">Ansible Configuration: Host Information</h3>
           <div class="cd-row-right cd-row-child">
             <button class="button button-fallback-default pf-c-button pf-m-secondary" id="new-host-btn">
@@ -64,8 +77,9 @@
             </button>
           </div>
         </div>
-        <div class="panel-body">
-          <div class="cd-host-box">
+        <div class="cd-panel-body" id="cd-host-box-container">
+          <p class="cd-para" id="cd-host-placeholder">"No hosts have been configured. Click the "+New Host" button to add a new host."</p>
+          <div class="cd-host-box" id="cd-host-box">
             <div class="cd-host-list-header-row">
               <div class="cd-host-list-header-text">hostname</div>
               <div class="cd-host-list-header-text">monitor_interface</div>
@@ -81,15 +95,15 @@
     <!-- ROLE ASSIGNMENT -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">Ansible Configuration: Role Assignment</h3>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <div id="role-div">
           </div>
 
           <div class="cd-row-right cd-row-child">
-            <button class="btn active btn-primary" id="update-roles-btn">
+            <button class="btn active btn-primary" id="update-roles-btn" disabled>
               Update Roles
             </button>
           </div>
@@ -99,10 +113,10 @@
     <!-- GLOBAL OPTIONS -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Ansible Configuration: Global Options</h3>
+        <div class="cd-row cd-panel-heading">
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Additional Options</h3>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <div class="ct-form">
             <label class="control-label" for="options-interface-field">monitor_interface</label>
             <div class="ct-validation-wrapper">
@@ -140,11 +154,13 @@
     <!-- HOST FILE -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - hosts (/usr/share/ceph-ansible/hosts)</h3>
+        <div class="cd-row cd-panel-heading">
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - hosts</h3>
+          <button class="btn active btn-primary hidden" id="show-host-file-btn"><i class="fas fa-eye"></i></button>
         </div>
-        <div class="panel-body">
-<pre id="host-file-content">
+        <div class="cd-panel-body">
+          <p class="cd-para">Click "Generate" to generate the hosts inventory file (/usr/share/ceph-ansible/hosts)</p>
+<pre id="host-file-content" class="hidden">
 Click "Generate" to create and display the "hosts" file content.
 </pre>
           <div class="cd-row-right cd-row-child">
@@ -158,11 +174,13 @@ Click "Generate" to create and display the "hosts" file content.
     <!-- ALL.YML -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
-          <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - all.yml (/usr/share/ceph-ansible/group_vars/all.yml)</h3>
+        <div class="cd-row cd-panel-heading">
+          <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - all.yml </h3>
+          <button class="btn active btn-primary hidden" id="show-all-file-btn"><i class="fas fa-eye"></i></button>
         </div>
-        <div class="panel-body">
-<pre id="all-file-content">
+        <div class="cd-panel-body">
+          <p class="cd-para">Click "Generate" to generate all.yml using the  (/usr/share/ceph-ansible/group_vars/all.yml)</p>
+<pre id="all-file-content" class="hidden">
 Click "Generate" to create and display the "all.yml" file content.
 </pre>
           <div class="cd-row-right cd-row-child">
@@ -176,11 +194,11 @@ Click "Generate" to create and display the "all.yml" file content.
     <!-- PING TEST-->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">Ansible Configuration: Ping Test</h3>
           <i id="ping_all" class="fa fa-check-square deploy-step-incomplete"></i>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <p class="cd-para">Click "Run" to test Ansible Connectivity using Ansible Ping.</p>
           <div id="terminal-ping-iframe">
           </div>
@@ -200,11 +218,11 @@ Click "Generate" to create and display the "all.yml" file content.
     <!-- DEVICE ALIAS PLAYBOOK -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">CEPH Core Deployment: Step 1 - Ansible Playbook - device-alias.yml (/usr/share/ceph-ansible/device-alias.yml)</h3>
           <i id="device_alias" class="fa fa-check-square deploy-step-incomplete"></i>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <p class="cd-para">click "run" to run the device-alias.yml playbook</p>
           <div id="terminal-device-alias-iframe">
           </div>
@@ -220,11 +238,11 @@ Click "Generate" to create and display the "all.yml" file content.
     <!-- CORE PLAYBOOK -->
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
-        <div class="panel-heading cd-row">
+        <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">CEPH Core Deployment: Step 2 - Ansible Playbook - core.yml (/usr/share/ceph-ansible/core.yml)</h3>
           <i id="deploy_core" class="fa fa-check-square deploy-step-incomplete"></i>
         </div>
-        <div class="panel-body">
+        <div class="cd-panel-body">
           <p class="cd-para">click "run" to perform the core.yml playbook</p>
           <div id="terminal-core-iframe">
           </div>

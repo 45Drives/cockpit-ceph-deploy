@@ -29,6 +29,51 @@ function show_snackbar_msg(msg_label,msg_content,msg_color,id) {
 	}
   } 
 
+  function set_last_theme_state() {
+	var toggle_switch = document.getElementById("toggle-theme");
+	var state = localStorage.getItem("houston-theme-state");
+	var icon = document.getElementById("houston-theme-icon");
+	//var logo = document.getElementById("logo-45d");
+	if (state === "light") {
+		toggle_switch.checked = false;
+		document.documentElement.setAttribute("data-theme", "light");
+		icon.classList.remove("fa-moon");
+		icon.classList.add("fa-sun");
+		//logo.src = "branding/logo-light.svg";
+	} else if (state === "dark") {
+		toggle_switch.checked = true;
+		document.documentElement.setAttribute("data-theme", "dark");
+		icon.classList.remove("fa-sun");
+		icon.classList.add("fa-moon");
+		//logo.src = "branding/logo-dark.svg";
+	} else {
+		toggle_switch.checked = false;
+		state = "light";
+		localStorage.setItem("houston-theme-state", state);
+		//logo.src = "branding/logo-light.svg";
+	}
+}
+
+function switch_theme(/*event*/ e) {
+	var icon = document.getElementById("houston-theme-icon");
+	//var logo = document.getElementById("logo-45d");
+	var state = "";
+	if (e.target.checked) {
+		state = "dark";
+		icon.classList.remove("fa-sun");
+		icon.classList.add("fa-moon");
+		//logo.src = "branding/logo-dark.svg";
+	} else {
+		state = "light";
+		icon.classList.remove("fa-moon");
+		icon.classList.add("fa-sun");
+		//logo.src = "branding/logo-light.svg";
+	}
+	document.documentElement.setAttribute("data-theme", state);
+	localStorage.setItem("houston-theme-state", state);
+}
+
+
 function add_host_request(){
 	let hostname = document.getElementById("new-hostname-field").value;
 	let monitor_interface = document.getElementById("new-interface-field").value;
@@ -186,6 +231,7 @@ function update_role_info(hosts_json,roles_json){
 
 	//create a blank th entry to start then create a header for each role
 	let role_table_header_row = document.createElement("tr");
+	role_table_header_row.classList.add("cd-table-header-row");
 	role_table_header_row.appendChild(document.createElement("th"));
 	for (let key of Object.keys(roles_json)){
 		let th = document.createElement("th");
@@ -207,17 +253,21 @@ function update_role_info(hosts_json,roles_json){
 			let role_checkbox_td = document.createElement("td");
 			let role_checkbox = document.createElement("input");
 			role_checkbox.type = "checkbox";
+			role_checkbox.classList.add("cd-checkbox");
 			role_checkbox.id = role_key + "-" + host_key + "-checkbox"; //eg "osds-hostname1-checkbox"
 			if(roles_json[role_key].includes(host_key)){
 				// ensure that checkbox is pre-checked if hostname is found in role list.
 				role_checkbox.checked = true; 
 			}
+			role_checkbox.addEventListener("change",function(){
+			document.getElementById("update-roles-btn").removeAttribute("disabled")});
 			role_checkbox_td.appendChild(role_checkbox);
 			role_table_host_row.appendChild(role_checkbox_td);
 		}
 		role_table.appendChild(role_table_host_row); // add row to table
 	}
 	role_div.appendChild(role_table); // add table to div
+	document.getElementById("update-roles-btn").disabled = true; // diable the update roles button
 }
 
 function update_options_info(options_json){
@@ -367,7 +417,10 @@ function update_host_info(hosts_json){
 	while (host_list.hasChildNodes()) {  
 		host_list.removeChild(host_list.firstChild);
 	}
-	if(Object.keys(hosts_json).length > 0){	
+	localStorage.setItem("core_params_hosts",hosts_json);
+	if(Object.keys(hosts_json).length > 0){
+		document.getElementById("cd-host-box").classList.remove("hidden");
+		document.getElementById("cd-host-placeholder").classList.add("hidden");
 		for (let key of Object.keys(hosts_json)) {
 			let hostname = hosts_json[key]["hostname"];
 			//let ip = hosts_json[key]["ip"];
@@ -411,11 +464,8 @@ function update_host_info(hosts_json){
 			host_list.appendChild(new_host_entry);
 		}
 	}else{
-		var placeholder = document.createElement("div");
-		placeholder.classList.add("cd-host-list-entry-placeholder");
-		placeholder.id = "cd-host-placeholder";
-		placeholder.innerText = "No hosts have been configured. Click the \"+New Host\" button to add a new host.";
-		host_list.appendChild(placeholder);
+		document.getElementById("cd-host-box").classList.add("hidden");
+		document.getElementById("cd-host-placeholder").classList.remove("hidden");
 	}
 }
 
@@ -544,6 +594,30 @@ function update_options_request(){
 	});
 }
 
+function show_all_file(){
+	let all_file_content = document.getElementById("all-file-content");
+	let show_button = document.getElementById("show-all-file-btn");
+	if(all_file_content && all_file_content.classList.contains("hidden")){
+		all_file_content.classList.remove("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+	}else{
+		all_file_content.classList.add("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye"></i>';
+	}
+}
+
+function show_host_file(){
+	let host_file_content = document.getElementById("host-file-content");
+	let show_button = document.getElementById("show-host-file-btn");
+	if(host_file_content && host_file_content.classList.contains("hidden")){
+		host_file_content.classList.remove("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+	}else{
+		host_file_content.classList.add("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye"></i>';
+	}
+}
+
 function generate_host_file(){
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_hosts"];
 	var result_json = null;
@@ -566,6 +640,10 @@ function generate_host_file(){
 			var host_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
 			host_file_content_proc.done(function(data){
 				document.getElementById("host-file-content").innerText = data;
+				localStorage.setItem("hosts",data);
+				let show_button = document.getElementById("show-host-file-btn");
+				show_button.classList.remove("hidden");
+				show_button.addEventListener("click",show_host_file);
 			});
 			host_file_content_proc.fail(function(ex,data){
 				console.log("host_file_content_proc (FAIL): ",data);
@@ -601,6 +679,10 @@ function generate_all_file(){
 			var all_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
 			all_file_content_proc.done(function(data){
 				document.getElementById("all-file-content").innerText = data;
+				localStorage.setItem("all.yml",data);
+				let show_button = document.getElementById("show-all-file-btn");
+				show_button.classList.remove("hidden");
+				show_button.addEventListener("click",show_all_file);
 			});
 			all_file_content_proc.fail(function(ex,data){
 				console.log("all_file_content_proc (FAIL): ",data);
@@ -624,38 +706,36 @@ function makeTerminal(termID){
 	return term;
 }
 
-function update_deploy_state(content,playbook){
-	console.log("deploy_state_file_updated: ",playbook);
-	let prev_state = (localStorage.getItem("deploy_state")??"{}");
-	let prev_state_json = JSON.parse(prev_state);
+function update_deploy_state(content){
+	let prev_state_json_str = (localStorage.getItem("deploy_state")??"{}");
+	let prev_state_json = JSON.parse(prev_state_json_str);
 	if(content && prev_state_json != content){
 		localStorage.setItem("deploy_state",JSON.stringify(content));
-		if(content.hasOwnProperty(playbook) && content[playbook].hasOwnProperty("result")){
+		Object.entries(content).forEach(([playbook, obj]) => {
 			let checkmark = document.getElementById(playbook);
-			if(checkmark && content[playbook].result === 0){
+			if(checkmark && content.hasOwnProperty(playbook) && content[playbook].result === 0){
 				checkmark.classList.remove("fa-exclamation-triangle");
 				checkmark.classList.remove("deploy-step-failed");
 				checkmark.classList.remove("deploy-step-incomplete");
 				checkmark.classList.add("fa-check-square");
 				checkmark.classList.add("deploy-step-complete");
-			}else if (checkmark){
+			}else if (checkmark && content.hasOwnProperty(playbook)){
 				checkmark.classList.remove("deploy-step-incomplete");
 				checkmark.classList.remove("fa-check-square");
 				checkmark.classList.remove("deploy-step-complete");
 				checkmark.classList.add("deploy-step-failed");
 				checkmark.classList.add("fa-exclamation-triangle");
 			}
-		}
+		});
 	}
 }
 
-function monitor_deploy_state(playbook){
+function monitor_deploy_state(){
 	g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
-	g_deploy_file.watch(function(content){update_deploy_state(content,playbook);});
+	g_deploy_file.watch(function(content){update_deploy_state(content);});
 }
 
 function ansible_ping(){
-	monitor_deploy_state("ping_all");
 	localStorage.setItem("terminal-command","ansible_runner -c ping_all\n");
 	let ping_term = document.getElementById("terminal-ping");
 	if(!ping_term){ping_term = makeTerminal("terminal-ping");}
@@ -663,7 +743,6 @@ function ansible_ping(){
 }
 
 function ansible_device_alias(){
-	monitor_deploy_state("device_alias");
 	localStorage.setItem("terminal-command","ansible_runner -c device_alias\n");
 	let device_alias_term = document.getElementById("terminal-device-alias");
 	if(!device_alias_term){device_alias_term = makeTerminal("terminal-device-alias");}
@@ -671,7 +750,6 @@ function ansible_device_alias(){
 }
 
 function ansible_core(){
-	monitor_deploy_state("deploy_core");
 	localStorage.setItem("terminal-command","ansible_runner -c deploy_core\n");
 	let core_term = document.getElementById("terminal-core");
 	if(!core_term){core_term = makeTerminal("terminal-core");}
@@ -692,8 +770,35 @@ function main()
 
 				show_step_content(current_step);
 				get_param_file_content();
+				g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
+				g_deploy_file.modify(function(old_content){if(!old_content){return {};}else{return old_content;}});
+				monitor_deploy_state();
 				deploy_state_json = (localStorage.getItem("deploy_state")??"{}");
+				localStorage.setItem("deploy_state",deploy_state_json);
 				deploy_state_obj = JSON.parse(deploy_state_json);
+
+				let hosts = localStorage.getItem("hosts");
+				let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
+				hosts_content.then((content,tag) => {
+					if(hosts && content && hosts == content){
+						document.getElementById("host-file-content").innerHTML = content;
+						let show_button = document.getElementById("show-host-file-btn");
+						show_button.addEventListener("click",show_host_file);
+						show_button.classList.remove("hidden");
+					}
+				});
+
+
+				let all_yml = localStorage.getItem("all.yml");
+				let all_content = cockpit.file("/usr/share/ceph-ansible/group_vars/all.yml").read();
+				all_content.then((content,tag) => {
+					if(all_yml && content && all_yml == content){
+						document.getElementById("all-file-content").innerHTML = content;
+						let show_button = document.getElementById("show-all-file-btn");
+						show_button.addEventListener("click",show_all_file);
+						show_button.classList.remove("hidden");
+					}
+				});
 
 				Object.entries(deploy_state_obj).forEach(([playbook, obj]) => {
 					let checkmark = document.getElementById(playbook);
@@ -720,7 +825,7 @@ function main()
 				document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
 				document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 				document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
-
+				document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 				
 				document.getElementById("next-step-btn").addEventListener("click",() => {
 					var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
