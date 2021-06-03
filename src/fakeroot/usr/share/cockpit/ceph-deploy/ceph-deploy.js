@@ -268,6 +268,12 @@ function update_role_info(hosts_json,roles_json){
 	}
 	role_div.appendChild(role_table); // add table to div
 	document.getElementById("update-roles-btn").disabled = true; // diable the update roles button
+	let role_content = document.getElementById("role-content");
+	let placeholder = document.getElementById("cd-role-placeholder");
+	if(role_content && placeholder){
+		if(role_table.getElementsByTagName('tr').length === 1){ role_content.classList.add("hidden");placeholder.classList.remove("hidden");}
+		else{role_content.classList.remove("hidden");placeholder.classList.add("hidden");}
+	}
 }
 
 function update_options_info(options_json){
@@ -756,6 +762,180 @@ function ansible_core(){
 	document.getElementById("terminal-core-iframe").appendChild(core_term);
 }
 
+function toggle_panel_body_visibility(btn_id,pb_id){
+	let pb = document.getElementById(pb_id);
+	let btn = document.getElementById(btn_id);
+	if(pb && btn){
+		if(pb.classList.contains("hidden")){
+			pb.classList.remove("hidden");
+			btn.classList.remove("fa-angle-down");
+			btn.classList.add("fa-angle-up");
+		}else{
+			pb.classList.add("hidden");
+			btn.classList.remove("fa-angle-up");
+			btn.classList.add("fa-angle-down");
+		}
+	}
+}
+
+function setup_panel_vis_toggle_buttons(){
+	let vis_toggle_buttons = document.getElementsByClassName("cd-panel-vis-toggle");
+	for(let i=0; i<vis_toggle_buttons.length; i++){
+		let target_content_id = vis_toggle_buttons[i].getAttribute("for");
+		let target_content_obj = document.getElementById(target_content_id);
+		let btn_id = vis_toggle_buttons[i].id;
+		if(target_content_id && target_content_obj && btn_id){
+			vis_toggle_buttons[i].addEventListener(
+				"click",() => {toggle_panel_body_visibility(btn_id,target_content_id);});
+		}
+	}
+}
+
+function setup_deploy_step_start_buttons(){
+	let start_buttons = document.getElementsByClassName("cd-deploy-step-start-btn");
+	for(let i = 0; i < start_buttons.length; i++){
+		let target_div = start_buttons[i].getAttribute("for");
+		start_buttons[i].addEventListener("click",()=>{
+			document.getElementById("cd-main-menu").classList.add("hidden");
+			document.getElementById(target_div).classList.remove("hidden");
+		});
+	}
+}
+
+function setup_top_nav_buttons(){
+	let main_menu_link = document.getElementById("main-menu-link");
+	if(main_menu_link){
+		main_menu_link.addEventListener("click",()=>{
+			let step_content_ids = [
+				"step-preconfig",
+				"step-ansible-config",
+				"step-core",
+				"step-cephfs",
+				"step-nfs",
+				"step-smb",
+				"step-rgw",
+				"step-rgwlb",
+				"step-iscsi",
+				"step-dashboard"
+			];
+
+			for(let i = 0; i < step_content_ids.length; i++){
+				let content = document.getElementById(step_content_ids[i]);
+				if(content){
+					content.classList.add("hidden");
+				}
+			}
+			
+			let main_menu_content = document.getElementById("cd-main-menu");
+			if(main_menu_content){main_menu_content.classList.remove("hidden");}
+		});
+	}
+}
+
+function setup_buttons(){
+	setup_top_nav_buttons();
+	setup_deploy_step_start_buttons();
+	setup_panel_vis_toggle_buttons();
+
+}
+
+function setup_main_menu(){
+	let deploy_step_ids = [
+		"deploy-step-preconfig",
+		"deploy-step-ansible-config",
+		"deploy-step-core",
+		"deploy-step-cephfs",
+		"deploy-step-nfs",
+		"deploy-step-smb",
+		"deploy-step-rgw",
+		"deploy-step-rgwlb",
+		"deploy-step-iscsi",
+		"deploy-step-dashboard"
+	];
+
+	let deploy_step_default_states = {
+		"deploy-step-preconfig" : "unlocked",
+		"deploy-step-ansible-config" : "locked",
+		"deploy-step-core" : "locked",
+		"deploy-step-cephfs" : "locked",
+		"deploy-step-nfs" : "locked",
+		"deploy-step-smb" : "locked",
+		"deploy-step-rgw" : "locked",
+		"deploy-step-rgwlb" : "locked",
+		"deploy-step-iscsi" : "locked",
+		"deploy-step-dashboard" : "locked"
+	};
+
+	let deploy_step_current_states = {};
+
+	let deploy_step_unlock_requirements = {
+		"deploy-step-preconfig": [],
+		"deploy-step-ansible-config": ["deploy-step-preconfig"],
+		"deploy-step-core": ["deploy-step-ansible-config"],
+		"deploy-step-cephfs": ["deploy-step-core"],
+		"deploy-step-nfs": ["deploy-step-cephfs"],
+		"deploy-step-smb": ["deploy-step-cephfs"],
+		"deploy-step-rgw": ["deploy-step-core"],
+		"deploy-step-rgwlb": ["deploy-step-rgw"],
+		"deploy-step-iscsi": ["deploy-step-core"],
+		"deploy-step-dashboard": ["deploy-step-rgw","deploy-step-iscsi","deploy-step-nfs","deploy-step-smb"]
+	};
+
+	// get states from local storage
+	for(let i = 0; i < deploy_step_ids.length; i++){
+		deploy_step_current_states[deploy_step_ids[i]] = (localStorage.getItem(deploy_step_ids[i])??deploy_step_default_states[deploy_step_ids[i]]);
+	}
+
+	// unlock the steps that have their unlock requirements met and update local storage.
+	for(let i = 0; i < deploy_step_ids.length; i++){
+		if(deploy_step_current_states[deploy_step_ids[i]] == "locked"){
+			for(let j = 0; j < deploy_step_unlock_requirements[deploy_step_ids[i]].length; j++){
+				if(deploy_step_current_states[deploy_step_unlock_requirements[deploy_step_ids[i]][j]] == "complete"){
+					deploy_step_current_states[deploy_step_ids[i]] = "unlocked";
+					break;
+				}
+			}
+		}
+		localStorage.setItem(deploy_step_ids[i],deploy_step_current_states[deploy_step_ids[i]]);
+	}
+
+	// update the appearance based on updated states
+	for(let i = 0; i < deploy_step_ids.length; i++){
+		let deploy_step_element = document.getElementById(deploy_step_ids[i]);
+		
+		if(deploy_step_element){
+			let status_div = deploy_step_element.querySelector('.cd-step-status');
+			let start_btn = deploy_step_element.querySelector('.cd-deploy-step-start-btn');
+			if(deploy_step_current_states[deploy_step_ids[i]] == "complete"){
+				deploy_step_element.classList.add("cd-step-complete");
+				if(status_div && start_btn){ 
+					status_div.innerHTML = '<i class="fas fa-check"></i>';
+					status_div.title = "completed";
+					start_btn.classList.remove("hidden");
+					start_btn.title = "redo";
+					start_btn.innerHTML = '<i class="fas fa-redo"></i>';
+				}
+			}else if(deploy_step_current_states[deploy_step_ids[i]] == "unlocked"){
+				deploy_step_element.classList.remove("cd-step-complete");
+				if(status_div && start_btn){ 
+					status_div.innerHTML = '<i class="fas fa-lock-open"></i>';
+					status_div.title = "ready";
+					start_btn.classList.remove("hidden");
+					start_btn.title = "start";
+				}
+			}else if(deploy_step_current_states[deploy_step_ids[i]] == "locked"){
+				deploy_step_element.classList.remove("cd-step-complete");
+				if(status_div && start_btn){ 
+					status_div.innerHTML = '<i class="fas fa-lock"></i>';
+					status_div.title = "locked: complete required steps to unlock.";
+					start_btn.classList.add("hidden");
+					start_btn.title = "start";
+				}
+			}
+		}
+	}
+}
+
 function main()
 {
 	let root_check = cockpit.permission({ admin: true });
@@ -766,9 +946,11 @@ function main()
 				//user is an administrator, start the module as normal
                 //setup on-click listeners for buttons as required.
 				var current_step = Number(localStorage.getItem("current_step")??"0");
-				if(current_step === 0){ document.getElementById("prev-step-btn").disabled = true; }
+				//if(current_step === 0){ document.getElementById("prev-step-btn").disabled = true; }
+				setup_main_menu();
+				setup_buttons();
 
-				show_step_content(current_step);
+				//show_step_content(current_step);
 				get_param_file_content();
 				g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
 				g_deploy_file.modify(function(old_content){if(!old_content){return {};}else{return old_content;}});
@@ -827,24 +1009,24 @@ function main()
 				document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
 				document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 				
-				document.getElementById("next-step-btn").addEventListener("click",() => {
-					var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
-					var current_step = next_step -1;
-					hide_step_content(current_step);
-					show_step_content(next_step);
-					document.getElementById("prev-step-btn").removeAttribute("disabled");
-					localStorage.setItem("current_step",next_step.toString());
-				});
-				
-				document.getElementById("prev-step-btn").addEventListener("click",() => {
-					var prev_step = Number(localStorage.getItem("current_step")??"0") == 0 ? 0 : Number(localStorage.getItem("current_step")??"0") - 1;
-					var current_step = prev_step +1;
-					hide_step_content(current_step);
-					show_step_content(prev_step);
-					if(prev_step !== 0){document.getElementById("prev-step-btn").removeAttribute("disabled");}
-					else{document.getElementById("prev-step-btn").disabled = true;}
-					localStorage.setItem("current_step",prev_step.toString());
-				});
+				//document.getElementById("next-step-btn").addEventListener("click",() => {
+				//	var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
+				//	var current_step = next_step -1;
+				//	hide_step_content(current_step);
+				//	show_step_content(next_step);
+				//	document.getElementById("prev-step-btn").removeAttribute("disabled");
+				//	localStorage.setItem("current_step",next_step.toString());
+				//});
+				//
+				//document.getElementById("prev-step-btn").addEventListener("click",() => {
+				//	var prev_step = Number(localStorage.getItem("current_step")??"0") == 0 ? 0 : Number(localStorage.getItem("current_step")??"0") - 1;
+				//	var current_step = prev_step +1;
+				//	hide_step_content(current_step);
+				//	show_step_content(prev_step);
+				//	if(prev_step !== 0){document.getElementById("prev-step-btn").removeAttribute("disabled");}
+				//	else{document.getElementById("prev-step-btn").disabled = true;}
+				//	localStorage.setItem("current_step",prev_step.toString());
+				//});
 				
 			}else{
 				//user is not an administrator, inform them of this by
