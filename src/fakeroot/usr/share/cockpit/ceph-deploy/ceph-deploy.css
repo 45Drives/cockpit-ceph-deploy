@@ -975,12 +975,13 @@ th,td {
     font-weight: 700;
 }
 
-.back-to-main-btn {
-    color: var(--font);
-    font-size: medium;
+.progress-bar-main-back {
+    color: var(--border);
+    font-size: x-large;
+    font-weight: 800;
     padding: 5px 5px 5px 5px;
     flex-grow: 0;
-    border: 1px solid var(--border);
+    cursor: pointer;
 }
 
 .cd-progress-bar {
@@ -988,8 +989,8 @@ th,td {
 	flex-direction: row;
 	align-items:center;
 	justify-content:flex-start;
-    gap: 10px;
-    padding: 5px 5px 5px 10px;
+    gap: 5px;
+    padding: 5px 5px 5px 5px;
 }
 
 .progress-bar-title{
@@ -1031,8 +1032,7 @@ th,td {
 }
 
 .progress-step-divider {
-    padding:5px 5px 5px 5px;
-    color: var(--font);
+    color: var(--border);
 }
 
 .cd-main-nav {
@@ -1042,4 +1042,8 @@ th,td {
     padding: 5px 5px 5px 5px;
     flex-grow: 0;
     border-right: 3px solid var(--border);
+}
+
+.cd-step-bottom-nav-group {
+    width: 80%;
 }

@@ -803,40 +803,145 @@ function setup_deploy_step_start_buttons(){
 }
 
 function setup_top_nav_buttons(){
-	let main_menu_link = document.getElementById("main-menu-link");
-	if(main_menu_link){
-		main_menu_link.addEventListener("click",()=>{
-			let step_content_ids = [
-				"step-preconfig",
-				"step-ansible-config",
-				"step-core",
-				"step-cephfs",
-				"step-nfs",
-				"step-smb",
-				"step-rgw",
-				"step-rgwlb",
-				"step-iscsi",
-				"step-dashboard"
-			];
-
-			for(let i = 0; i < step_content_ids.length; i++){
-				let content = document.getElementById(step_content_ids[i]);
-				if(content){
-					content.classList.add("hidden");
+	let main_menu_links = document.getElementsByClassName("progress-bar-main-back");
+	if(main_menu_links){
+		for(let i = 0; i < main_menu_links.length; i++){
+			main_menu_links[i].addEventListener("click",()=>{
+				let step_content_ids = [
+					"step-preconfig",
+					"step-ansible-config",
+					"step-core",
+					"step-cephfs",
+					"step-nfs",
+					"step-smb",
+					"step-rgw",
+					"step-rgwlb",
+					"step-iscsi",
+					"step-dashboard"
+				];
+	
+				for(let i = 0; i < step_content_ids.length; i++){
+					let content = document.getElementById(step_content_ids[i]);
+					if(content){
+						content.classList.add("hidden");
+					}
 				}
-			}
-			
-			let main_menu_content = document.getElementById("cd-main-menu");
-			if(main_menu_content){main_menu_content.classList.remove("hidden");}
-		});
+				
+				let main_menu_content = document.getElementById("cd-main-menu");
+				if(main_menu_content){main_menu_content.classList.remove("hidden");}
+			});
+		}
 	}
 }
+
+function setup_deploy_step_nav_buttons(){
+	let done_buttons = document.getElementsByClassName("cd-deploy-step-done-btn");
+	if(done_buttons){
+		for(let i = 0; i < done_buttons.length; i++){
+			let step_content_id = done_buttons[i].getAttribute("for");
+			if(step_content_id){
+				let step_content = document.getElementById(step_content_id);
+				if(step_content){
+					let deploy_step_id = step_content.getAttribute("for");
+					if(deploy_step_id){
+						done_buttons[i].addEventListener("click", () => {
+							localStorage.setItem(deploy_step_id,"complete");
+							step_content.classList.add("hidden");
+							document.getElementById("cd-main-menu").classList.remove("hidden");
+							setup_main_menu();
+						});
+					}
+				}
+			}
+		}
+	}
+
+	let next_buttons = document.getElementsByClassName("cd-deploy-step-next-btn");
+	if(next_buttons){
+		for(let i = 0; i < next_buttons.length; i++){
+			let step_content_id = next_buttons[i].getAttribute("for");
+			if(step_content_id){
+				next_buttons[i].addEventListener("click",()=>{
+					console.log(step_content_id);
+					let step_progress = localStorage.getItem(step_content_id)??"0";
+					step_progress++;
+					localStorage.setItem(step_content_id,String(step_progress));
+					setup_progress_bar(step_content_id);
+				});
+			}
+		}
+	}
+
+	let prev_buttons = document.getElementsByClassName("cd-deploy-step-prev-btn");
+	if(next_buttons){
+		for(let i = 0; i < prev_buttons.length; i++){
+			let step_content_id = prev_buttons[i].getAttribute("for");
+			if(step_content_id){
+				prev_buttons[i].addEventListener("click",()=>{
+					let step_progress = Number(localStorage.getItem(step_content_id)??"1");
+					step_progress--;
+					localStorage.setItem(step_content_id,String(step_progress));
+					setup_progress_bar(step_content_id);
+				});
+			}
+		}
+	}
+}
+
+function setup_progress_bar(step_id){
+	let step_div = document.getElementById(step_id);
+	let step_progress = localStorage.getItem(step_id)??"0";
+
+	let progress_bar_steps = step_div.querySelectorAll(':scope [data-progress-bar-idx]');
+	if(progress_bar_steps){
+		for(let i = 0; i < progress_bar_steps.length; i++){
+			if(progress_bar_steps[i].dataset.progressBarIdx === step_progress){
+				progress_bar_steps[i].classList.add("progress-current-step");
+				progress_bar_steps[i].classList.remove("progress-completed-step");
+				let current_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
+				if(current_step_content){ current_step_content.classList.remove("hidden")}
+				localStorage.setItem(step_id,progress_bar_steps[i].dataset.progressBarIdx);
+			}else if(Number(progress_bar_steps[i].dataset.progressBarIdx) < Number(step_progress)){
+				progress_bar_steps[i].classList.remove("progress-current-step");
+				progress_bar_steps[i].classList.add("progress-completed-step");
+				let completed_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
+				if(completed_step_content){ completed_step_content.classList.add("hidden")}
+			}else{
+				progress_bar_steps[i].classList.remove("progress-current-step");
+				progress_bar_steps[i].classList.remove("progress-completed-step");
+				let next_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
+				if(next_step_content){ next_step_content.classList.add("hidden")}
+			}
+		}
+	}
+
+	let prev_button = step_div.querySelector(':scope .cd-deploy-step-prev-btn');
+	let next_button = step_div.querySelector(':scope .cd-deploy-step-next-btn');
+	let done_button = step_div.querySelector(':scope .cd-deploy-step-done-btn');
+
+	if(prev_button){
+		if(step_progress === "0"){prev_button.disabled = true;}
+		else{prev_button.removeAttribute("disabled");}
+	}
+
+	if(next_button){
+		if(Number(step_progress) === progress_bar_steps.length -1 ){
+			next_button.classList.add("hidden");
+			if(done_button) done_button.classList.remove("hidden");
+		}else{
+			next_button.classList.remove("hidden");
+			if(done_button) done_button.classList.add("hidden");
+		}
+	}
+}
+
 
 function setup_buttons(){
 	setup_top_nav_buttons();
 	setup_deploy_step_start_buttons();
 	setup_panel_vis_toggle_buttons();
-
+	setup_deploy_step_nav_buttons();
+	setup_progress_bar("step-ansible-config");
 }
 
 function setup_main_menu(){
@@ -946,7 +1051,7 @@ function main()
 				//user is an administrator, start the module as normal
                 //setup on-click listeners for buttons as required.
 				var current_step = Number(localStorage.getItem("current_step")??"0");
-				//if(current_step === 0){ document.getElementById("prev-step-btn").disabled = true; }
+
 				setup_main_menu();
 				setup_buttons();
 
@@ -1008,25 +1113,6 @@ function main()
 				document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 				document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
 				document.getElementById("toggle-theme").addEventListener("change",switch_theme);
-				
-				//document.getElementById("next-step-btn").addEventListener("click",() => {
-				//	var next_step = Number(localStorage.getItem("current_step")??"0") + 1;
-				//	var current_step = next_step -1;
-				//	hide_step_content(current_step);
-				//	show_step_content(next_step);
-				//	document.getElementById("prev-step-btn").removeAttribute("disabled");
-				//	localStorage.setItem("current_step",next_step.toString());
-				//});
-				//
-				//document.getElementById("prev-step-btn").addEventListener("click",() => {
-				//	var prev_step = Number(localStorage.getItem("current_step")??"0") == 0 ? 0 : Number(localStorage.getItem("current_step")??"0") - 1;
-				//	var current_step = prev_step +1;
-				//	hide_step_content(current_step);
-				//	show_step_content(prev_step);
-				//	if(prev_step !== 0){document.getElementById("prev-step-btn").removeAttribute("disabled");}
-				//	else{document.getElementById("prev-step-btn").disabled = true;}
-				//	localStorage.setItem("current_step",prev_step.toString());
-				//});
 				
 			}else{
 				//user is not an administrator, inform them of this by

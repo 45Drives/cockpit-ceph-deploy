@@ -31,23 +31,22 @@
 </head>
 
 <body>
-  <div class="cd-top-nav-button-group">
-    <div class="nav-btn-group">
-      <div class="cd-main-nav" id="main-menu-link" title="main menu">Ceph Deploy</div>
-      <div class="nav-toggle">
-        <i class="fas fa-sun" id="houston-theme-icon"></i>
-        <div class="horizontal-spacer-sm"></div>
-        <label class="switch">
-          <input type="checkbox" id="toggle-theme">
-          <span class="slider round"></span>
-        </label>
-      </div>
-      </div>
-    </div>
-  </div>
-
 
   <div id="cd-main-menu">
+    <div class="cd-top-nav-button-group">
+      <div class="nav-btn-group">
+        <div class="cd-main-nav" id="main-menu-link" title="main menu">Ceph Deploy</div>
+        <div class="nav-toggle">
+          <i class="fas fa-sun" id="houston-theme-icon"></i>
+          <div class="horizontal-spacer-sm"></div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-theme">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
     <div id="cd-tree-menu">
       <div class="cd-tree-menu-row">
         <div class="cd-tree-menu-col">
@@ -210,19 +209,21 @@
   </div>
 
   <!-- PRE-CONFIGURATION -->
-  <div id="step-preconfig" class="hidden">
-    <!--<div class="cd-top-nav-button-group">-->
-      <!--<div class="nav-toggle">-->
+  <div id="step-preconfig" class="hidden" for="deploy-step-preconfig">
+    <div class="cd-top-nav-button-group">
         <div class="cd-progress-bar" id="progress-bar-preconfig">
+          <div class="progress-bar-main-back" title="main menu">
+            Ceph Deploy
+          </div>
+          <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
           <div class="progress-bar-title">Pre-Configuration</div>
           <div class="progress-step progress-current-step">Requirements</div>
         </div>
-      <!--</div>-->
-    <!--</div>-->
+    </div>
     <div class="cd-block">
       <div class="panel panel-default cd-panel">
         <div class="cd-row cd-panel-heading">
-          <h3 class="panel-title cd-row-child">ceph-deploy: Pre-configuration Requirements</h3>
+          <h3 class="panel-title cd-row-child">Pre-configuration Requirements</h3>
         </div>
         <div class="cd-panel-body">
           <p class="preconfig-heading">Please ensure that the following network steps are completed before proceeding:</p>
@@ -232,81 +233,104 @@
             <li class="preconfig-step"><i class="fa fa-key"></i> ssh keys have been generated on the administrator node and passwordless ssh to all hosts is working.</li>
             <li class="preconfig-step"><i class="fa fa-download"></i> The ceph-ansible package is installed on the administrator node.</li>
           </ul>
-          <p class="preconfig-heading">Once these requirements are met, click "Next" to move to Step 1: Host Configuration.</p>
+          <p class="preconfig-heading">Once these requirements are met, click "Done" to complete this step and return to the main menu.</p>
         </div>
       </div>
     </div>
-    <div class="cd-row-right">
+    <div class="cd-row-right cd-step-bottom-nav-group">
       <button type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-preconfig">Done</button>
     </div>
   </div>
   
   <!-- ANSIBLE CONFIGURATION -->  
-  <div id="step-ansible-config" class="hidden">
-    <!-- HOST INFORMATION -->
-    <div class="cd-block" id="step-1-0">
-      <div class="panel panel-default cd-panel">
-        <div class="cd-row cd-panel-heading" id="step-1-0-panel-heading">
-          <h3 class="panel-title cd-row-child" id="step-1-0-panel-title">Ansible Configuration: Host Information</h3>
-          <div class="cd-row-right cd-row-child cd-panel-nav">
-            <i id="step-1-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-1-0-panel-body"></i>
-          </div>
+  <div id="step-ansible-config" class="hidden" for="deploy-step-ansible-config">
+    <div class="cd-top-nav-button-group">
+      <div class="cd-progress-bar" id="progress-bar-ansible-config">
+        <div class="progress-bar-main-back" title="main menu">
+          Ceph Deploy
         </div>
-        <div class="cd-panel-body" id="step-1-0-panel-body">
-          <p class="cd-para" id="cd-host-placeholder">No hosts have been configured. Click the "+New Host" button to add a new host.</p>
-
-          <div class="cd-host-box" id="cd-host-box">
-            <div class="cd-host-list-header-row">
-              <div class="cd-host-list-header-text">hostname</div>
-              <div class="cd-host-list-header-text">monitor_interface</div>
-              <div class="cd-host-list-header-icon"></div>
-              <div class="cd-host-list-header-icon"></div>
-            </div>
-            <div class="cd-host-list" id="cd-host-list">
-            </div>
-          </div>
-          <div class="cd-row-right cd-row-child">
-            <button class="btn active btn-primary" id="new-host-btn">
-              <span class="button-symbol">+</span>New Host
-            </button>
-          </div>
-        </div>
+        <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
+        <div class="progress-bar-title">Ansible Configuration</div>
+        <div class="progress-step progress-current-step" data-progress-bar-idx="0">Hosts & Roles</div>
+        <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
+        <div class="progress-step "  data-progress-bar-idx="1">Additional Options</div>
+        <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
+        <div class="progress-step "  data-progress-bar-idx="2">Inventory File (hosts)</div>
+        <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
+        <div class="progress-step "  data-progress-bar-idx="3">Inventory File (all.yml)</div>
+        <div class="progress-step-divider"><i class="fas fa-chevron-right"></i></div>
+        <div class="progress-step "  data-progress-bar-idx="4">Ping Test</div>
       </div>
     </div>
-    <!-- ROLE ASSIGNMENT -->
-    <div class="cd-block" id="step-1-1">
-      <div class="panel panel-default cd-panel">
-        <div class="cd-row cd-panel-heading">
-          <h3 class="panel-title cd-row-child">Ansible Configuration: Role Assignment</h3>
-          <div class="cd-row-right cd-row-child cd-panel-nav">
-            <i id="step-1-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-1-1-panel-body"></i>
-          </div>
-        </div>
-        <div id="step-1-1-panel-body" class="cd-panel-body">
-          <p class="cd-para" id="cd-role-placeholder">Add at least one host in order to assign roles.</p>
-          <div id="role-content" class="hidden">
-            <div id="role-div">
+    <!-- ANSIBLE-CONFIGURATION: STEP 1 -->
+    <div class="hidden" data-step-content-idx="0">
+      <!-- HOST INFORMATION -->
+      <div class="cd-block">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading" id="step-1-0-panel-heading">
+            <h3 class="panel-title cd-row-child" id="step-1-0-panel-title">Ansible Configuration: Host Information</h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-1-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-1-1-body"></i>
             </div>
+          </div>
+          <div class="cd-panel-body" id="ansible-config-1-1-body">
+            <p class="cd-para" id="cd-host-placeholder">No hosts have been configured. Click the "+New Host" button to add a new host.</p>
   
+            <div class="cd-host-box" id="cd-host-box">
+              <div class="cd-host-list-header-row">
+                <div class="cd-host-list-header-text">hostname</div>
+                <div class="cd-host-list-header-text">monitor_interface</div>
+                <div class="cd-host-list-header-icon"></div>
+                <div class="cd-host-list-header-icon"></div>
+              </div>
+              <div class="cd-host-list" id="cd-host-list">
+              </div>
+            </div>
             <div class="cd-row-right cd-row-child">
-              <button class="btn active btn-primary" id="update-roles-btn" disabled>
-                Update Roles
+              <button class="btn active btn-primary" id="new-host-btn">
+                <span class="button-symbol">+</span>New Host
               </button>
             </div>
           </div>
         </div>
       </div>
+      <!-- ROLE ASSIGNMENT -->
+      <div class="cd-block">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">Ansible Configuration: Role Assignment</h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-1-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-1-2-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-1-2-body" class="cd-panel-body">
+            <p class="cd-para" id="cd-role-placeholder">Add at least one host in order to assign roles.</p>
+            <div id="role-content" class="hidden">
+              <div id="role-div">
+              </div>
+    
+              <div class="cd-row-right cd-row-child">
+                <button class="btn active btn-primary" id="update-roles-btn" disabled>
+                  Update Roles
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- ANSIBLE-CONFIGURATION: STEP 2 -->
     <!-- GLOBAL OPTIONS -->
-    <div class="cd-block" id="step-1-2">
+    <div class="cd-block step-ansible-config hidden" data-step-content-idx="1">
       <div class="panel panel-default cd-panel">
         <div class="cd-row cd-panel-heading">
           <h3 class="panel-title cd-row-child">Ansible Configuration: Additional Options</h3>
           <div class="cd-row-right cd-row-child cd-panel-nav">
-            <i id="step-1-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-1-2-panel-body"></i>
+            <i id="step-1-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-2-body"></i>
           </div>
         </div>
-        <div id="step-1-2-panel-body" class="cd-panel-body">
+        <div id="ansible-config-2-body" class="cd-panel-body">
           <div class="ct-form">
             <label class="control-label" for="options-interface-field">monitor_interface</label>
             <div class="ct-validation-wrapper">
@@ -341,21 +365,20 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ANSIBLE INVENTORY FILE GENERATION -->
-  <div id="step-ansible-config-2" class="hidden">
+
+    <!-- ANSIBLE-CONFIGURATION: STEP 3 -->
         <!-- HOST FILE -->
-        <div class="cd-block" id="step-2-0">
+        <div class="cd-block step-ansible-config hidden" data-step-content-idx="2">
           <div class="panel panel-default cd-panel">
             <div class="cd-row cd-panel-heading">
               <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - hosts</h3>
               <div class="cd-row-right cd-row-child cd-panel-nav">
-                <i id="step-2-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-2-0-panel-body"></i>
+                <i id="step-2-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-3-body"></i>
                 
               </div>
             </div>
-            <div id="step-2-0-panel-body" class="cd-panel-body">
+            <div id="ansible-config-3-body" class="cd-panel-body">
               <p class="cd-para">Click "Generate" to generate the hosts inventory file (/usr/share/ceph-ansible/hosts)</p>
               <div class="cd-row-right">
                 <button class="btn active btn-primary hidden" id="show-host-file-btn">
@@ -373,19 +396,20 @@
             </div>
           </div>
         </div>
+
+        <!-- ANSIBLE-CONFIGURATION: STEP 4 -->
         <!-- ALL.YML -->
-        
-        <div class="cd-block" id="step-2-1">
+        <div class="cd-block step-ansible-config hidden" data-step-content-idx="3">
           <div class="panel panel-default cd-panel">
             <div class="cd-row cd-panel-heading">
               <h3 class="panel-title cd-row-child">Ansible Configuration: Inventory File Generation - all.yml </h3>
               <div class="cd-row-right cd-row-child cd-panel-nav">
-                <i id="step-2-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-2-1-panel-body"></i>
+                <i id="step-2-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-4-body"></i>
                 <button class="btn active btn-primary hidden" id="show-all-file-btn"><i class="fas fa-eye"></i></button>
               </div>
               
             </div>
-            <div id="step-2-1-panel-body" class="cd-panel-body">
+            <div id="ansible-config-4-body" class="cd-panel-body">
               <p class="cd-para">Click "Generate" to generate all.yml using the  (/usr/share/ceph-ansible/group_vars/all.yml)</p>
     <pre id="all-file-content" class="hidden">
     Click "Generate" to create and display the "all.yml" file content.
@@ -398,18 +422,18 @@
             </div>
           </div>
         </div>
-
+        <!-- ANSIBLE-CONFIGURATION: STEP 5 -->
         <!-- PING TEST-->
-        <div class="cd-block" id="step-2-2">
+        <div class="cd-block step-ansible-config hidden" data-step-content-idx="4">
           <div class="panel panel-default cd-panel">
             <div class="cd-row cd-panel-heading">
               <h3 class="panel-title cd-row-child">Ansible Configuration: Ping Test</h3>
               <div class="cd-row-right cd-row-child cd-panel-nav">
-                <i id="step-2-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-2-2-panel-body"></i>
+                <i id="step-2-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-5-body"></i>
                 <i id="ping_all" class="fa fa-check-square deploy-step-incomplete"></i>
               </div>
             </div>
-            <div id="step-2-2-panel-body" class="cd-panel-body">
+            <div id="ansible-config-5-body" class="cd-panel-body">
               <p class="cd-para">Click "Run" to test Ansible Connectivity using Ansible Ping.</p>
               <div id="terminal-ping-iframe">
               </div>
@@ -420,6 +444,11 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="cd-row-right cd-step-bottom-nav-group">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-ansible-config">Prev</button>
+          <button type="button" class="btn btn-primary cd-deploy-step-next-btn" for="step-ansible-config">Next</button>
+          <button type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-ansible-config">Done</button>
         </div>
   </div>
 
