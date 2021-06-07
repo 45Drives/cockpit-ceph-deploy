@@ -1046,4 +1046,18 @@ th,td {
 
 .cd-step-bottom-nav-group {
     width: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+    justify-content: space-between;
+    padding: 5px 15px 30px 30px;
+}
+
+.cd-step-bottom-nav-group-right {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items:center;
+    justify-content: flex-end;
+    padding: 5px 15px 30px 30px;
 }

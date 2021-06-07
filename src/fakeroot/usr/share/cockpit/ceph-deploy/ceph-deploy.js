@@ -271,8 +271,14 @@ function update_role_info(hosts_json,roles_json){
 	let role_content = document.getElementById("role-content");
 	let placeholder = document.getElementById("cd-role-placeholder");
 	if(role_content && placeholder){
-		if(role_table.getElementsByTagName('tr').length === 1){ role_content.classList.add("hidden");placeholder.classList.remove("hidden");}
-		else{role_content.classList.remove("hidden");placeholder.classList.add("hidden");}
+		if(role_table.getElementsByTagName('tr').length === 1){ 
+			role_content.classList.add("hidden");
+			placeholder.classList.remove("hidden");
+		}
+		else{
+			role_content.classList.remove("hidden");
+			placeholder.classList.add("hidden");
+		}
 	}
 }
 
@@ -301,6 +307,16 @@ function update_options_info(options_json){
 
 		hybrid_cluster_checkbox.addEventListener("change",function(){
 			document.getElementById("global-options-btn").removeAttribute("disabled")});
+
+		//enable/disable next nav button.
+		let next_btn = document.getElementById("ansible-config-add-options-nxt");
+		if(monitor_interface_field.value && public_network_field.value && next_btn){
+			next_btn.removeAttribute("disabled");
+			next_btn.title = "To proceed, fill in required fields.";
+		}else if(next_btn){
+			next_btn.disabled = true;
+			next_btn.title = "";
+		}
 	}
 }
 
@@ -425,6 +441,7 @@ function update_host_info(hosts_json){
 	}
 	localStorage.setItem("core_params_hosts",hosts_json);
 	if(Object.keys(hosts_json).length > 0){
+		document.getElementById("ansible-config-hosts-and-roles-nxt").removeAttribute("disabled");
 		document.getElementById("cd-host-box").classList.remove("hidden");
 		document.getElementById("cd-host-placeholder").classList.add("hidden");
 		for (let key of Object.keys(hosts_json)) {
@@ -472,6 +489,7 @@ function update_host_info(hosts_json){
 	}else{
 		document.getElementById("cd-host-box").classList.add("hidden");
 		document.getElementById("cd-host-placeholder").classList.remove("hidden");
+		document.getElementById("ansible-config-hosts-and-roles-nxt").disabled = true;
 	}
 }
 
@@ -646,10 +664,15 @@ function generate_host_file(){
 			var host_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
 			host_file_content_proc.done(function(data){
 				document.getElementById("host-file-content").innerText = data;
+				document.getElementById("host-file-content").classList.remove("hidden");
 				localStorage.setItem("hosts",data);
 				let show_button = document.getElementById("show-host-file-btn");
+				show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 				show_button.classList.remove("hidden");
 				show_button.addEventListener("click",show_host_file);
+				document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
+				document.getElementById("inv-file-hosts-default").classList.add("hidden");
+				document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
 			});
 			host_file_content_proc.fail(function(ex,data){
 				console.log("host_file_content_proc (FAIL): ",data);
@@ -685,10 +708,16 @@ function generate_all_file(){
 			var all_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
 			all_file_content_proc.done(function(data){
 				document.getElementById("all-file-content").innerText = data;
+				document.getElementById("all-file-content").classList.remove("hidden");
 				localStorage.setItem("all.yml",data);
 				let show_button = document.getElementById("show-all-file-btn");
+				show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 				show_button.classList.remove("hidden");
 				show_button.addEventListener("click",show_all_file);
+				document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
+				document.getElementById("inv-file-all-default").classList.add("hidden");
+				document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
+
 			});
 			all_file_content_proc.fail(function(ex,data){
 				console.log("all_file_content_proc (FAIL): ",data);
@@ -718,19 +747,11 @@ function update_deploy_state(content){
 	if(content && prev_state_json != content){
 		localStorage.setItem("deploy_state",JSON.stringify(content));
 		Object.entries(content).forEach(([playbook, obj]) => {
-			let checkmark = document.getElementById(playbook);
-			if(checkmark && content.hasOwnProperty(playbook) && content[playbook].result === 0){
-				checkmark.classList.remove("fa-exclamation-triangle");
-				checkmark.classList.remove("deploy-step-failed");
-				checkmark.classList.remove("deploy-step-incomplete");
-				checkmark.classList.add("fa-check-square");
-				checkmark.classList.add("deploy-step-complete");
-			}else if (checkmark && content.hasOwnProperty(playbook)){
-				checkmark.classList.remove("deploy-step-incomplete");
-				checkmark.classList.remove("fa-check-square");
-				checkmark.classList.remove("deploy-step-complete");
-				checkmark.classList.add("deploy-step-failed");
-				checkmark.classList.add("fa-exclamation-triangle");
+			let done_button = document.getElementById(playbook);
+			if(done_button && content.hasOwnProperty(playbook) && content[playbook].result === 0){
+				done_button.removeAttribute("disabled");
+			}else if (done_button && content.hasOwnProperty(playbook)){
+				done_button.disabled = true;
 			}
 		});
 	}
@@ -863,9 +884,9 @@ function setup_deploy_step_nav_buttons(){
 			if(step_content_id){
 				next_buttons[i].addEventListener("click",()=>{
 					console.log(step_content_id);
-					let step_progress = localStorage.getItem(step_content_id)??"0";
+					let step_progress = localStorage.getItem(step_content_id+"-progress")??"0";
 					step_progress++;
-					localStorage.setItem(step_content_id,String(step_progress));
+					localStorage.setItem(step_content_id+"-progress",String(step_progress));
 					setup_progress_bar(step_content_id);
 				});
 			}
@@ -878,9 +899,9 @@ function setup_deploy_step_nav_buttons(){
 			let step_content_id = prev_buttons[i].getAttribute("for");
 			if(step_content_id){
 				prev_buttons[i].addEventListener("click",()=>{
-					let step_progress = Number(localStorage.getItem(step_content_id)??"1");
+					let step_progress = Number(localStorage.getItem(step_content_id+"-progress")??"1");
 					step_progress--;
-					localStorage.setItem(step_content_id,String(step_progress));
+					localStorage.setItem(step_content_id+"-progress",String(step_progress));
 					setup_progress_bar(step_content_id);
 				});
 			}
@@ -890,7 +911,8 @@ function setup_deploy_step_nav_buttons(){
 
 function setup_progress_bar(step_id){
 	let step_div = document.getElementById(step_id);
-	let step_progress = localStorage.getItem(step_id)??"0";
+	let step_progress_key = step_id+"-progress";
+	let step_progress = localStorage.getItem(step_progress_key)??"0";
 
 	let progress_bar_steps = step_div.querySelectorAll(':scope [data-progress-bar-idx]');
 	if(progress_bar_steps){
@@ -900,7 +922,7 @@ function setup_progress_bar(step_id){
 				progress_bar_steps[i].classList.remove("progress-completed-step");
 				let current_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
 				if(current_step_content){ current_step_content.classList.remove("hidden")}
-				localStorage.setItem(step_id,progress_bar_steps[i].dataset.progressBarIdx);
+				localStorage.setItem(step_progress_key,progress_bar_steps[i].dataset.progressBarIdx);
 			}else if(Number(progress_bar_steps[i].dataset.progressBarIdx) < Number(step_progress)){
 				progress_bar_steps[i].classList.remove("progress-current-step");
 				progress_bar_steps[i].classList.add("progress-completed-step");
@@ -942,6 +964,11 @@ function setup_buttons(){
 	setup_panel_vis_toggle_buttons();
 	setup_deploy_step_nav_buttons();
 	setup_progress_bar("step-ansible-config");
+	setup_progress_bar("step-core");
+	setup_progress_bar("step-cephfs");
+	setup_progress_bar("step-rgw");
+	setup_progress_bar("step-iscsi");
+
 }
 
 function setup_main_menu(){
@@ -1061,6 +1088,7 @@ function main()
 				g_deploy_file.modify(function(old_content){if(!old_content){return {};}else{return old_content;}});
 				monitor_deploy_state();
 				deploy_state_json = (localStorage.getItem("deploy_state")??"{}");
+
 				localStorage.setItem("deploy_state",deploy_state_json);
 				deploy_state_obj = JSON.parse(deploy_state_json);
 
@@ -1068,10 +1096,18 @@ function main()
 				let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
 				hosts_content.then((content,tag) => {
 					if(hosts && content && hosts == content){
+						let host_file_file_div_content = document.getElementById("host-file-content");
+						host_file_file_div_content.classList.remove("hidden");
 						document.getElementById("host-file-content").innerHTML = content;
 						let show_button = document.getElementById("show-host-file-btn");
 						show_button.addEventListener("click",show_host_file);
 						show_button.classList.remove("hidden");
+						show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+						document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
+						document.getElementById("inv-file-hosts-default").classList.add("hidden");
+						document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
+					}else{
+						document.getElementById("ansible-config-inv-hosts-nxt").disabled=true;
 					}
 				});
 
@@ -1080,27 +1116,27 @@ function main()
 				let all_content = cockpit.file("/usr/share/ceph-ansible/group_vars/all.yml").read();
 				all_content.then((content,tag) => {
 					if(all_yml && content && all_yml == content){
-						document.getElementById("all-file-content").innerHTML = content;
+						let all_file_div_content = document.getElementById("all-file-content")
+						all_file_div_content.innerHTML = content;
+						all_file_div_content.classList.remove("hidden");
 						let show_button = document.getElementById("show-all-file-btn");
 						show_button.addEventListener("click",show_all_file);
 						show_button.classList.remove("hidden");
+						show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+						document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
+						document.getElementById("inv-file-all-default").classList.add("hidden");
+						document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
+					}else{
+						document.getElementById("ansible-config-inv-all-nxt").disabled=true;
 					}
 				});
 
 				Object.entries(deploy_state_obj).forEach(([playbook, obj]) => {
-					let checkmark = document.getElementById(playbook);
-					if(checkmark && deploy_state_obj[playbook].result === 0){
-						checkmark.classList.remove("fa-exclamation-triangle");
-						checkmark.classList.remove("deploy-step-failed");
-						checkmark.classList.remove("deploy-step-incomplete");
-						checkmark.classList.add("fa-check-square");
-						checkmark.classList.add("deploy-step-complete");
-					}else if (checkmark){
-						checkmark.classList.remove("deploy-step-incomplete");
-						checkmark.classList.remove("fa-check-square");
-						checkmark.classList.remove("deploy-step-complete");
-						checkmark.classList.add("deploy-step-failed");
-						checkmark.classList.add("fa-exclamation-triangle");
+					let done_button = document.getElementById(playbook);
+					if(done_button && deploy_state_obj[playbook].result === 0){
+						done_button.removeAttribute("disabled");
+					}else if (done_button){
+						done_button.disabled=true;
 					}
         		});
 				
