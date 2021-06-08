@@ -44,39 +44,39 @@
         ],
         "metrics": [
             "ubuntuosd1",
-	    "ubuntuosd2",
-	    "ubuntuosd3",
-	    "ubuntugw1",
-	    "ubuntugw2"
+	        "ubuntuosd2",
+	        "ubuntuosd3",
+	        "ubuntugw1",
+	        "ubuntugw2"
         ],
         "mdss": [
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "smbs": [
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "nfss": [
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "iscsigws": [	
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "rgws": [
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "rgwloadbalancers": [
 	    "ubuntugw1",
 	    "ubuntugw2"
-	],
+	    ],
         "client": [	
 	    "ubuntugw1",
 	    "ubuntugw2"
-	]
+	    ]
     },
     "options": {
         "monitor_interface": "ens3",

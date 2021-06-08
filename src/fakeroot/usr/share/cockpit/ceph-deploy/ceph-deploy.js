@@ -18,70 +18,78 @@
 let g_core_params = null;
 let g_deploy_file = null;
 
-
+/**
+ * Display a short message at the bottom of the screen.
+ * @param {string} msg_label 
+ * @param {string} msg_content 
+ * @param {string} msg_color 
+ * @param {string} id 
+ */
 function show_snackbar_msg(msg_label,msg_content,msg_color,id) {
 	var snackbar = document.getElementById(id);
 	if(snackbar != null){
 		snackbar.innerHTML = msg_label + msg_content;
 		snackbar.style.backgroundColor = msg_color;
 		snackbar.className = "show";
-		setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 3000);
+		setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 4000);
 	}
-  } 
+} 
 
+/**
+ * obtains the "houston-theme-state" from local storage and sets the state accordingly.
+ */
   function set_last_theme_state() {
 	var toggle_switch = document.getElementById("toggle-theme");
 	var state = localStorage.getItem("houston-theme-state");
 	var icon = document.getElementById("houston-theme-icon");
-	//var logo = document.getElementById("logo-45d");
 	if (state === "light") {
 		toggle_switch.checked = false;
 		document.documentElement.setAttribute("data-theme", "light");
 		icon.classList.remove("fa-moon");
 		icon.classList.add("fa-sun");
-		//logo.src = "branding/logo-light.svg";
 	} else if (state === "dark") {
 		toggle_switch.checked = true;
 		document.documentElement.setAttribute("data-theme", "dark");
 		icon.classList.remove("fa-sun");
 		icon.classList.add("fa-moon");
-		//logo.src = "branding/logo-dark.svg";
 	} else {
 		toggle_switch.checked = false;
 		state = "light";
 		localStorage.setItem("houston-theme-state", state);
-		//logo.src = "branding/logo-light.svg";
 	}
 }
 
+/**
+ * handler invoked when the theme switch is clicked. 
+ * @param {event} e 
+ */
 function switch_theme(/*event*/ e) {
 	var icon = document.getElementById("houston-theme-icon");
-	//var logo = document.getElementById("logo-45d");
 	var state = "";
 	if (e.target.checked) {
 		state = "dark";
 		icon.classList.remove("fa-sun");
 		icon.classList.add("fa-moon");
-		//logo.src = "branding/logo-dark.svg";
 	} else {
 		state = "light";
 		icon.classList.remove("fa-moon");
 		icon.classList.add("fa-sun");
-		//logo.src = "branding/logo-light.svg";
 	}
 	document.documentElement.setAttribute("data-theme", state);
 	localStorage.setItem("houston-theme-state", state);
 }
 
-
+/**
+ * adds a host using the core_params script. "new-hostname-field" and "new-interface-field" are used.
+ * on successful completion, modal dialog "add-host-modal" is hidden, and get_param_file_content
+ * is called.
+ */
 function add_host_request(){
 	let hostname = document.getElementById("new-hostname-field").value;
 	let monitor_interface = document.getElementById("new-interface-field").value;
-	//let ip = document.getElementById("new-ip-field").value;
 	if(hostname != null && hostname != ""){
 		host_request_json = {[hostname]:{"hostname":""}};
 		host_request_json[hostname]["hostname"] = hostname;
-		//host_request_json[hostname]["ip"] = (ip != null) ? ip:"";
 		host_request_json[hostname]["monitor_interface"] = (monitor_interface != null) ? monitor_interface:"";
 		var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-h",JSON.stringify(host_request_json),"-w"];
 		var result_json = null;
@@ -127,36 +135,39 @@ function add_host_request(){
 			}
 		});
 	}
-	else{
-		return false;
-	}
-
 }
 
+/**
+ * shows the add-host-modal dialog window.
+ */
 function add_host(){
 	document.getElementById("add-host-modal-title").innerText = "Add New Host";
 	
 	let hostname_field = document.getElementById("new-hostname-field");
-	//let ip_field = document.getElementById("new-ip-field");
 	let interface_field = document.getElementById("new-interface-field");
 	hostname_field.value = "";
-	//ip_field.value = "";
 	interface_field.value = "";
 
     show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	//ip_field.addEventListener("input",function(){
-	//	check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
 	interface_field.addEventListener("input",function(){
 		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
-
     document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("continue-add-host").addEventListener("click",add_host_request);
 	document.getElementById("continue-add-host").innerText = "Add";
 }
 
+/**
+ * Checks to see if the text entered in a field is a valid hostname.
+ * @param {string} name_field_id 
+ * @param {string} feedback_field_id 
+ * @param {string} button_id 
+ * @param {string} label_name 
+ * @param {boolean} required_flag 
+ * @returns {boolean}
+ */
 function check_name_field(name_field_id,feedback_field_id,button_id,label_name,required_flag) {
 	var field_text = document.getElementById(name_field_id).value;
 	var button = document.getElementById(button_id);
@@ -183,6 +194,15 @@ function check_name_field(name_field_id,feedback_field_id,button_id,label_name,r
 	return true;
 }
 
+/**
+ * provides feedback on whether a given field contains a valid IP address.
+ * @param {string} field_id 
+ * @param {string} feedback_field_id 
+ * @param {string} button_id 
+ * @param {string} label_name 
+ * @param {boolean} required_flag 
+ * @returns {boolean}
+ */
 function check_ip_field(field_id,feedback_field_id,button_id,label_name,required_flag) {
 	var ip_string = document.getElementById(field_id).value;
 	var button = document.getElementById(button_id);
@@ -201,17 +221,30 @@ function check_ip_field(field_id,feedback_field_id,button_id,label_name,required
 	return true;
 }
 
+/**
+ * a regular expression that determines if a string constitutes a valid ipv4 or ipv6 address.
+ * @param {string} ipaddress 
+ * @returns {boolean}
+ */
 function validate_ip_address(ipaddress) {  
 	let ipv6 = /^((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}))|:)))(%.+)?((\/){1}(1?2?[0-8]|1?[0-1][0-9]|[1-9]?[0-9]))?\s*$/.test(ipaddress);
 	let ipv4 = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)((\/){1}([1-2]?[0-9]|3[0-2]))?$/.test(ipaddress);
 	return (ipv4 || ipv6)
 }  
 
+/**
+ * displays the modal dialog window with the provided id.
+ * @param {string} id 
+ */
 function show_modal_dialog(id){
     var modal = document.getElementById(id);
 	modal.style.display = "block";
 }
 
+/**
+ * hides the modal dialog window with the provided id.
+ * @param {string} id 
+ */
 function hide_modal_dialog(id) {
 	var modal = document.getElementById(id);
 	modal.style.display = "none";
@@ -219,6 +252,12 @@ function hide_modal_dialog(id) {
 	document.getElementById("new-hostname-field").value = "";
 }
 
+/**
+ * creates a table with checkboxes that represents which roles are assigned
+ * to a given host.
+ * @param {Object} hosts_json 
+ * @param {Object} roles_json 
+ */
 function update_role_info(hosts_json,roles_json){
 	//clear out the role-div element
 	let role_div = document.getElementById("role-div");
@@ -282,6 +321,12 @@ function update_role_info(hosts_json,roles_json){
 	}
 }
 
+/**
+ * updates the text fields based on the values of the options_json provided.
+ * This will also forbid progress (by disabling the next button) if the required fields
+ * are not filled in.
+ * @param {Object} options_json 
+ */
 function update_options_info(options_json){
 	let monitor_interface_field = document.getElementById("options-interface-field");
 	let cluster_network_field = document.getElementById("options-cluster-network-field");
@@ -320,8 +365,11 @@ function update_options_info(options_json){
 	}
 }
 
+/**
+ * uses the core_params helper script. The -s option provided will output json to 
+ * stdout. This will then update the hosts, roles and options using the current json.
+ */
 function get_param_file_content(){
-	var core_params = null;
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-s"];
 	var result_json = null;
 	var proc = cockpit.spawn(spawn_args, {superuser: "require"});
@@ -344,7 +392,6 @@ function get_param_file_content(){
 				update_host_info(result_json.old_file_content.hosts);
 				update_role_info(result_json.old_file_content.hosts, result_json.old_file_content.roles);
 				update_options_info(result_json.old_file_content.options);
-				core_params = result_json.old_file_content;
 			}
 		}else{
 			msg_color = "#bd3030";
@@ -362,6 +409,11 @@ function get_param_file_content(){
 	});
 }
 
+/**
+ * uses core_params helper script with the -x option to remove the host with 
+ * the hostname of the provided string from /usr/share/cockpit/ceph-deploy/params/core_params.json.
+ * @param {string} hostname 
+ */
 function remove_host(hostname){
 	host_request_json = {[hostname]:{"hostname":{}}};
 		host_request_json[hostname]["hostname"] = hostname;
@@ -409,22 +461,24 @@ function remove_host(hostname){
 		});
 }
 
+/**
+ * shows the add-host-modal dialog, with the editable fields populated with
+ * the hostname and monitor_interface strings.
+ * @param {string} hostname 
+ * @param {string} monitor_interface 
+ */
 function edit_host(hostname,monitor_interface){
 	document.getElementById("add-host-modal-title").innerText = "Edit Host";
 	
 	let hostname_field = document.getElementById("new-hostname-field");
-	//let ip_field = document.getElementById("new-ip-field");
 	let interface_field = document.getElementById("new-interface-field");
 	
 	hostname_field.value = hostname;
-	//ip_field.value = ip;
 	interface_field.value = monitor_interface;
 
 	show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	//ip_field.addEventListener("input",function(){
-	//	check_ip_field("new-ip-field","new-ip-field-feedback","continue-add-host","ip",false)});
 	interface_field.addEventListener("input",function(){
 		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
 
@@ -434,19 +488,23 @@ function edit_host(hostname,monitor_interface){
 	document.getElementById("continue-add-host").innerText = "Save";
 }
 
+/**
+ * updates the list of hosts using the json provided. if the host list is empty, progress
+ * is forbidden by disabling the next button. It will also enable the button if
+ * the list is not empty. 
+ * @param {Object} hosts_json 
+ */
 function update_host_info(hosts_json){
 	let host_list = document.getElementById("cd-host-list");
 	while (host_list.hasChildNodes()) {  
 		host_list.removeChild(host_list.firstChild);
 	}
-	localStorage.setItem("core_params_hosts",hosts_json);
 	if(Object.keys(hosts_json).length > 0){
 		document.getElementById("ansible-config-hosts-and-roles-nxt").removeAttribute("disabled");
 		document.getElementById("cd-host-box").classList.remove("hidden");
 		document.getElementById("cd-host-placeholder").classList.add("hidden");
 		for (let key of Object.keys(hosts_json)) {
 			let hostname = hosts_json[key]["hostname"];
-			//let ip = hosts_json[key]["ip"];
 			let monitor_interface = hosts_json[key]["monitor_interface"];
 			
 			var new_host_entry = document.createElement("div");
@@ -455,10 +513,6 @@ function update_host_info(hosts_json){
 			var host_entry_hostname = document.createElement("div");
 			host_entry_hostname.classList.add("cd-host-list-entry-text");
 			host_entry_hostname.innerText = hostname;
-
-			//var host_entry_ip = document.createElement("div");
-			//host_entry_ip.classList.add("cd-host-list-entry-text");
-			//host_entry_ip.innerText = ip;
 
 			var host_entry_monitor_interface = document.createElement("div");
 			host_entry_monitor_interface.classList.add("cd-host-list-entry-text");
@@ -469,7 +523,6 @@ function update_host_info(hosts_json){
 
 			host_entry_edit_icon.addEventListener("click", function(){
 				let hns = hostname.valueOf();
-				//let ips = ip.valueOf();
 				let mis = monitor_interface.valueOf();
 				edit_host(hns,mis);
 			});
@@ -479,7 +532,6 @@ function update_host_info(hosts_json){
 			host_entry_delete_icon.addEventListener("click", function(){let arg = hostname.valueOf();remove_host(arg)});
 
 			new_host_entry.appendChild(host_entry_hostname);
-			//new_host_entry.appendChild(host_entry_ip);
 			new_host_entry.appendChild(host_entry_monitor_interface);
 			new_host_entry.appendChild(host_entry_edit_icon);
 			new_host_entry.appendChild(host_entry_delete_icon);
@@ -493,20 +545,11 @@ function update_host_info(hosts_json){
 	}
 }
 
-function hide_step_content(step){
-	let id_string = "step-" + step.toString();
-	let step_content = document.getElementById(id_string);
-	if(step_content != null){step_content.classList.add("hidden");}
-}
-
-function show_step_content(step){
-	let id_string = "step-" + step.toString();
-	let step_content = document.getElementById(id_string);
-	if(step_content != null){step_content.classList.remove("hidden");}
-}
-
+/**
+ * using the state of the checkboxes, use the core_params helper script
+ * to update /usr/share/cockpit/ceph-deploy/params/core_params.json
+ */
 function update_role_request(){
-
 	// we can update the roles assigned to each host by performing two subsequent requests.
 	// we can remove any unchecked roles first, then we can add in all of the checked roles.
 
@@ -597,6 +640,10 @@ function update_role_request(){
 	});
 }
 
+/**
+ * use the core_params helper script to update the options in /usr/share/cockpit/ceph-deploy/params/core_params.json
+ * using the content of the option field elements. 
+ */
 function update_options_request(){
 	let options_request_json = {
 		"monitor_interface": document.getElementById("options-interface-field").value,
@@ -618,6 +665,9 @@ function update_options_request(){
 	});
 }
 
+/**
+ * hides/unhides the all-file-content div, and updates the icon on the show button.
+ */
 function show_all_file(){
 	let all_file_content = document.getElementById("all-file-content");
 	let show_button = document.getElementById("show-all-file-btn");
@@ -630,6 +680,9 @@ function show_all_file(){
 	}
 }
 
+/**
+ * hides/unhides the host-file-content div, and updates the icon on the show button.
+ */
 function show_host_file(){
 	let host_file_content = document.getElementById("host-file-content");
 	let show_button = document.getElementById("show-host-file-btn");
@@ -642,6 +695,10 @@ function show_host_file(){
 	}
 }
 
+/**
+ * uses the make_hosts helper script to create /usr/share/ceph-ansible/hosts.
+ * This will use the core_params.json file to create this.
+ */
 function generate_host_file(){
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_hosts"];
 	var result_json = null;
@@ -686,6 +743,9 @@ function generate_host_file(){
 	});
 }
 
+/**
+ * uses the make_all helper script to create /usr/share/ceph-ansible/group_vars/all.yml
+ */
 function generate_all_file(){
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_all"];
 	var result_json = null;
@@ -731,6 +791,13 @@ function generate_all_file(){
 	});
 }
 
+/**
+ * creates an iframe which uses terminal.html. This in turn will
+ * use a modified version of terminal.js that will get "terminal-command"
+ * from local storage and run it when it starts.
+ * @param {string} termID 
+ * @returns 
+ */
 function makeTerminal(termID){
 	let term = document.createElement("iframe");
 	term.setAttribute("width","100%");
@@ -1082,7 +1149,6 @@ function main()
 				setup_main_menu();
 				setup_buttons();
 
-				//show_step_content(current_step);
 				get_param_file_content();
 				g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
 				g_deploy_file.modify(function(old_content){if(!old_content){return {};}else{return old_content;}});
