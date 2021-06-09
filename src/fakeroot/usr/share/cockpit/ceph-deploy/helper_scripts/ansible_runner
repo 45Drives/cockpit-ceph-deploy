@@ -56,8 +56,8 @@ def print_to_string(item):
         output = buf.getvalue().rstrip("\n")
         return output
 
-def update_ceph_deploy_state(cmd):
-    state_file_path = "/usr/share/cockpit/ceph-deploy/state/deploy_state.json"
+def update_ceph_playbook_state(cmd):
+    state_file_path = "/usr/share/cockpit/ceph-deploy/state/playbook_state.json"
     state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
     state_dict = {}
 
@@ -87,13 +87,6 @@ def update_ceph_deploy_state(cmd):
 
 def run_ansible_command(cmd):
     split_command = shlex.split(ansible_commands[cmd]["command"])
-    #current_dir = os.path.abspath(os.getcwd())
-    #print("Curent Dir: ",current_dir)
-    #print("Desired Dir: ", os.path.abspath(ansible_commands[cmd]["cwd"]))
-    #os.chdir(os.path.abspath(ansible_commands[cmd]["cwd"]))
-    #current_dir = os.path.abspath(os.getcwd())
-    #print("Curent Dir: ",current_dir)
-    #subcall_stream(split_command)
     command = subprocess.run(
         split_command,
         cwd=ansible_commands[cmd]["cwd"],
@@ -104,21 +97,7 @@ def run_ansible_command(cmd):
         )
     ansible_commands[cmd]["result"] = command.returncode
     ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
-    update_ceph_deploy_state(cmd)
-
-def subcall_stream(cmd, fail_on_error=True):
-    # Run a shell command, streaming output to STDOUT in real time
-    # Expects a list style command, e.g. `["docker", "pull", "ubuntu"]`
-    p = subprocess.run(cmd, stdout=sys.stdout, stderr=sys.stdout, bufsize=1, universal_newlines=True)
-    #for line in p.stdout:
-    #    sys.stdout.write(line)
-    #p.wait()
-    exit_code = p.returncode
-    print("EXIT_CODE: ", exit_code)
-    #if exit_code != 0 and fail_on_error:
-    #    raise RuntimeError(f"Shell command failed with exit code {exit_code}. Command: `{cmd}`")
-    #return(exit_code)
-
+    update_ceph_playbook_state(cmd)
 
 def main():
     cmd_lst_str = "["

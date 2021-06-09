@@ -18,6 +18,69 @@
 let g_core_params = null;
 let g_deploy_file = null;
 
+let g_ceph_deploy_default_state = {
+	"deploy-step-preconfig" : {
+		"lock_state":"unlocked",
+		"step_content_id":"step-preconfig",
+		"progress":"0",
+		"unlock_requirements": []
+	},
+	"deploy-step-ansible-config" : {
+		"lock_state":"locked",
+		"step_content_id":"step-ansible-config",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-preconfig"]
+	},
+	"deploy-step-core" : {
+		"lock_state":"locked",
+		"step_content_id":"step-core",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-ansible-config"]
+	},
+	"deploy-step-cephfs" : {
+		"lock_state":"locked",
+		"step_content_id":"step-cephfs",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-core"]
+	},
+	"deploy-step-nfs" : {
+		"lock_state":"locked",
+		"step_content_id":"step-nfs",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-cephfs"]
+	},
+	"deploy-step-smb" : {
+		"lock_state":"locked",
+		"step_content_id":"step-smb",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-cephfs"]
+	},
+	"deploy-step-rgw" : {
+		"lock_state":"locked",
+		"step_content_id":"step-rgw",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-core"]
+	},
+	"deploy-step-rgwlb" : {
+		"lock_state":"locked",
+		"step_content_id":"step-rgwlb",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-rgw"]
+	},
+	"deploy-step-iscsi" : {
+		"lock_state":"locked",
+		"step_content_id":"step-iscsi",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-core"]
+	},
+	"deploy-step-dashboard" : {
+		"lock_state": "locked",
+		"step_content_id":"step-dashboard",
+		"progress":"0",
+		"unlock_requirements": ["deploy-step-rgw","deploy-step-iscsi","deploy-step-nfs","deploy-step-smb"]
+	}
+};
+
 /**
  * Display a short message at the bottom of the screen.
  * @param {string} msg_label 
@@ -31,7 +94,7 @@ function show_snackbar_msg(msg_label,msg_content,msg_color,id) {
 		snackbar.innerHTML = msg_label + msg_content;
 		snackbar.style.backgroundColor = msg_color;
 		snackbar.className = "show";
-		setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 4000);
+		setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 5000);
 	}
 } 
 
@@ -808,27 +871,52 @@ function makeTerminal(termID){
 	return term;
 }
 
-function update_deploy_state(content){
-	let prev_state_json_str = (localStorage.getItem("deploy_state")??"{}");
+/**
+ * update the playbook_state local storage with content from
+ * /usr/share/cockpit/ceph-deploy/state/playbook_state.json and enable the 
+ * corresponding html element (button) with id==key. to allow for progression
+ * within the module. 
+ * @param {Object} content 
+ */
+function update_playbook_state(content){
+	let prev_state_json_str = (localStorage.getItem("playbook_state")??"{}");
 	let prev_state_json = JSON.parse(prev_state_json_str);
 	if(content && prev_state_json != content){
-		localStorage.setItem("deploy_state",JSON.stringify(content));
+		localStorage.setItem("playbook_state",JSON.stringify(content));
 		Object.entries(content).forEach(([playbook, obj]) => {
-			let done_button = document.getElementById(playbook);
-			if(done_button && content.hasOwnProperty(playbook) && content[playbook].result === 0){
-				done_button.removeAttribute("disabled");
-			}else if (done_button && content.hasOwnProperty(playbook)){
-				done_button.disabled = true;
+			let target_button = document.getElementById(playbook);
+			if(target_button && content.hasOwnProperty(playbook) && content[playbook].result === 0){
+				target_button.removeAttribute("disabled");
+				if(!prev_state_json.hasOwnProperty(playbook) || 
+					(prev_state_json.hasOwnProperty(playbook) && 
+					prev_state_json[playbook].time_stamp != content[playbook].time_stamp)){
+					show_snackbar_msg("Playbook ("+playbook+"): ","Completed Successfully","#20a030","snackbar");
+				}
+			}else if (target_button && content.hasOwnProperty(playbook)){
+				target_button.disabled = true;
+				if(!prev_state_json.hasOwnProperty(playbook) || 
+					(prev_state_json.hasOwnProperty(playbook) && 
+					prev_state_json[playbook].time_stamp != content[playbook].time_stamp)){
+					show_snackbar_msg("Playbook ("+playbook+"):","Unsuccessful","#bd3030","snackbar");
+				}
 			}
 		});
 	}
 }
 
-function monitor_deploy_state(){
-	g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
-	g_deploy_file.watch(function(content){update_deploy_state(content);});
+/**
+ * watch the file /usr/share/cockpit/ceph-deploy/state/playbook_state.json
+ * for changes and trigger update_playbook_state when the file is accessed.
+ */
+function monitor_playbook_state_file(){
+	g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/playbook_state.json", { syntax: JSON });
+	g_deploy_file.watch(function(content){update_playbook_state(content);});
 }
 
+/**
+ * set the terminal-command value in local storage and spawn a new
+ * terminal within the appropriate iframe. 
+ */
 function ansible_ping(){
 	localStorage.setItem("terminal-command","ansible_runner -c ping_all\n");
 	let ping_term = document.getElementById("terminal-ping");
@@ -836,6 +924,9 @@ function ansible_ping(){
 	document.getElementById("terminal-ping-iframe").appendChild(ping_term);
 }
 
+/**
+ * perform the device_alias playbook within a new terminal. 
+ */
 function ansible_device_alias(){
 	localStorage.setItem("terminal-command","ansible_runner -c device_alias\n");
 	let device_alias_term = document.getElementById("terminal-device-alias");
@@ -843,6 +934,9 @@ function ansible_device_alias(){
 	document.getElementById("terminal-device-alias-iframe").appendChild(device_alias_term);
 }
 
+/**
+ * perform the deploy_core playbook within a new terminal. 
+ */
 function ansible_core(){
 	localStorage.setItem("terminal-command","ansible_runner -c deploy_core\n");
 	let core_term = document.getElementById("terminal-core");
@@ -850,6 +944,12 @@ function ansible_core(){
 	document.getElementById("terminal-core-iframe").appendChild(core_term);
 }
 
+/**
+ * toggle the visibility of the panel body and icon of the button
+ * corresponding to pb_id and btn_id respectively.
+ * @param {string} btn_id 
+ * @param {string} pb_id 
+ */
 function toggle_panel_body_visibility(btn_id,pb_id){
 	let pb = document.getElementById(pb_id);
 	let btn = document.getElementById(btn_id);
@@ -866,6 +966,10 @@ function toggle_panel_body_visibility(btn_id,pb_id){
 	}
 }
 
+/**
+ * set up event listeners for the buttons that toggle the visibility of 
+ * a given panel. 
+ */
 function setup_panel_vis_toggle_buttons(){
 	let vis_toggle_buttons = document.getElementsByClassName("cd-panel-vis-toggle");
 	for(let i=0; i<vis_toggle_buttons.length; i++){
@@ -879,6 +983,9 @@ function setup_panel_vis_toggle_buttons(){
 	}
 }
 
+/**
+ * set up event listeners for each module's start button (found in main menu).
+ */
 function setup_deploy_step_start_buttons(){
 	let start_buttons = document.getElementsByClassName("cd-deploy-step-start-btn");
 	for(let i = 0; i < start_buttons.length; i++){
@@ -890,31 +997,22 @@ function setup_deploy_step_start_buttons(){
 	}
 }
 
-function setup_top_nav_buttons(){
+/**
+ * 
+ */
+function setup_main_menu_links(){
 	let main_menu_links = document.getElementsByClassName("progress-bar-main-back");
 	if(main_menu_links){
 		for(let i = 0; i < main_menu_links.length; i++){
 			main_menu_links[i].addEventListener("click",()=>{
-				let step_content_ids = [
-					"step-preconfig",
-					"step-ansible-config",
-					"step-core",
-					"step-cephfs",
-					"step-nfs",
-					"step-smb",
-					"step-rgw",
-					"step-rgwlb",
-					"step-iscsi",
-					"step-dashboard"
-				];
-	
-				for(let i = 0; i < step_content_ids.length; i++){
-					let content = document.getElementById(step_content_ids[i]);
+				let ceph_deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+				Object.entries(ceph_deploy_state).forEach(([deploy_step_id, obj]) => {
+					let content = document.getElementById(obj.step_content_id);
 					if(content){
 						content.classList.add("hidden");
 					}
-				}
-				
+				});
+
 				let main_menu_content = document.getElementById("cd-main-menu");
 				if(main_menu_content){main_menu_content.classList.remove("hidden");}
 			});
@@ -922,7 +1020,11 @@ function setup_top_nav_buttons(){
 	}
 }
 
+/**
+ * configure all prev, next and done buttons for each deploy-step with default behavior. 
+ */
 function setup_deploy_step_nav_buttons(){
+
 	let done_buttons = document.getElementsByClassName("cd-deploy-step-done-btn");
 	if(done_buttons){
 		for(let i = 0; i < done_buttons.length; i++){
@@ -933,7 +1035,10 @@ function setup_deploy_step_nav_buttons(){
 					let deploy_step_id = step_content.getAttribute("for");
 					if(deploy_step_id){
 						done_buttons[i].addEventListener("click", () => {
-							localStorage.setItem(deploy_step_id,"complete");
+							let deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+							deploy_state[deploy_step_id].lock_state = "complete";
+							localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state));
+							sync_ceph_deploy_state();
 							step_content.classList.add("hidden");
 							document.getElementById("cd-main-menu").classList.remove("hidden");
 							setup_main_menu();
@@ -950,47 +1055,66 @@ function setup_deploy_step_nav_buttons(){
 			let step_content_id = next_buttons[i].getAttribute("for");
 			if(step_content_id){
 				next_buttons[i].addEventListener("click",()=>{
-					console.log(step_content_id);
-					let step_progress = localStorage.getItem(step_content_id+"-progress")??"0";
-					step_progress++;
-					localStorage.setItem(step_content_id+"-progress",String(step_progress));
-					setup_progress_bar(step_content_id);
+					let step_content = document.getElementById(step_content_id);
+					if(step_content){
+						let ceph_deploy_step_id = step_content.getAttribute("for");
+						let deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+						if(deploy_state.hasOwnProperty(ceph_deploy_step_id) && deploy_state[ceph_deploy_step_id].step_content_id == step_content_id){
+							let prog_int = Number(deploy_state[ceph_deploy_step_id].progress);
+							prog_int++;
+							deploy_state[ceph_deploy_step_id].progress = prog_int.toString();
+							localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state));
+							sync_ceph_deploy_state();
+							setup_progress_bar(ceph_deploy_step_id);
+						}
+					}
 				});
 			}
 		}
 	}
 
 	let prev_buttons = document.getElementsByClassName("cd-deploy-step-prev-btn");
-	if(next_buttons){
+	if(prev_buttons){
 		for(let i = 0; i < prev_buttons.length; i++){
 			let step_content_id = prev_buttons[i].getAttribute("for");
 			if(step_content_id){
 				prev_buttons[i].addEventListener("click",()=>{
-					let step_progress = Number(localStorage.getItem(step_content_id+"-progress")??"1");
-					step_progress--;
-					localStorage.setItem(step_content_id+"-progress",String(step_progress));
-					setup_progress_bar(step_content_id);
+					let step_content = document.getElementById(step_content_id);
+					if(step_content){
+						let ceph_deploy_step_id = step_content.getAttribute("for");
+						let deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+						if(deploy_state.hasOwnProperty(ceph_deploy_step_id) && deploy_state[ceph_deploy_step_id].step_content_id == step_content_id){
+							let prog_int = Number(deploy_state[ceph_deploy_step_id].progress);
+							prog_int--;
+							deploy_state[ceph_deploy_step_id].progress = prog_int.toString();
+							localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state));
+							sync_ceph_deploy_state();
+							setup_progress_bar(ceph_deploy_step_id);
+						}
+					}
 				});
 			}
 		}
 	}
 }
 
-function setup_progress_bar(step_id){
-	let step_div = document.getElementById(step_id);
-	let step_progress_key = step_id+"-progress";
-	let step_progress = localStorage.getItem(step_progress_key)??"0";
-
+/**
+ * set up progress bars for the deploy step with the id==step_id.
+ * @param {string} deploy_step_key
+ */
+function setup_progress_bar(deploy_step_key){
+	let ceph_deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+	let step_div = document.getElementById(ceph_deploy_state[deploy_step_key].step_content_id);
+	if(!step_div) return;
 	let progress_bar_steps = step_div.querySelectorAll(':scope [data-progress-bar-idx]');
 	if(progress_bar_steps){
 		for(let i = 0; i < progress_bar_steps.length; i++){
-			if(progress_bar_steps[i].dataset.progressBarIdx === step_progress){
+			if(progress_bar_steps[i].dataset.progressBarIdx === ceph_deploy_state[deploy_step_key].progress){
 				progress_bar_steps[i].classList.add("progress-current-step");
 				progress_bar_steps[i].classList.remove("progress-completed-step");
 				let current_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
-				if(current_step_content){ current_step_content.classList.remove("hidden")}
-				localStorage.setItem(step_progress_key,progress_bar_steps[i].dataset.progressBarIdx);
-			}else if(Number(progress_bar_steps[i].dataset.progressBarIdx) < Number(step_progress)){
+				if(current_step_content){current_step_content.classList.remove("hidden");}
+			}else if(Number(progress_bar_steps[i].dataset.progressBarIdx) < Number(ceph_deploy_state[deploy_step_key].progress)){
 				progress_bar_steps[i].classList.remove("progress-current-step");
 				progress_bar_steps[i].classList.add("progress-completed-step");
 				let completed_step_content = step_div.querySelector(`:scope [data-step-content-idx="${progress_bar_steps[i].dataset.progressBarIdx}"]`);
@@ -1009,12 +1133,12 @@ function setup_progress_bar(step_id){
 	let done_button = step_div.querySelector(':scope .cd-deploy-step-done-btn');
 
 	if(prev_button){
-		if(step_progress === "0"){prev_button.disabled = true;}
+		if(ceph_deploy_state[deploy_step_key].progress === "0"){prev_button.disabled = true;}
 		else{prev_button.removeAttribute("disabled");}
 	}
 
 	if(next_button){
-		if(Number(step_progress) === progress_bar_steps.length -1 ){
+		if(Number(ceph_deploy_state[deploy_step_key].progress) === progress_bar_steps.length -1 ){
 			next_button.classList.add("hidden");
 			if(done_button) done_button.classList.remove("hidden");
 		}else{
@@ -1024,20 +1148,35 @@ function setup_progress_bar(step_id){
 	}
 }
 
-
+/**
+ * set up event listeners for buttons.
+ */
 function setup_buttons(){
-	setup_top_nav_buttons();
+	setup_main_menu();
+	setup_main_menu_links();
 	setup_deploy_step_start_buttons();
 	setup_panel_vis_toggle_buttons();
 	setup_deploy_step_nav_buttons();
-	setup_progress_bar("step-ansible-config");
-	setup_progress_bar("step-core");
-	setup_progress_bar("step-cephfs");
-	setup_progress_bar("step-rgw");
-	setup_progress_bar("step-iscsi");
+	setup_progress_bar("deploy-step-ansible-config");
+	setup_progress_bar("deploy-step-core");
+	setup_progress_bar("deploy-step-cephfs");
+	setup_progress_bar("deploy-step-rgw");
+	setup_progress_bar("deploy-step-iscsi");
 
+	document.getElementById("new-host-btn").addEventListener("click",add_host);
+	document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
+	document.getElementById("global-options-btn").addEventListener("click",update_options_request);
+	document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
+	document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
+	document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
+	document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
+	document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
+	document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 }
 
+/**
+ * update the state of the main menu according to the deploy states stored in local storage.
+ */
 function setup_main_menu(){
 	let deploy_step_ids = [
 		"deploy-step-preconfig",
@@ -1080,32 +1219,34 @@ function setup_main_menu(){
 		"deploy-step-dashboard": ["deploy-step-rgw","deploy-step-iscsi","deploy-step-nfs","deploy-step-smb"]
 	};
 
-	// get states from local storage
-	for(let i = 0; i < deploy_step_ids.length; i++){
-		deploy_step_current_states[deploy_step_ids[i]] = (localStorage.getItem(deploy_step_ids[i])??deploy_step_default_states[deploy_step_ids[i]]);
-	}
+	//// get states from local storage
+	//for(let i = 0; i < deploy_step_ids.length; i++){
+	//	deploy_step_current_states[deploy_step_ids[i]] = (localStorage.getItem(deploy_step_ids[i])??deploy_step_default_states[deploy_step_ids[i]]);
+	//}
 
+	deploy_step_current_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+	deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
 	// unlock the steps that have their unlock requirements met and update local storage.
-	for(let i = 0; i < deploy_step_ids.length; i++){
-		if(deploy_step_current_states[deploy_step_ids[i]] == "locked"){
-			for(let j = 0; j < deploy_step_unlock_requirements[deploy_step_ids[i]].length; j++){
-				if(deploy_step_current_states[deploy_step_unlock_requirements[deploy_step_ids[i]][j]] == "complete"){
-					deploy_step_current_states[deploy_step_ids[i]] = "unlocked";
+	Object.entries(deploy_step_current_states).forEach(([deploy_step_id, obj]) => {
+		if(obj.lock_state == "locked"){
+			for(let i = 0; i < obj.unlock_requirements.length; i++){
+				if(deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"){
+					deploy_step_current_states[deploy_step_id].lock_state = "unlocked";
 					break;
 				}
 			}
 		}
-		localStorage.setItem(deploy_step_ids[i],deploy_step_current_states[deploy_step_ids[i]]);
-	}
+	});
+	localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_step_current_states));
+	sync_ceph_deploy_state();
 
 	// update the appearance based on updated states
 	for(let i = 0; i < deploy_step_ids.length; i++){
 		let deploy_step_element = document.getElementById(deploy_step_ids[i]);
-		
 		if(deploy_step_element){
 			let status_div = deploy_step_element.querySelector('.cd-step-status');
 			let start_btn = deploy_step_element.querySelector('.cd-deploy-step-start-btn');
-			if(deploy_step_current_states[deploy_step_ids[i]] == "complete"){
+			if(deploy_step_current_states[deploy_step_ids[i]].lock_state == "complete"){
 				deploy_step_element.classList.add("cd-step-complete");
 				if(status_div && start_btn){ 
 					status_div.innerHTML = '<i class="fas fa-check"></i>';
@@ -1114,7 +1255,7 @@ function setup_main_menu(){
 					start_btn.title = "redo";
 					start_btn.innerHTML = '<i class="fas fa-redo"></i>';
 				}
-			}else if(deploy_step_current_states[deploy_step_ids[i]] == "unlocked"){
+			}else if(deploy_step_current_states[deploy_step_ids[i]].lock_state == "unlocked"){
 				deploy_step_element.classList.remove("cd-step-complete");
 				if(status_div && start_btn){ 
 					status_div.innerHTML = '<i class="fas fa-lock-open"></i>';
@@ -1122,7 +1263,7 @@ function setup_main_menu(){
 					start_btn.classList.remove("hidden");
 					start_btn.title = "start";
 				}
-			}else if(deploy_step_current_states[deploy_step_ids[i]] == "locked"){
+			}else if(deploy_step_current_states[deploy_step_ids[i]].lock_state == "locked"){
 				deploy_step_element.classList.remove("cd-step-complete");
 				if(status_div && start_btn){ 
 					status_div.innerHTML = '<i class="fas fa-lock"></i>';
@@ -1135,6 +1276,111 @@ function setup_main_menu(){
 	}
 }
 
+function sync_ceph_deploy_state(){
+	let ceph_deploy_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+	let ceph_deploy_state_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json");
+	ceph_deploy_state_file.read().then((content,tag) => {
+		if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str == content){
+			//localStorage and state file on server are not null and are the same
+			console.log("localStorage and /usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json are congruent");
+		}else if(!content && ceph_deploy_state_json_str){
+			//file does not exist locally
+			let create_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
+			create_state_file.then(tag => {
+				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
+				ceph_deploy_state_file.close();
+				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
+			});
+			create_state_file.catch(e => {console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be created."); ceph_deploy_state_file.close();});
+		}else if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str != content){
+			//localStorage and state file on server are not the same.
+			//Update the state file stored on server.
+			let update_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
+			update_state_file.then(tag => {
+				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was updated"); 
+				ceph_deploy_state_file.close();
+				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
+			});
+			update_state_file.catch(e => {console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be updated."); ceph_deploy_state_file.close();});
+		}
+	});
+
+	let playbook_state_json = (localStorage.getItem("playbook_state")??"{}");
+	localStorage.setItem("playbook_state",playbook_state_json);
+	let playbook_state_obj = JSON.parse(playbook_state_json);
+	Object.entries(playbook_state_obj).forEach(([playbook, obj]) => {
+		let done_button = document.getElementById(playbook);
+		if(done_button && playbook_state_obj[playbook].result === 0){
+			done_button.removeAttribute("disabled");
+		}else if (done_button){
+			done_button.disabled=true;
+		}
+	});
+
+	let hosts = localStorage.getItem("hosts");
+	let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
+	hosts_content.then((content,tag) => {
+		if(hosts && content && hosts == content){
+			let host_file_file_div_content = document.getElementById("host-file-content");
+			host_file_file_div_content.classList.remove("hidden");
+			document.getElementById("host-file-content").innerHTML = content;
+			let show_button = document.getElementById("show-host-file-btn");
+			show_button.addEventListener("click",show_host_file);
+			show_button.classList.remove("hidden");
+			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+			document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
+			document.getElementById("inv-file-hosts-default").classList.add("hidden");
+			document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
+		}else{
+			document.getElementById("ansible-config-inv-hosts-nxt").disabled=true;
+		}
+	});
+
+	let all_yml = localStorage.getItem("all.yml");
+	let all_content = cockpit.file("/usr/share/ceph-ansible/group_vars/all.yml").read();
+	all_content.then((content,tag) => {
+		if(all_yml && content && all_yml == content){
+			let all_file_div_content = document.getElementById("all-file-content")
+			all_file_div_content.innerHTML = content;
+			all_file_div_content.classList.remove("hidden");
+			let show_button = document.getElementById("show-all-file-btn");
+			show_button.addEventListener("click",show_all_file);
+			show_button.classList.remove("hidden");
+			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+			document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
+			document.getElementById("inv-file-all-default").classList.add("hidden");
+			document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
+		}else{
+			document.getElementById("ansible-config-inv-all-nxt").disabled=true;
+		}
+	});
+}
+
+function get_ceph_deploy_initial_state(){
+	let ceph_deploy_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
+	let ceph_deploy_state_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json");
+	ceph_deploy_state_file.read().then((content,tag) => {
+		if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str == content){
+			//localStorage and state file on server are not null and are the same
+			console.log("localStorage and /usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json are congruent");
+		}else if(!content && ceph_deploy_state_json_str){
+			//file does not exist locally
+			let create_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
+			create_state_file.then(tag => {
+				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
+				ceph_deploy_state_file.close();
+				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
+			});
+			create_state_file.catch(e => {console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be created."); ceph_deploy_state_file.close();});
+		}else if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str != content){
+			//localStorage and state file on server are not the same.
+			//defer to the state on the server as it is possible that more than one browser was used.
+			localStorage.setItem("ceph_deploy_state",content);
+			console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json saved to browser's localStorage.");
+		}
+	});
+}
+
 function main()
 {
 	let root_check = cockpit.permission({ admin: true });
@@ -1144,82 +1390,15 @@ function main()
 			if(root_check.allowed){
 				//user is an administrator, start the module as normal
                 //setup on-click listeners for buttons as required.
-				var current_step = Number(localStorage.getItem("current_step")??"0");
-
-				setup_main_menu();
 				setup_buttons();
-
 				get_param_file_content();
-				g_deploy_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/deploy_state.json", { syntax: JSON });
-				g_deploy_file.modify(function(old_content){if(!old_content){return {};}else{return old_content;}});
-				monitor_deploy_state();
-				deploy_state_json = (localStorage.getItem("deploy_state")??"{}");
-
-				localStorage.setItem("deploy_state",deploy_state_json);
-				deploy_state_obj = JSON.parse(deploy_state_json);
-
-				let hosts = localStorage.getItem("hosts");
-				let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
-				hosts_content.then((content,tag) => {
-					if(hosts && content && hosts == content){
-						let host_file_file_div_content = document.getElementById("host-file-content");
-						host_file_file_div_content.classList.remove("hidden");
-						document.getElementById("host-file-content").innerHTML = content;
-						let show_button = document.getElementById("show-host-file-btn");
-						show_button.addEventListener("click",show_host_file);
-						show_button.classList.remove("hidden");
-						show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-						document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
-						document.getElementById("inv-file-hosts-default").classList.add("hidden");
-						document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
-					}else{
-						document.getElementById("ansible-config-inv-hosts-nxt").disabled=true;
-					}
-				});
-
-
-				let all_yml = localStorage.getItem("all.yml");
-				let all_content = cockpit.file("/usr/share/ceph-ansible/group_vars/all.yml").read();
-				all_content.then((content,tag) => {
-					if(all_yml && content && all_yml == content){
-						let all_file_div_content = document.getElementById("all-file-content")
-						all_file_div_content.innerHTML = content;
-						all_file_div_content.classList.remove("hidden");
-						let show_button = document.getElementById("show-all-file-btn");
-						show_button.addEventListener("click",show_all_file);
-						show_button.classList.remove("hidden");
-						show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-						document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
-						document.getElementById("inv-file-all-default").classList.add("hidden");
-						document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
-					}else{
-						document.getElementById("ansible-config-inv-all-nxt").disabled=true;
-					}
-				});
-
-				Object.entries(deploy_state_obj).forEach(([playbook, obj]) => {
-					let done_button = document.getElementById(playbook);
-					if(done_button && deploy_state_obj[playbook].result === 0){
-						done_button.removeAttribute("disabled");
-					}else if (done_button){
-						done_button.disabled=true;
-					}
-        		});
-				
-				document.getElementById("new-host-btn").addEventListener("click",add_host);
-				document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
-				document.getElementById("global-options-btn").addEventListener("click",update_options_request);
-				document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
-				document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
-				document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
-				document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
-				document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
-				document.getElementById("toggle-theme").addEventListener("change",switch_theme);
+				monitor_playbook_state_file();
+				get_ceph_deploy_initial_state();
+				sync_ceph_deploy_state();
 				
 			}else{
-				//user is not an administrator, inform them of this by
-				//displaying a message on each tab page. 
-				let page_content = document.getElementById("host_configuration_content");
+				//user is not an administrator, block the page content.
+				let page_content = document.getElementById("ceph-deploy-content");
 				page_content.innerHTML = "";
 				let user_msg = document.createElement("div");
 				user_msg.className = "content_block_msg";

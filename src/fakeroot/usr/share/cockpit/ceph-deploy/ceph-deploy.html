@@ -34,6 +34,7 @@
     </head>
 
     <body>
+      <div id="ceph-deploy-content">
       <div id="cd-main-menu">
         <div class="cd-top-nav-button-group">
           <div class="nav-btn-group">
@@ -255,10 +256,10 @@
               <i class="fas fa-chevron-right"></i>
             </div>
             <div class="progress-bar-title">Pre-Configuration</div>
-            <div class="progress-step progress-current-step">Requirements</div>
+            <div class="progress-step progress-current-step" data-progress-bar-idx="0">Requirements</div>
           </div>
         </div>
-        <div class="cd-block">
+        <div class="cd-block" data-step-content-idx="0">
           <div class="panel panel-default cd-panel">
             <div class="cd-row cd-panel-heading">
               <h3 class="panel-title cd-row-child">
@@ -1148,6 +1149,8 @@
       <div id="add-host-snackbar"></div>
       <div id="update-roles-snackbar"></div>
       <div id="update-options-snackbar"></div>
+      <div id="general-snackbar"></div>
+    </div>
     </body>
   </html>
 </html>
