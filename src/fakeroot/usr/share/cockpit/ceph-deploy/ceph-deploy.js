@@ -1276,23 +1276,14 @@ function setup_main_menu(){
 	}
 }
 
+/**
+ * update the files stored on the administrator node that are used to store deploy state.
+ */
 function sync_ceph_deploy_state(){
 	let ceph_deploy_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
 	let ceph_deploy_state_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json");
 	ceph_deploy_state_file.read().then((content,tag) => {
-		if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str == content){
-			//localStorage and state file on server are not null and are the same
-			console.log("localStorage and /usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json are congruent");
-		}else if(!content && ceph_deploy_state_json_str){
-			//file does not exist locally
-			let create_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
-			create_state_file.then(tag => {
-				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
-				ceph_deploy_state_file.close();
-				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
-			});
-			create_state_file.catch(e => {console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be created."); ceph_deploy_state_file.close();});
-		}else if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str != content){
+	if(ceph_deploy_state_json_str != content){
 			//localStorage and state file on server are not the same.
 			//Update the state file stored on server.
 			let update_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
@@ -1317,10 +1308,10 @@ function sync_ceph_deploy_state(){
 		}
 	});
 
-	let hosts = localStorage.getItem("hosts");
 	let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
 	hosts_content.then((content,tag) => {
-		if(hosts && content && hosts == content){
+		if(content){
+			localStorage.setItem("hosts",content);
 			let host_file_file_div_content = document.getElementById("host-file-content");
 			host_file_file_div_content.classList.remove("hidden");
 			document.getElementById("host-file-content").innerHTML = content;
@@ -1336,10 +1327,10 @@ function sync_ceph_deploy_state(){
 		}
 	});
 
-	let all_yml = localStorage.getItem("all.yml");
 	let all_content = cockpit.file("/usr/share/ceph-ansible/group_vars/all.yml").read();
 	all_content.then((content,tag) => {
-		if(all_yml && content && all_yml == content){
+		if(content){
+			localStorage.setItem("all.yml",content);
 			let all_file_div_content = document.getElementById("all-file-content")
 			all_file_div_content.innerHTML = content;
 			all_file_div_content.classList.remove("hidden");
@@ -1357,28 +1348,42 @@ function sync_ceph_deploy_state(){
 }
 
 function get_ceph_deploy_initial_state(){
-	let ceph_deploy_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
-	let ceph_deploy_state_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json");
-	ceph_deploy_state_file.read().then((content,tag) => {
-		if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str == content){
-			//localStorage and state file on server are not null and are the same
-			console.log("localStorage and /usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json are congruent");
-		}else if(!content && ceph_deploy_state_json_str){
-			//file does not exist locally
-			let create_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
-			create_state_file.then(tag => {
-				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
+	return new Promise((resolve,reject) => {
+		let ceph_deploy_state_file = cockpit.file("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json");
+		initial_state = ceph_deploy_state_file.read();
+		initial_state.then((content,tag) => {
+			if(content){
+				//defer to the state on the server as it is possible that more than one browser was used.
+				localStorage.setItem("ceph_deploy_state",content);
 				ceph_deploy_state_file.close();
-				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
-			});
-			create_state_file.catch(e => {console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be created."); ceph_deploy_state_file.close();});
-		}else if(ceph_deploy_state_json_str && content && ceph_deploy_state_json_str != content){
-			//localStorage and state file on server are not the same.
-			//defer to the state on the server as it is possible that more than one browser was used.
-			localStorage.setItem("ceph_deploy_state",content);
-			console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json saved to browser's localStorage.");
-		}
-	});
+				resolve();
+			}else if(!content){
+				//file does not exist locally
+				let create_state_file = ceph_deploy_state_file.replace(JSON.stringify(g_ceph_deploy_default_state));
+				create_state_file.then(tag => {
+					console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
+					ceph_deploy_state_file.close();
+					localStorage.setItem("ceph_deploy_state",JSON.stringify(g_ceph_deploy_default_state));
+					resolve();
+				});
+				create_state_file.catch(e => {
+					ceph_deploy_state_file.close();
+					reject("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be created."); 
+				});
+			}
+		});
+	}); 
+}
+
+async function start_ceph_deploy(){
+	try{
+		await get_ceph_deploy_initial_state();
+	}catch(e){
+		console.log(e);
+	}
+	setup_buttons();
+	get_param_file_content();
+	monitor_playbook_state_file();
 }
 
 function main()
@@ -1390,11 +1395,7 @@ function main()
 			if(root_check.allowed){
 				//user is an administrator, start the module as normal
                 //setup on-click listeners for buttons as required.
-				setup_buttons();
-				get_param_file_content();
-				monitor_playbook_state_file();
-				get_ceph_deploy_initial_state();
-				sync_ceph_deploy_state();
+				start_ceph_deploy();
 				
 			}else{
 				//user is not an administrator, block the page content.
