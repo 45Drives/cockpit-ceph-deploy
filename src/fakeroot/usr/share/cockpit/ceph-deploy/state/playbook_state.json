@@ -3,18 +3,24 @@
         "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
         "cwd": null,
         "result": 0,
-        "time_stamp": "2021-06-09-19-29"
+        "time_stamp": "2021-06-10-19-17"
     },
     "device_alias": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts device-alias.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-09-20-10"
+        "time_stamp": "2021-06-10-19-17"
     },
     "deploy_core": {
         "command": "ansible-playbook core.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-09-19-34"
+        "time_stamp": "2021-06-10-17-09"
+    },
+    "deploy_cephfs": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts cephfs.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-10-17-13"
     }
 }

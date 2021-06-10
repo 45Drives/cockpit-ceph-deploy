@@ -765,21 +765,7 @@ th,td {
     min-height: 50px;
 }
 
-#terminal-ping {
-    height:500px;
-    width:100%;
-    overflow:auto;
-    padding-left: 1em;
-}
-
-#terminal-device-alias {
-    height:500px;
-    width:100%;
-    overflow:auto;
-    padding-left: 1em;
-}
-
-#terminal-core {
+#terminal-core, #terminal-cephfs, #terminal-device-alias, #terminal-ping {
     height:500px;
     width:100%;
     overflow:auto;

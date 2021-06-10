@@ -469,7 +469,8 @@
               </div>
             </div>
             <div id="ansible-config-2-body" class="cd-panel-body">
-              <div class="ct-form">
+              <p class="cd-para">Ceph Core: (mons,mgrs,osds,metrics)</p>
+              <div class="ct-form" id="core-options">
                 <label class="control-label" for="options-interface-field"
                   >monitor_interface</label
                 >
@@ -517,7 +518,6 @@
                     id="options-cluster-network-field-feedback"
                   ></div>
                 </div>
-
                 <label
                   class="control-label"
                   for="options-hybrid-cluster-checkbox"
@@ -532,6 +532,25 @@
                   />
                 </div>
               </div>
+              <p class="cd-para">RADOS Options:</p>
+              <div class="ct-form" id="rgw-options">
+                <label class="control-label" for="options-radosgw-interface-field"
+                >radosgw_interface</label
+              >
+              <div class="ct-validation-wrapper">
+                <input
+                  class="ct-input cd-field"
+                  type="text"
+                  aria-invalid="false"
+                  id="options-radosgw-interface-field"
+                />
+                <div
+                  class="cd-field-feedback"
+                  id="options-radosgw-interface-field-feedback"
+                ></div>
+              </div>
+              </div>
+              
 
               <div class="cd-row-right cd-row-child">
                 <button
@@ -890,7 +909,7 @@
               class="progress-step progress-current-step"
               data-progress-bar-idx="0"
             >
-              STEP TITLE
+              Playbook (cephfs.yml)
             </div>
             <div class="progress-step-divider">
               <i class="fas fa-chevron-right"></i>
@@ -900,7 +919,7 @@
         <div class="cd-block step-cephfs hidden" data-step-content-idx="0">
           <div class="panel panel-default cd-panel">
             <div class="cd-row cd-panel-heading">
-              <h3 class="panel-title cd-row-child">CephFS: BOILER PLATE</h3>
+              <h3 class="panel-title cd-row-child">CephFS: Ansible Playbook - /usr/share/ceph-ansible/cephfs.yml</h3>
               <div class="cd-row-right cd-row-child cd-panel-nav">
                 <i
                   id="step-3-0-panel-show"
@@ -910,8 +929,8 @@
               </div>
             </div>
             <div id="cephfs-step-1-body" class="cd-panel-body">
-              <p class="cd-para">BOILER PLATE</p>
-              <div id="terminal-device-alias-iframe"></div>
+              <p class="cd-para">click "run" to perform the cephfs.yml playbook</p>
+              <div id="terminal-cephfs-iframe"></div>
               <div class="cd-row-right cd-row-child">
                 <button class="btn active btn-primary" id="ansible-cephfs-btn">
                   Run
@@ -930,11 +949,11 @@
             <button
               id="deploy_cephfs"
               type="button"
-              class="btn btn-primary cd-deploy-step-next-btn"
+              class="btn btn-primary cd-deploy-step-done-btn"
               for="step-cephfs"
               disabled
             >
-              Next
+              Done
             </button>
           </div>
         </div>

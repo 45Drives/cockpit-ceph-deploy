@@ -43,11 +43,7 @@
             "ubuntuosd1"
         ],
         "metrics": [
-            "ubuntuosd1",
-	        "ubuntuosd2",
-	        "ubuntuosd3",
-	        "ubuntugw1",
-	        "ubuntugw2"
+	        "ubuntugw1"
         ],
         "mdss": [
 	    "ubuntugw1",
@@ -82,6 +78,7 @@
         "monitor_interface": "ens3",
         "public_network": "192.168.0.0/16",
         "cluster_network": "",
+        "radosgw_interface": "ens3",
         "hybrid_cluster": null
     }
 }

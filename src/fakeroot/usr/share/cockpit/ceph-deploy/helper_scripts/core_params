@@ -81,6 +81,7 @@ class Options:
 	monitor_interface: str = ""
 	public_network: str = ""
 	cluster_network: str = ""
+	radosgw_interface: str = ""
 	hybrid_cluster: bool = False
 
 	def load_dictionary(self, dict_variable: dict):

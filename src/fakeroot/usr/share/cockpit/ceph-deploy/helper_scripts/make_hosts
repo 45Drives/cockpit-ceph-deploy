@@ -14,6 +14,7 @@ g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 g_host_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/hosts"
 g_host_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
 g_ansible_file_path = "/usr/share/ceph-ansible/hosts"
+g_ansible_host_inv_file_dir = "/usr/share/ceph-ansible/host_vars"
 
 def print_to_string(item):
 	with io.StringIO() as buf, redirect_stdout(buf):
@@ -67,10 +68,41 @@ def make_host_file(roles_dict,path,dir,ansible_path):
 		print(json.dumps(error_msg,indent=4))
 		sys.exit(1)
 
-def make_host_inventory_files(host_dict,dir):
+
+def make_ansible_host_inventory_files(host_dict,dir,start_tag,end_tag):
 	if not os.path.exists(dir):
 		os.makedirs(dir)
 	
+	for host in host_dict.keys():
+		path = (dir+"/"+host+".yml")
+		if not os.path.exists(path):
+			host_inventory_file = open(path,"w")
+			host_inventory_file.write(start_tag + "\n")
+			host_inventory_file.write(end_tag)
+			host_inventory_file.close()
+
+	for host in host_dict.keys():
+		path = (dir+"/"+host+".yml")
+		
+		host_inventory_file = open(path,"r")
+		content = host_inventory_file.read()
+		host_inventory_file.close()
+
+		section_to_replace = content[content.find(start_tag + "\n")+len(start_tag):content.rfind(end_tag)]
+		new_content = "\n"
+		if ("monitor_interface" in host_dict[host].keys() and host_dict[host]["monitor_interface"] != ""):
+			new_content += "monitor_interface: " + host_dict[host]["monitor_interface"] + "\n"
+		
+		updated_host_inventory_file = open(path,"w")
+		content = content.replace(section_to_replace,new_content)
+		updated_host_inventory_file.write(content)
+		updated_host_inventory_file.close()
+
+
+def make_host_inventory_files(host_dict,dir):
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+
 	# remove old host inventory files
 	for host in host_dict.keys():
 		path = (dir+"/"+host+".yml")
@@ -83,6 +115,7 @@ def make_host_inventory_files(host_dict,dir):
 		if ("monitor_interface" in host_dict[host].keys() and host_dict[host]["monitor_interface"] != ""):
 			host_inventory_file.write("monitor_interface: " + host_dict[host]["monitor_interface"] + "\n")
 		host_inventory_file.close()
+
 
 def check_etc_hosts(host_dict):
 	ip_test = []
@@ -124,6 +157,12 @@ def main():
 	params = get_parameters(g_param_file_path)
 	make_host_file(params["roles"],g_host_file_path,g_host_file_dir,g_ansible_file_path)
 	make_host_inventory_files(params["hosts"],g_host_file_dir)
+	make_ansible_host_inventory_files(
+		params["hosts"],
+		g_ansible_host_inv_file_dir,
+		"# BEGIN **********  cockpit-ceph-deploy make_hosts output **********",
+		"# END **********  cockpit-ceph-deploy make_hosts output **********"
+		)
 	#check_etc_hosts(params["hosts"])
 	success_msg = { "success_msg":"hosts file created successfully","path":g_ansible_file_path}
 	print(json.dumps(success_msg,indent=4))

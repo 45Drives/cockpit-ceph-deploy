@@ -394,6 +394,7 @@ function update_options_info(options_json){
 	let monitor_interface_field = document.getElementById("options-interface-field");
 	let cluster_network_field = document.getElementById("options-cluster-network-field");
 	let public_network_field = document.getElementById("options-public-network-field");
+	let radosgw_interface_field = document.getElementById("options-radosgw-interface-field");
 	let hybrid_cluster_checkbox = document.getElementById("options-hybrid-cluster-checkbox");
 
 	document.getElementById("global-options-btn").disabled = true;
@@ -402,11 +403,15 @@ function update_options_info(options_json){
 		monitor_interface_field.value = options_json["monitor_interface"];
 		cluster_network_field.value = options_json["cluster_network"];
 		public_network_field.value = options_json["public_network"];
+		radosgw_interface_field.value = options_json["radosgw_interface"];
 		hybrid_cluster_checkbox.checked = options_json["hybrid_cluster"];
 
 		cluster_network_field.addEventListener("input",function(){
 			check_ip_field("options-cluster-network-field","options-cluster-network-field-feedback","global-options-btn","cluster_network",false)});
 
+		radosgw_interface_field.addEventListener("input",function(){
+			check_name_field("options-radosgw-interface-field","options-radosgw-interface-field-feedback","global-options-btn","radosgw_interface",false)});
+			
 		public_network_field.addEventListener("input",function(){
 			check_ip_field("options-public-network-field","options-public-network-field-feedback","global-options-btn","public_network",true)});
 		
@@ -712,6 +717,7 @@ function update_options_request(){
 		"monitor_interface": document.getElementById("options-interface-field").value,
 		"cluster_network": document.getElementById("options-cluster-network-field").value,
 		"public_network": document.getElementById("options-public-network-field").value,
+		"radosgw_interface": document.getElementById("options-radosgw-interface-field").value,
 		"hybrid_cluster": document.getElementById("options-hybrid-cluster-checkbox").checked
 	};
 	if (options_request_json["hybrid_cluster"] === null){options_request_json["hybrid_cluster"] = false;}
@@ -945,6 +951,16 @@ function ansible_core(){
 }
 
 /**
+ * perform the deploy_cephfs playbook within a new terminal. 
+ */
+ function ansible_cephfs(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_cephfs\n");
+	let cephfs_term = document.getElementById("terminal-cephfs");
+	if(!cephfs_term){cephfs_term = makeTerminal("terminal-cephfs");}
+	document.getElementById("terminal-cephfs-iframe").appendChild(cephfs_term);
+}
+
+/**
  * toggle the visibility of the panel body and icon of the button
  * corresponding to pb_id and btn_id respectively.
  * @param {string} btn_id 
@@ -1171,6 +1187,7 @@ function setup_buttons(){
 	document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
 	document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 	document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
+	document.getElementById("ansible-cephfs-btn").addEventListener("click",ansible_cephfs);
 	document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 }
 
@@ -1379,7 +1396,8 @@ async function start_ceph_deploy(){
 	try{
 		await get_ceph_deploy_initial_state();
 	}catch(e){
-		console.log(e);
+		alert(e);
+		console.error(e);
 	}
 	setup_buttons();
 	get_param_file_content();
