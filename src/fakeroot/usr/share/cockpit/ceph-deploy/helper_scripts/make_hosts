@@ -90,8 +90,10 @@ def make_ansible_host_inventory_files(host_dict,dir,start_tag,end_tag):
 
 		section_to_replace = content[content.find(start_tag + "\n")+len(start_tag):content.rfind(end_tag)]
 		new_content = "\n"
-		if ("monitor_interface" in host_dict[host].keys() and host_dict[host]["monitor_interface"] != ""):
-			new_content += "monitor_interface: " + host_dict[host]["monitor_interface"] + "\n"
+		ignore = ["hostname"]
+		for field in host_dict[host].keys():
+			if(host_dict[host][field] and field not in ignore):
+				new_content += field + ": " + host_dict[host][field] + "\n"
 		
 		updated_host_inventory_file = open(path,"w")
 		content = content.replace(section_to_replace,new_content)
@@ -112,8 +114,10 @@ def make_host_inventory_files(host_dict,dir):
 	for host in host_dict.keys():
 		path = (dir+"/"+host+".yml")
 		host_inventory_file = open(path,"w")
-		if ("monitor_interface" in host_dict[host].keys() and host_dict[host]["monitor_interface"] != ""):
-			host_inventory_file.write("monitor_interface: " + host_dict[host]["monitor_interface"] + "\n")
+		ignore = ["hostname"]
+		for field in host_dict[host].keys():
+			if(host_dict[host][field] and field not in ignore):
+				host_inventory_file.write(field + ": " + host_dict[host][field] + "\n")
 		host_inventory_file.close()
 
 

@@ -177,6 +177,14 @@ input:checked + .slider:before {
     border-radius: 4px;
 }
 
+.cd-option-panel {
+    max-width: 90%;
+    background-color: var(--container);
+	border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-left: 15px;
+}
+
 .cd-panel-body {
     padding: 15px;
     color: var(--font);
@@ -456,6 +464,7 @@ input:checked + .slider:before {
     .ct-form > .ct-validation-wrapper {
         display: flex;
         flex-direction: column;
+        justify-content: center;
     }
 
     .ct-form input[type=number] {

@@ -2,27 +2,22 @@
     "hosts": {
         "ubuntuosd1": {
             "hostname": "ubuntuosd1",
-            "ip": "192.168.13.13",
             "monitor_interface": "ens3"
         },
         "ubuntuosd2": {
             "hostname": "ubuntuosd2",
-            "ip": "192.168.13.14",
             "monitor_interface": "ens3"
         },
         "ubuntuosd3": {
             "hostname": "ubuntuosd3",
-            "ip": "192.168.13.15",
             "monitor_interface": "ens3"
         },
 	"ubuntugw1":{
 	    "hostname":"ubuntugw1",
-	    "ip":"192.168.13.16",
 	    "monitor_interface":"ens3"
 	},
 	"ubuntugw2":{
 	    "hostname":"ubuntugw2",
-	    "ip":"192.168.13.17",
 	    "monitor_interface":"ens3"
 	}
     },

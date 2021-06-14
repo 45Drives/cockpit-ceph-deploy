@@ -31,7 +31,7 @@ from typing import List
 @dataclass()
 class Host:
 	hostname: str = ""
-	ip: str = ""
+	radosgw_address: str = ""
 	monitor_interface: str = ""
 
 	def load_dictionary(self, dict_variable: dict):
@@ -82,6 +82,10 @@ class Options:
 	public_network: str = ""
 	cluster_network: str = ""
 	radosgw_interface: str = ""
+	ip_version: str = ""
+	radosgw_civetweb_port: str = ""
+	radosgw_frontend_type: str = ""
+	radosgw_civetweb_num_threads: str = ""
 	hybrid_cluster: bool = False
 
 	def load_dictionary(self, dict_variable: dict):

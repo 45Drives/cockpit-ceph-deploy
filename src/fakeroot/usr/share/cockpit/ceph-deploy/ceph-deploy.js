@@ -17,6 +17,156 @@
 
 let g_core_params = null;
 let g_deploy_file = null;
+let g_option_scheme = {
+	"mons":{
+		"global": [
+			{
+				"option_name":"monitor_interface",
+				"optional":false,
+				"label":"monitor_interface",
+				"feedback":true,
+				"feedback_type":"name",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+			{
+				"option_name":"ip_version",
+				"optional":false,
+				"label":"ip_version",
+				"feedback":true,
+				"feedback_type":"choice",
+				"feedback_choice_options":["ipv4","ipv6"],
+				"help":"",
+				"input_type":"text",
+				"default_value":"ipv4"
+			}
+		],
+		"unique": [
+			{
+				"option_name":"monitor_interface",
+				"optional":true,
+				"label":"monitor_interface",
+				"feedback":true,
+				"feedback_type":"name",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			}
+		]
+	},
+	"mgrs":{
+		"global": [],
+		"unique": []
+	},
+	"osds":{
+		"global": [
+			{
+				"option_name":"public_network",
+				"optional":false,
+				"label":"public_network",
+				"feedback":true,
+				"feedback_type":"ip",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+			{
+				"option_name":"cluster_network",
+				"optional":true,
+				"label":"cluster_network",
+				"feedback":true,
+				"feedback_type":"ip",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+			{
+				"option_name":"hybrid_cluster",
+				"optional":false,
+				"label":"hybrid_cluster",
+				"feedback":false,
+				"help":"",
+				"input_type":"checkbox",
+				"default_value":false
+			}
+		],
+		"unique": []
+	},
+	"metrics":{
+		"global": [],
+		"unique": []
+	},
+	"mdss":{
+		"global": [],
+		"unique": []
+	},
+	"smbs":{
+		"global": [],
+		"unique": []
+	},
+	"nfss":{
+		"global": [],
+		"unique": []
+	},
+	"iscsigws":{
+		"global": [],
+		"unique": []
+	},
+	"rgws":{
+		"global": [
+			{
+				"option_name":"radosgw_civetweb_port",
+				"optional":false,
+				"label":"radosgw_civetweb_port",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":"8080"
+			},
+			{
+				"option_name":"radosgw_frontend_type",
+				"optional":false,
+				"label":"radosgw_frontend_type",
+				"feedback":false,
+				"help":"",
+				"input_type":"text",
+				"default_value":"beast"
+			},
+			{
+				"option_name":"radosgw_civetweb_num_threads",
+				"optional":false,
+				"label":"radosgw_civetweb_num_threads",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":"512"
+			}
+		],
+		"unique": [
+			{
+				"option_name":"radosgw_address",
+				"optional":false,
+				"label":"radosgw_address",
+				"feedback":true,
+				"feedback_type":"ip",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			}
+		]
+	},
+	"rgwloadbalancers":{
+		"global": [],
+		"unique": []
+	},
+	"client":{
+		"global": [],
+		"unique": []
+	}
+}
 
 let g_ceph_deploy_default_state = {
 	"deploy-step-preconfig" : {
@@ -388,49 +538,243 @@ function update_role_info(hosts_json,roles_json){
  * updates the text fields based on the values of the options_json provided.
  * This will also forbid progress (by disabling the next button) if the required fields
  * are not filled in.
+ * @param {Object} hosts_json 
+ * @param {Object} roles_json 
  * @param {Object} options_json 
  */
-function update_options_info(options_json){
-	let monitor_interface_field = document.getElementById("options-interface-field");
-	let cluster_network_field = document.getElementById("options-cluster-network-field");
-	let public_network_field = document.getElementById("options-public-network-field");
-	let radosgw_interface_field = document.getElementById("options-radosgw-interface-field");
-	let hybrid_cluster_checkbox = document.getElementById("options-hybrid-cluster-checkbox");
+function update_options_info(hosts_json, roles_json, options_json){
+	let options_div = document.getElementById("ansible-config-options");
+	if(options_div){
+		options_div.innerHTML = ""; //erase everything within the options div.
+		//create global and per-host options for each role type
+		Object.entries(roles_json).forEach(([role, host_list]) => {
+			//loop through each role in the roles_json
+			if(host_list.length > 0 && g_option_scheme[role].global.length > 0){
+				// At least one host is assigned this role
+
+				//create a box to house all global and per-host options
+				let role_option_div = document.createElement("div");
+				role_option_div.classList.add("panel","panel-default","cd-option-panel");
+
+				let section_header = document.createElement("div");
+				section_header.classList.add("cd-row", "cd-panel-heading");
+				
+				let section_header_text = document.createElement("h3");
+				section_header_text.classList.add("panel-title", "cd-row-child");
+				section_header_text.innerText = "Options [" + role + "]: ";
+				section_header.appendChild(section_header_text);
+
+				let section_body = document.createElement("div");
+				section_body.classList.add("cd-panel-body");
+
+				let global_option_p = document.createElement("p");
+				global_option_p.classList.add("cd-para");
+				global_option_p.innerText = "Global Options: ";
+				section_body.appendChild(global_option_p);
+
+				let global_form = document.createElement("div");
+				global_form.classList.add("ct-form");
+				global_form.id = role;
+				
+				for(let opt of g_option_scheme[role].global){
+					// loop through each option in the option scheme and create fields
+					// for each global option.
+					let opt_wrapper = document.createElement("div");
+					opt_wrapper.classList.add("ct-validation-wrapper");
+
+					let opt_label = document.createElement("label");
+					opt_label.classList.add("control-label");
+					opt_label.setAttribute("for",opt.option_name);
+					opt_label.innerText = (opt.optional ? "" : "* ") + opt.option_name;
+					global_form.appendChild(opt_label);
+
+					let opt_input = document.createElement("input");
+					if(opt.input_type === "text"){
+						// make a text field
+						opt_input.type = opt.input_type;
+						opt_input.classList.add("ct-input","cd-field");
+						opt_input.value = (
+							(options_json.hasOwnProperty(opt.option_name) && 
+							(options_json[opt.option_name] != ""))?options_json[opt.option_name]:opt.default_value);
+					}else if(opt.input_type === "checkbox"){
+						// make a checkbox
+						opt_input.type = opt.input_type;
+						opt_input.classList.add("ct-input","cd-field-checkbox");
+						opt_input.checked = (
+							options_json.hasOwnProperty(opt.option_name)?options_json[opt.option_name]:false);
+						opt_input.addEventListener("change",function(){
+							document.getElementById("global-options-btn").removeAttribute("disabled")});
+					}
+					opt_input.setAttribute("aria-invalid","false");
+					opt_input.id = opt.option_name;
+					opt_input.setAttribute("global-option",true);
+					opt_input.setAttribute("optional",opt.optional);
+
+					opt_wrapper.appendChild(opt_input);
+
+					if(opt.feedback){
+						let feedback = document.createElement("div");
+						feedback.classList.add("cd-field-feedback");
+						feedback.id = opt.option_name + "-feedback";
+
+						if(opt.feedback_type === "ip"){
+							opt_input.addEventListener("input",function(){
+								check_ip_field(
+									opt.option_name,
+									opt.option_name + "-feedback",
+									"global-options-btn",
+									opt.option_name,
+									!opt.optional)
+								}
+							);
+						}else if(opt.feedback_type === "name"){
+							opt_input.addEventListener("input",function(){
+								check_name_field(
+									opt.option_name,
+									opt.option_name + "-feedback",
+									"global-options-btn",
+									opt.option_name,
+									!opt.optional)
+								}
+							);
+
+						}else if(opt.feedback_type === "num"){
+							//todo: ADD num listener
+							console.log("num");
+						}
+						else if(opt.feedback_type === "choice"){
+							//todo: ADD CHOICE LISTENER
+							console.log("choice");
+						}
+
+						opt_wrapper.appendChild(feedback);
+					}
+					global_form.appendChild(opt_wrapper);
+					section_body.appendChild(global_form);
+				}
+
+				// per-host options
+				if(host_list.length > 0 && g_option_scheme[role].unique.length > 0){
+					let unique_option_p = document.createElement("p");
+					unique_option_p.classList.add("cd-para");
+					unique_option_p.innerText = "Per-host Options: ";
+					section_body.appendChild(unique_option_p);
+
+					for(let i = 0; i < host_list.length; i++){
+						let host_option_div = document.createElement("div");
+						host_option_div.classList.add("panel","panel-default","cd-option-panel");
+
+						let host_option_panel_heading = document.createElement("div");
+						host_option_panel_heading.classList.add("cd-row", "cd-panel-heading");
+						host_option_panel_heading.innerText = host_list[i];
+
+						let host_option_panel_body = document.createElement("div");
+						host_option_panel_body.classList.add("cd-panel-body");
+
+						let host_form = document.createElement("div");
+						host_form.classList.add("ct-form");
+
+						for(let opt of g_option_scheme[role].unique){
+							let opt_wrapper = document.createElement("div");
+							opt_wrapper.classList.add("ct-validation-wrapper");
+						
+							let opt_label = document.createElement("label");
+							opt_label.classList.add("control-label");
+							opt_label.setAttribute("for",opt.option_name + "-" + host_list[i]);
+							opt_label.innerText = (opt.optional ? "" : "* ") + opt.option_name;
+							host_form.appendChild(opt_label);
+						
+							let opt_input = document.createElement("input");
+							if(opt.input_type === "text"){
+								opt_input.type = opt.input_type;
+								opt_input.classList.add("ct-input","cd-field");
+								opt_input.value =(hosts_json[host_list[i]].hasOwnProperty(opt.option_name)?hosts_json[host_list[i]][opt.option_name]:opt.default_value);
+							}else if(opt.input_type === "checkbox"){
+								opt_input.type = opt.input_type;
+								opt_input.classList.add("ct-input","cd-field-checkbox");
+								opt_input.addEventListener("change",function(){
+									document.getElementById("global-options-btn").removeAttribute("disabled")});
+							}
+							opt_input.setAttribute("aria-invalid","false");
+							opt_input.id = opt.option_name + "-" + host_list[i];
+							opt_input.setAttribute("hostname",host_list[i]);
+							opt_input.setAttribute("field",opt.option_name);
+							opt_input.setAttribute("optional",opt.optional);
+							opt_input.setAttribute("global-option",false);
+						
+							opt_wrapper.appendChild(opt_input);
+						
+							if(opt.feedback){
+								let feedback = document.createElement("div");
+								feedback.classList.add("cd-field-feedback");
+								feedback.id = opt.option_name + "-" + host_list[i] + "-feedback";
+							
+								if(opt.feedback_type === "ip"){
+									opt_input.addEventListener("input",function(){
+										check_ip_field(
+											opt.option_name + "-" + host_list[i],
+											opt.option_name + "-" + host_list[i] + "-feedback",
+											"global-options-btn",
+											opt.option_name,
+											!opt.optional)
+										}
+									);
+								}else if(opt.feedback_type === "name"){
+									opt_input.addEventListener("input",function(){
+										check_name_field(
+											opt.option_name + "-" + host_list[i],
+											opt.option_name + "-" + host_list[i] + "-feedback",
+											"global-options-btn",
+											opt.option_name,
+											!opt.optional)
+										}
+									);
+									
+								}else if(opt.feedback_type === "num"){
+									//todo: ADD num listener
+									console.log("num");
+								}
+								else if(opt.feedback_type === "choice"){
+									//todo: ADD CHOICE LISTENER
+									console.log("choice");
+								}
+							
+								opt_wrapper.appendChild(feedback);
+							}
+							host_form.appendChild(opt_wrapper);
+						}
+						host_option_panel_body.appendChild(host_form);
+						host_option_div.appendChild(host_option_panel_heading);
+						host_option_div.appendChild(host_option_panel_body);
+						section_body.appendChild(host_option_div);
+					}
+				}
+				role_option_div.appendChild(section_header);
+				role_option_div.appendChild(section_body);
+				options_div.appendChild(role_option_div);
+			}
+		});
+	}
 
 	document.getElementById("global-options-btn").disabled = true;
+	let per_host_list = options_div.querySelectorAll(':scope input[global-option="false"]');
+	console.log("per_host_list: ",per_host_list);
 
-	if(monitor_interface_field && cluster_network_field && public_network_field && hybrid_cluster_checkbox){
-		monitor_interface_field.value = options_json["monitor_interface"];
-		cluster_network_field.value = options_json["cluster_network"];
-		public_network_field.value = options_json["public_network"];
-		radosgw_interface_field.value = options_json["radosgw_interface"];
-		hybrid_cluster_checkbox.checked = options_json["hybrid_cluster"];
+	let global_list = options_div.querySelectorAll(':scope input[global-option="true"]');
+	console.log("global_list: ",global_list);
+	
+	let required_list = options_div.querySelectorAll(':scope input[optional="false"]');
+	console.log("required_list: ",required_list);
 
-		cluster_network_field.addEventListener("input",function(){
-			check_ip_field("options-cluster-network-field","options-cluster-network-field-feedback","global-options-btn","cluster_network",false)});
-
-		radosgw_interface_field.addEventListener("input",function(){
-			check_name_field("options-radosgw-interface-field","options-radosgw-interface-field-feedback","global-options-btn","radosgw_interface",false)});
-			
-		public_network_field.addEventListener("input",function(){
-			check_ip_field("options-public-network-field","options-public-network-field-feedback","global-options-btn","public_network",true)});
-		
-		monitor_interface_field.addEventListener("input",function(){
-			check_name_field("options-interface-field","options-interface-field-feedback","global-options-btn","monitor_interface",true)});
-
-		hybrid_cluster_checkbox.addEventListener("change",function(){
-			document.getElementById("global-options-btn").removeAttribute("disabled")});
-
-		//enable/disable next nav button.
-		let next_btn = document.getElementById("ansible-config-add-options-nxt");
-		if(monitor_interface_field.value && public_network_field.value && next_btn){
-			next_btn.removeAttribute("disabled");
-			next_btn.title = "To proceed, fill in required fields.";
-		}else if(next_btn){
+	let next_btn = document.getElementById("ansible-config-add-options-nxt");
+	next_btn.removeAttribute("disabled");
+	required_list.forEach(element => {
+		if(element.value == ""){
 			next_btn.disabled = true;
-			next_btn.title = "";
+			next_btn.title = "To proceed, fill in required fields.";
 		}
-	}
+	});
+
 }
 
 /**
@@ -459,7 +803,7 @@ function get_param_file_content(){
 			if(result_json.hasOwnProperty("old_file_content")){
 				update_host_info(result_json.old_file_content.hosts);
 				update_role_info(result_json.old_file_content.hosts, result_json.old_file_content.roles);
-				update_options_info(result_json.old_file_content.options);
+				update_options_info(result_json.old_file_content.hosts, result_json.old_file_content.roles,result_json.old_file_content.options);
 			}
 		}else{
 			msg_color = "#bd3030";
@@ -714,12 +1058,17 @@ function update_role_request(){
  */
 function update_options_request(){
 	let options_request_json = {
-		"monitor_interface": document.getElementById("options-interface-field").value,
-		"cluster_network": document.getElementById("options-cluster-network-field").value,
-		"public_network": document.getElementById("options-public-network-field").value,
-		"radosgw_interface": document.getElementById("options-radosgw-interface-field").value,
-		"hybrid_cluster": document.getElementById("options-hybrid-cluster-checkbox").checked
+		"monitor_interface": document.getElementById("monitor_interface").value,
+		"cluster_network": document.getElementById("cluster_network").value,
+		"public_network": document.getElementById("public_network").value,
+		"ip_version": document.getElementById("ip_version").value,
+		"hybrid_cluster": document.getElementById("hybrid_cluster").checked
 	};
+
+	Object.entries(g_option_scheme).forEach(([role]) => {
+		//TODO: CONTINUE FROM HERE TOMORROW>>>> 
+	});
+
 	if (options_request_json["hybrid_cluster"] === null){options_request_json["hybrid_cluster"] = false;}
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
 	var result_json = null;
@@ -1164,6 +1513,8 @@ function setup_progress_bar(deploy_step_key){
 	}
 }
 
+
+
 /**
  * set up event listeners for buttons.
  */
@@ -1207,40 +1558,6 @@ function setup_main_menu(){
 		"deploy-step-iscsi",
 		"deploy-step-dashboard"
 	];
-
-	let deploy_step_default_states = {
-		"deploy-step-preconfig" : "unlocked",
-		"deploy-step-ansible-config" : "locked",
-		"deploy-step-core" : "locked",
-		"deploy-step-cephfs" : "locked",
-		"deploy-step-nfs" : "locked",
-		"deploy-step-smb" : "locked",
-		"deploy-step-rgw" : "locked",
-		"deploy-step-rgwlb" : "locked",
-		"deploy-step-iscsi" : "locked",
-		"deploy-step-dashboard" : "locked"
-	};
-
-	let deploy_step_current_states = {};
-
-	let deploy_step_unlock_requirements = {
-		"deploy-step-preconfig": [],
-		"deploy-step-ansible-config": ["deploy-step-preconfig"],
-		"deploy-step-core": ["deploy-step-ansible-config"],
-		"deploy-step-cephfs": ["deploy-step-core"],
-		"deploy-step-nfs": ["deploy-step-cephfs"],
-		"deploy-step-smb": ["deploy-step-cephfs"],
-		"deploy-step-rgw": ["deploy-step-core"],
-		"deploy-step-rgwlb": ["deploy-step-rgw"],
-		"deploy-step-iscsi": ["deploy-step-core"],
-		"deploy-step-dashboard": ["deploy-step-rgw","deploy-step-iscsi","deploy-step-nfs","deploy-step-smb"]
-	};
-
-	//// get states from local storage
-	//for(let i = 0; i < deploy_step_ids.length; i++){
-	//	deploy_step_current_states[deploy_step_ids[i]] = (localStorage.getItem(deploy_step_ids[i])??deploy_step_default_states[deploy_step_ids[i]]);
-	//}
-
 	deploy_step_current_state_json_str = (localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
 	deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
 	// unlock the steps that have their unlock requirements met and update local storage.
@@ -1414,7 +1731,6 @@ function main()
 				//user is an administrator, start the module as normal
                 //setup on-click listeners for buttons as required.
 				start_ceph_deploy();
-				
 			}else{
 				//user is not an administrator, block the page content.
 				let page_content = document.getElementById("ceph-deploy-content");
