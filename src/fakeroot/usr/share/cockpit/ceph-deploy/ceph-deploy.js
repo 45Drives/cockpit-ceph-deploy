@@ -757,14 +757,8 @@ function update_options_info(hosts_json, roles_json, options_json){
 	}
 
 	document.getElementById("global-options-btn").disabled = true;
-	let per_host_list = options_div.querySelectorAll(':scope input[global-option="false"]');
-	console.log("per_host_list: ",per_host_list);
-
-	let global_list = options_div.querySelectorAll(':scope input[global-option="true"]');
-	console.log("global_list: ",global_list);
 	
 	let required_list = options_div.querySelectorAll(':scope input[optional="false"]');
-	console.log("required_list: ",required_list);
 
 	let next_btn = document.getElementById("ansible-config-add-options-nxt");
 	next_btn.removeAttribute("disabled");
@@ -1057,24 +1051,85 @@ function update_role_request(){
  * using the content of the option field elements. 
  */
 function update_options_request(){
-	let options_request_json = {
-		"monitor_interface": document.getElementById("monitor_interface").value,
-		"cluster_network": document.getElementById("cluster_network").value,
-		"public_network": document.getElementById("public_network").value,
-		"ip_version": document.getElementById("ip_version").value,
-		"hybrid_cluster": document.getElementById("hybrid_cluster").checked
-	};
+	// go through each role and get the values for the options_request_json and the 
+	// host_request json.
+	let options_request_json = {};
+	let options_div = document.getElementById("ansible-config-options");
+	let global_list = [...options_div.querySelectorAll(':scope input[global-option="true"]')];
 
-	Object.entries(g_option_scheme).forEach(([role]) => {
-		//TODO: CONTINUE FROM HERE TOMORROW>>>> 
+	global_list.forEach(element => {
+		if(element.type == "text"){
+			options_request_json[element.id] = element.value;
+		}
+		else if(element.type == "checkbox"){
+			options_request_json[element.id] = (element.checked?true:false);
+		}
 	});
 
-	if (options_request_json["hybrid_cluster"] === null){options_request_json["hybrid_cluster"] = false;}
-	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
-	var result_json = null;
-	var options_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	let per_host_list = [...options_div.querySelectorAll(':scope input[global-option="false"]')];
+	
+	host_request_json = {}
+
+	per_host_list.forEach(element => {
+		if(!host_request_json.hasOwnProperty(element.hostname)){
+			host_request_json[element.getAttribute("hostname")] = {"hostname": element.getAttribute("hostname")};
+		}
+
+		if(element.type == "text"){
+			host_request_json[element.getAttribute("hostname")][element.getAttribute("field")] = element.value;
+		}
+		else if(element.type == "checkbox"){
+			host_request_json[element.getAttribute("hostname")][element.getAttribute("field")] = (element.checked?true:false);
+		}
+	});
+	
+	var options_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
+	var options_proc = cockpit.spawn(options_spawn_args, {superuser: "require"});
 	options_proc.done(function(data){
 		show_snackbar_msg("Message: ","Global options have been updated", "#20a030","update-options-snackbar");
+		var host_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-h",JSON.stringify(host_request_json),"-w"];
+		var result_json = null;
+		var proc = cockpit.spawn(host_spawn_args, {superuser: "require"});
+		proc.done(function(data) {
+			var msg_label = "";
+			var msg_content = "";
+			var msg_color = "";
+			try {
+				result_json = JSON.parse(data);
+			} catch (e) {
+				msg_color = "#bd3030";
+				msg_label = "Error:";
+				msg_content = "Unexpected return value.";
+			}
+			if (result_json.hasOwnProperty("success_msg")){
+				msg_color = "#20a030";
+				msg_label = "Add Host: ";
+				msg_content = "Host Added Succcessfully.";
+			}else{
+				msg_color = "#bd3030";
+				msg_label = "Error:";
+				msg_content = "Unexpected return value.";
+			}
+			hide_modal_dialog("add-host-modal");
+			get_param_file_content();
+			show_snackbar_msg(msg_label,msg_content,msg_color,"add-host-snackbar");
+		});
+		proc.fail(function(ex, data) {
+			document.getElementById("add-host-result-msg").style.display = "block";
+			var msg_label = document.getElementById("add-host-result-msg-label");
+			msg_label.innerHTML = "Error:";
+			var msg_content = document.getElementById("add-host-result-msg-content");
+			try {
+				result_json = JSON.parse(data);
+			} catch (e) {
+				msg_content.innerHTML = "Unable to add host";
+			}
+			if (result_json.hasOwnProperty("error_msg")){
+				msg_content.innerHTML = result_json.error_msg;
+			}else{
+				msg_content.innerHTML = "Unable to add host";
+			}
+		});
 		get_param_file_content();
 	});
 	options_proc.fail(function(ex, data) {
