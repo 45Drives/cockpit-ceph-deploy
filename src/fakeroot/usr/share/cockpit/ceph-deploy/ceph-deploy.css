@@ -255,7 +255,7 @@ input:checked + .slider:before {
 .cd-host-list-entry-text {
 	box-sizing: border-box;
 	flex-grow: 1;
-	width: 45%;  
+	width: 98%;  
 	padding: 0 0.25em 0.25em 0;
 	overflow: hidden; 
 	list-style: none;

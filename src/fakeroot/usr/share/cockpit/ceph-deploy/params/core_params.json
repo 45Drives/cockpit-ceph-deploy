@@ -1,79 +1,89 @@
 {
     "hosts": {
-        "ubuntuosd1": {
-            "hostname": "ubuntuosd1",
-            "monitor_interface": "ens3"
-        },
-        "ubuntuosd2": {
-            "hostname": "ubuntuosd2",
-            "monitor_interface": "ens3"
-        },
-        "ubuntuosd3": {
-            "hostname": "ubuntuosd3",
-            "monitor_interface": "ens3"
-        },
-	"ubuntugw1":{
-	    "hostname":"ubuntugw1",
-	    "monitor_interface":"ens3"
-	},
-	"ubuntugw2":{
-	    "hostname":"ubuntugw2",
-	    "monitor_interface":"ens3"
-	}
+      "ubuntuosd1": {
+        "hostname": "ubuntuosd1",
+        "radosgw_address": "",
+        "monitor_interface": "ens3"
+      },
+      "ubuntuosd2": {
+        "hostname": "ubuntuosd2",
+        "radosgw_address": "",
+        "monitor_interface": "ens3"
+      },
+      "ubuntuosd3": {
+        "hostname": "ubuntuosd3",
+        "radosgw_address": "",
+        "monitor_interface": "ens3"
+      },
+      "ubuntugw1": {
+        "hostname": "ubuntugw1",
+        "radosgw_address": "192.168.13.16",
+        "monitor_interface": ""
+      },
+      "ubuntugw2": {
+        "hostname": "ubuntugw2",
+        "radosgw_address": "192.168.13.17",
+        "monitor_interface": ""
+      }
     },
     "roles": {
-        "mons": [
-            "ubuntuosd3",
-            "ubuntuosd2",
-            "ubuntuosd1"
-        ],
-        "mgrs": [
-            "ubuntuosd3",
-            "ubuntuosd2",
-            "ubuntuosd1"
-        ],
-        "osds": [
-            "ubuntuosd3",
-            "ubuntuosd2",
-            "ubuntuosd1"
-        ],
-        "metrics": [
-	        "ubuntugw1"
-        ],
-        "mdss": [
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "smbs": [
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "nfss": [
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "iscsigws": [	
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "rgws": [
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "rgwloadbalancers": [
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ],
-        "client": [	
-	    "ubuntugw1",
-	    "ubuntugw2"
-	    ]
+      "mons": [
+        "ubuntuosd3",
+        "ubuntuosd2",
+        "ubuntuosd1"
+      ],
+      "mgrs": [
+        "ubuntuosd3",
+        "ubuntuosd2",
+        "ubuntuosd1"
+      ],
+      "osds": [
+        "ubuntuosd3",
+        "ubuntuosd2",
+        "ubuntuosd1"
+      ],
+      "metrics": [
+        "ubuntugw1"
+      ],
+      "mdss": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "smbs": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "nfss": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "iscsigws": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "rgws": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "rgwloadbalancers": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ],
+      "client": [
+        "ubuntugw1",
+        "ubuntugw2"
+      ]
     },
     "options": {
-        "monitor_interface": "ens3",
-        "public_network": "192.168.0.0/16",
-        "cluster_network": "",
-        "radosgw_interface": "ens3",
-        "hybrid_cluster": null
+      "monitor_interface": "ens3",
+      "public_network": "192.168.0.0/16",
+      "cluster_network": "",
+      "radosgw_interface": "ens3",
+      "hybrid_cluster": false,
+      "ip_version": "ipv4",
+      "radosgw_civetweb_port": "8080",
+      "radosgw_frontend_type": "beast",
+      "radosgw_civetweb_num_threads": "512"
     }
-}
+  }
+  

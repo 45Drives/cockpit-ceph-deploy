@@ -299,11 +299,11 @@ function switch_theme(/*event*/ e) {
  */
 function add_host_request(){
 	let hostname = document.getElementById("new-hostname-field").value;
-	let monitor_interface = document.getElementById("new-interface-field").value;
+	//let monitor_interface = document.getElementById("new-interface-field").value;
 	if(hostname != null && hostname != ""){
 		host_request_json = {[hostname]:{"hostname":""}};
 		host_request_json[hostname]["hostname"] = hostname;
-		host_request_json[hostname]["monitor_interface"] = (monitor_interface != null) ? monitor_interface:"";
+		//host_request_json[hostname]["monitor_interface"] = (monitor_interface != null) ? monitor_interface:"";
 		var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-h",JSON.stringify(host_request_json),"-w"];
 		var result_json = null;
 		var proc = cockpit.spawn(spawn_args, {superuser: "require"});
@@ -359,13 +359,13 @@ function add_host(){
 	let hostname_field = document.getElementById("new-hostname-field");
 	let interface_field = document.getElementById("new-interface-field");
 	hostname_field.value = "";
-	interface_field.value = "";
+	//interface_field.value = "";
 
     show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	interface_field.addEventListener("input",function(){
-		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
+	//interface_field.addEventListener("input",function(){
+	//	check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
     document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("continue-add-host").addEventListener("click",add_host_request);
@@ -868,33 +868,6 @@ function remove_host(hostname){
 }
 
 /**
- * shows the add-host-modal dialog, with the editable fields populated with
- * the hostname and monitor_interface strings.
- * @param {string} hostname 
- * @param {string} monitor_interface 
- */
-function edit_host(hostname,monitor_interface){
-	document.getElementById("add-host-modal-title").innerText = "Edit Host";
-	
-	let hostname_field = document.getElementById("new-hostname-field");
-	let interface_field = document.getElementById("new-interface-field");
-	
-	hostname_field.value = hostname;
-	interface_field.value = monitor_interface;
-
-	show_modal_dialog("add-host-modal");
-	hostname_field.addEventListener("input",function(){
-		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	interface_field.addEventListener("input",function(){
-		check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
-
-	document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
-	document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
-	document.getElementById("continue-add-host").addEventListener("click",add_host_request);
-	document.getElementById("continue-add-host").innerText = "Save";
-}
-
-/**
  * updates the list of hosts using the json provided. if the host list is empty, progress
  * is forbidden by disabling the next button. It will also enable the button if
  * the list is not empty. 
@@ -911,7 +884,6 @@ function update_host_info(hosts_json){
 		document.getElementById("cd-host-placeholder").classList.add("hidden");
 		for (let key of Object.keys(hosts_json)) {
 			let hostname = hosts_json[key]["hostname"];
-			let monitor_interface = hosts_json[key]["monitor_interface"];
 			
 			var new_host_entry = document.createElement("div");
 			new_host_entry.classList.add("cd-host-list-entry");
@@ -920,26 +892,11 @@ function update_host_info(hosts_json){
 			host_entry_hostname.classList.add("cd-host-list-entry-text");
 			host_entry_hostname.innerText = hostname;
 
-			var host_entry_monitor_interface = document.createElement("div");
-			host_entry_monitor_interface.classList.add("cd-host-list-entry-text");
-			host_entry_monitor_interface.innerText = monitor_interface;
-
-			var host_entry_edit_icon = document.createElement("div");
-			host_entry_edit_icon.classList.add("cd-host-list-entry-icon","fa","fa-gear");
-
-			host_entry_edit_icon.addEventListener("click", function(){
-				let hns = hostname.valueOf();
-				let mis = monitor_interface.valueOf();
-				edit_host(hns,mis);
-			});
-
 			var host_entry_delete_icon = document.createElement("div");
 			host_entry_delete_icon.classList.add("cd-host-list-entry-icon-del","fa","fa-times");
 			host_entry_delete_icon.addEventListener("click", function(){let arg = hostname.valueOf();remove_host(arg)});
 
 			new_host_entry.appendChild(host_entry_hostname);
-			new_host_entry.appendChild(host_entry_monitor_interface);
-			new_host_entry.appendChild(host_entry_edit_icon);
 			new_host_entry.appendChild(host_entry_delete_icon);
 
 			host_list.appendChild(new_host_entry);
