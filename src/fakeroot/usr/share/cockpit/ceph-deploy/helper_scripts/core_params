@@ -86,6 +86,7 @@ class Options:
 	radosgw_civetweb_port: str = ""
 	radosgw_frontend_type: str = ""
 	radosgw_civetweb_num_threads: str = ""
+	radosgw_civetweb_options: str = "num_threads=\{\{ radosgw_civetweb_num_threads \}\}"
 	hybrid_cluster: bool = False
 
 	def load_dictionary(self, dict_variable: dict):

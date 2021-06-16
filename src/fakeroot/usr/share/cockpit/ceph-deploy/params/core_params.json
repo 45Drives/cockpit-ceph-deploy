@@ -83,7 +83,8 @@
       "ip_version": "ipv4",
       "radosgw_civetweb_port": "8080",
       "radosgw_frontend_type": "beast",
-      "radosgw_civetweb_num_threads": "512"
+      "radosgw_civetweb_num_threads": "512",
+      "radosgw_civetweb_options":"num_threads={{ radosgw_civetweb_num_threads }}"
     }
   }
   

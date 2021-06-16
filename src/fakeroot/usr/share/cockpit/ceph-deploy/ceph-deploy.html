@@ -917,7 +917,7 @@
                 class="progress-step progress-current-step"
                 data-progress-bar-idx="0"
               >
-                STEP TITLE
+                Playbook (radosgw.yml)
               </div>
               <div class="progress-step-divider">
                 <i class="fas fa-chevron-right"></i>
@@ -927,7 +927,7 @@
           <div class="cd-block step-rgw hidden" data-step-content-idx="0">
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">RGW: BOILER PLATE</h3>
+                <h3 class="panel-title cd-row-child">RADOS Gateway: Ansible Playbook - /usr/share/ceph-ansible/radosgw.yml</h3>
                 <div class="cd-row-right cd-row-child cd-panel-nav">
                   <i
                     id="step-3-0-panel-show"
@@ -937,10 +937,10 @@
                 </div>
               </div>
               <div id="rgw-step-1-body" class="cd-panel-body">
-                <p class="cd-para">BOILER PLATE</p>
-                <div id="terminal-device-alias-iframe"></div>
+                <p class="cd-para">click "run" to perform the radosgw.yml playbook</p>
+                <div id="terminal-radosgw-iframe"></div>
                 <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-rgw-btn">
+                  <button class="btn active btn-primary" id="ansible-radosgw-btn">
                     Run
                   </button>
                 </div>
@@ -955,13 +955,13 @@
                 Prev
               </button>
               <button
-                id="deploy_rgw"
+                id="deploy_radosgw"
                 type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
+                class="btn btn-primary cd-deploy-step-done-btn"
                 for="step-rgw"
                 disabled
               >
-                Next
+                Done
               </button>
             </div>
           </div>
@@ -977,12 +977,12 @@
               <div class="progress-step-divider">
                 <i class="fas fa-chevron-right"></i>
               </div>
-              <div class="progress-bar-title">iscsi</div>
+              <div class="progress-bar-title">ISCSI</div>
               <div
                 class="progress-step progress-current-step"
                 data-progress-bar-idx="0"
               >
-                STEP TITLE
+                Playbook (iscsi.yml)
               </div>
               <div class="progress-step-divider">
                 <i class="fas fa-chevron-right"></i>
@@ -992,7 +992,7 @@
           <div class="cd-block step-iscsi hidden" data-step-content-idx="0">
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">iscsi: BOILER PLATE</h3>
+                <h3 class="panel-title cd-row-child">ISCSI: Ansible Playbook - /usr/share/ceph-ansible/iscsi.yml</h3>
                 <div class="cd-row-right cd-row-child cd-panel-nav">
                   <i
                     id="step-3-0-panel-show"
@@ -1002,8 +1002,8 @@
                 </div>
               </div>
               <div id="iscsi-step-1-body" class="cd-panel-body">
-                <p class="cd-para">BOILER PLATE</p>
-                <div id="terminal-device-alias-iframe"></div>
+                <p class="cd-para">click "run" to perform the iscsi.yml playbook</p>
+                <div id="terminal-iscsi-iframe"></div>
                 <div class="cd-row-right cd-row-child">
                   <button class="btn active btn-primary" id="ansible-iscsi-btn">
                     Run
@@ -1022,15 +1022,80 @@
               <button
                 id="deploy_iscsi"
                 type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
+                class="btn btn-primary cd-deploy-step-done-btn"
                 for="step-iscsi"
                 disabled
               >
-                Next
+                Done
               </button>
             </div>
           </div>
         </div>
+
+                <!-- CEPH-DASHBOARD -->
+                <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
+                  <div class="cd-top-nav-button-group">
+                    <div class="cd-progress-bar" id="progress-bar-step-dashboard">
+                      <div class="progress-bar-main-back" title="main menu">
+                        Ceph Deploy
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                      <div class="progress-bar-title">Ceph Dashboard</div>
+                      <div
+                        class="progress-step progress-current-step"
+                        data-progress-bar-idx="0"
+                      >
+                        Playbook (dashboard.yml)
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cd-block step-dashboard hidden" data-step-content-idx="0">
+                    <div class="panel panel-default cd-panel">
+                      <div class="cd-row cd-panel-heading">
+                        <h3 class="panel-title cd-row-child">Ceph Dashboard: Ansible Playbook - /usr/share/ceph-ansible/dashboard.yml</h3>
+                        <div class="cd-row-right cd-row-child cd-panel-nav">
+                          <i
+                            id="step-3-0-panel-show"
+                            class="fas fa-angle-up cd-panel-vis-toggle"
+                            for="dashboard-step-1-body"
+                          ></i>
+                        </div>
+                      </div>
+                      <div id="dashboard-step-1-body" class="cd-panel-body">
+                        <p class="cd-para">click "run" to perform the dashboard.yml playbook</p>
+                        <div id="terminal-dashboard-iframe"></div>
+                        <div class="cd-row-right cd-row-child">
+                          <button class="btn active btn-primary" id="ansible-dashboard-btn">
+                            Run
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+                      <button
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-prev-btn"
+                        for="step-dashboard"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        id="deploy_dashboard"
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-done-btn"
+                        for="step-dashboard"
+                        disabled
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
         <!-- Modal Menus -->
 

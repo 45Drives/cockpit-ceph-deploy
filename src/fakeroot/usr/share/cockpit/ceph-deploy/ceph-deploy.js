@@ -22,6 +22,7 @@ let g_option_scheme = {
 		"global": [
 			{
 				"option_name":"monitor_interface",
+				"option_format":"default",
 				"optional":false,
 				"label":"monitor_interface",
 				"feedback":true,
@@ -32,6 +33,7 @@ let g_option_scheme = {
 			},
 			{
 				"option_name":"ip_version",
+				"option_format":"default",
 				"optional":false,
 				"label":"ip_version",
 				"feedback":true,
@@ -45,6 +47,7 @@ let g_option_scheme = {
 		"unique": [
 			{
 				"option_name":"monitor_interface",
+				"option_format":"default",
 				"optional":true,
 				"label":"monitor_interface",
 				"feedback":true,
@@ -53,16 +56,19 @@ let g_option_scheme = {
 				"input_type":"text",
 				"default_value":""
 			}
-		]
+		],
+		"group": []
 	},
 	"mgrs":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"osds":{
 		"global": [
 			{
 				"option_name":"public_network",
+				"option_format":"default",
 				"optional":false,
 				"label":"public_network",
 				"feedback":true,
@@ -73,6 +79,7 @@ let g_option_scheme = {
 			},
 			{
 				"option_name":"cluster_network",
+				"option_format":"default",
 				"optional":true,
 				"label":"cluster_network",
 				"feedback":true,
@@ -83,6 +90,7 @@ let g_option_scheme = {
 			},
 			{
 				"option_name":"hybrid_cluster",
+				"option_format":"default",
 				"optional":false,
 				"label":"hybrid_cluster",
 				"feedback":false,
@@ -91,32 +99,39 @@ let g_option_scheme = {
 				"default_value":false
 			}
 		],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"metrics":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"mdss":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"smbs":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"nfss":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"iscsigws":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	},
 	"rgws":{
 		"global": [
 			{
 				"option_name":"radosgw_civetweb_port",
+				"option_format":"default",
 				"optional":false,
 				"label":"radosgw_civetweb_port",
 				"feedback":true,
@@ -127,6 +142,7 @@ let g_option_scheme = {
 			},
 			{
 				"option_name":"radosgw_frontend_type",
+				"option_format":"default",
 				"optional":false,
 				"label":"radosgw_frontend_type",
 				"feedback":false,
@@ -136,6 +152,7 @@ let g_option_scheme = {
 			},
 			{
 				"option_name":"radosgw_civetweb_num_threads",
+				"option_format":"default",
 				"optional":false,
 				"label":"radosgw_civetweb_num_threads",
 				"feedback":true,
@@ -148,6 +165,7 @@ let g_option_scheme = {
 		"unique": [
 			{
 				"option_name":"radosgw_address",
+				"option_format":"default",
 				"optional":false,
 				"label":"radosgw_address",
 				"feedback":true,
@@ -156,15 +174,145 @@ let g_option_scheme = {
 				"input_type":"text",
 				"default_value":""
 			}
-		]
+		],
+		"group": []
 	},
 	"rgwloadbalancers":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": [
+			{
+				"option_name":"haproxy_frontend_port",
+				"option_format":"default",
+				"optional":true,
+				"label":"haproxy_frontend_port",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":"80"
+			},
+			{
+				"option_name":"haproxy_frontend_ssl_port",
+				"option_format":"default",
+				"optional":true,
+				"label":"haproxy_frontend_ssl_port",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":"443"
+			},
+			{
+				"option_name":"haproxy_frontend_ssl_certificate",
+				"option_format":"default",
+				"optional":true,
+				"label":"haproxy_frontend_ssl_certificate",
+				"feedback":true,
+				"feedback_type":"path",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+			{
+				"option_name":"haproxy_ssl_dh_param",
+				"option_format":"default",
+				"optional":true,
+				"label":"haproxy_ssl_dh_param",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":"4096"
+			},
+			{
+				"option_name":"haproxy_ssl_ciphers",
+				"option_format":"multi-checkbox",
+				"multi_checkbox_entries":[
+					{
+						"label": "EECDH+AESGCM",
+						"default_value":true
+					},
+					{
+						"label": "EDH+AESGCM",
+						"default_value":true
+					}
+				],
+				"optional":true,
+				"label":"haproxy_ssl_ciphers",
+				"feedback":false,
+				"help":"",
+				"input_type":"checkbox",
+				"default_value":false
+			},
+			{
+				"option_name":"haproxy_ssl_options",
+				"option_format":"multi-checkbox",
+				"multi_checkbox_entries":[
+					{
+						"label": "no-sslv3",
+						"default_value":true
+					},
+					{
+						"label": "no-tlsv10",
+						"default_value":true
+					},
+					{
+						"label": "no-tlsv11",
+						"default_value":true
+					},
+					{
+						"label": "no-tls-tickets",
+						"default_value":true
+					}
+				],
+				"optional":true,
+				"label":"haproxy_ssl_options",
+				"feedback":false,
+				"help":"",
+				"input_type":"checkbox",
+				"default_value":false
+			},
+			{
+				"option_name":"virtual_ips",
+				"option_format":"multi-ip",
+				"optional":true,
+				"label":"virtual_ips",
+				"feedback":false,
+				"help":"",
+				"input_type":"button",
+				"default_value":"Add",
+			},
+			{
+				"option_name":"virtual_ip_netmask",
+				"option_format":"default",
+				"optional":true,
+				"label":"virtual_ip_netmask",
+				"feedback":true,
+				"feedback_type":"num",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+			{
+				"option_name":"virtual_ip_interface",
+				"option_format":"default",
+				"optional":true,
+				"label":"virtual_ip_interface",
+				"feedback":true,
+				"feedback_type":"name",
+				"help":"",
+				"input_type":"text",
+				"default_value":""
+			},
+
+
+		]
 	},
 	"client":{
 		"global": [],
-		"unique": []
+		"unique": [],
+		"group": []
 	}
 }
 
@@ -549,7 +697,11 @@ function update_options_info(hosts_json, roles_json, options_json){
 		//create global and per-host options for each role type
 		Object.entries(roles_json).forEach(([role, host_list]) => {
 			//loop through each role in the roles_json
-			if(host_list.length > 0 && g_option_scheme[role].global.length > 0){
+			if(host_list.length > 0 && (
+				(g_option_scheme[role].global.length > 0) || 
+				(g_option_scheme[role].group.length > 0) ||
+				(g_option_scheme[role].unique.length > 0)
+				)){
 				// At least one host is assigned this role
 
 				//create a box to house all global and per-host options
@@ -566,7 +718,8 @@ function update_options_info(hosts_json, roles_json, options_json){
 
 				let section_body = document.createElement("div");
 				section_body.classList.add("cd-panel-body");
-
+				if(g_option_scheme[role].global.length > 0){
+				// global options (these will end up in all.yml)
 				let global_option_p = document.createElement("p");
 				global_option_p.classList.add("cd-para");
 				global_option_p.innerText = "Global Options: ";
@@ -652,6 +805,89 @@ function update_options_info(hosts_json, roles_json, options_json){
 					global_form.appendChild(opt_wrapper);
 					section_body.appendChild(global_form);
 				}
+				}
+
+
+
+				// group options end up in group_vars/{group name}.yml
+				if(host_list.length > 0 && g_option_scheme[role].group.length > 0){
+					let group_option_p = document.createElement("p");
+					group_option_p.classList.add("cd-para");
+					group_option_p.innerText = "Group Options: (/usr/share/ceph-ansible/group_vars/" + role + ".yml)";
+					section_body.appendChild(group_option_p);
+				
+					let group_form = document.createElement("div");
+					group_form.classList.add("ct-form");
+
+					for(let opt of g_option_scheme[role].group){
+						let opt_wrapper = document.createElement("div");
+						opt_wrapper.classList.add("ct-validation-wrapper");
+
+						let opt_label = document.createElement("label");
+						opt_label.classList.add("control-label");
+						opt_label.setAttribute("for",opt.option_name);
+						opt_label.innerText = (opt.optional ? "" : "* ") + opt.option_name;
+
+						let opt_input = document.createElement("input");
+						switch(opt.option_format){
+							case "multi-checkbox":
+								opt_wrapper.innerText = opt.option_format;
+								opt_input.type = opt.input_type;
+								opt_input.classList.add("ct-input","cd-field-checkbox");
+								opt_input.setAttribute("aria-invalid","false");
+								opt_input.id = opt.option_name + "-" + role;
+								opt_input.setAttribute("group",role);
+								opt_input.setAttribute("field",opt.option_name);
+								opt_input.setAttribute("optional",opt.optional);
+								opt_input.setAttribute("group-option",true);
+								for(let sub_opt of opt.multi_checkbox_entries){
+									let wrapper = document.createElement("div");
+									wrapper.classList.add("ct-validation-wrapper");
+
+									let box_label = document.createElement("label");
+									box_label.classList.add("control-label");
+									box_label.setAttribute("for",sub_opt.label);
+									box_label.innerText = sub_opt.label;
+									
+									let box = document.createElement("input");
+									box.type = "checkbox";
+									box.classList.add("ct-input","cd-field-checkbox");
+
+									wrapper.appendChild(box_label);
+									wrapper.appendChild(box);
+									opt_wrapper.appendChild(wrapper);
+								}
+								break;
+							case "multi-ip":
+								opt_wrapper.innerText = opt.option_format;
+								break;
+							default:
+								if(opt.input_type === "text"){
+									opt_input.type = opt.input_type;
+									opt_input.classList.add("ct-input","cd-field");
+									//TODO IMPLEMENT A CHECK FOR GROUPS.JSON or something like that for this value.
+									opt_input.value = opt.default_value;
+								}else if(opt.input_type === "checkbox"){
+									opt_input.type = opt.input_type;
+									opt_input.classList.add("ct-input","cd-field-checkbox");
+									opt_input.addEventListener("change",function(){
+										document.getElementById("global-options-btn").removeAttribute("disabled")});
+								}
+								opt_input.setAttribute("aria-invalid","false");
+								opt_input.id = opt.option_name + "-" + role;
+								opt_input.setAttribute("group",role);
+								opt_input.setAttribute("field",opt.option_name);
+								opt_input.setAttribute("optional",opt.optional);
+								opt_input.setAttribute("group-option",true);
+								opt_wrapper.appendChild(opt_input);
+						}
+
+						group_form.appendChild(opt_label);
+						group_form.appendChild(opt_wrapper);
+					}
+					
+					section_body.appendChild(group_form);
+				}
 
 				// per-host options
 				if(host_list.length > 0 && g_option_scheme[role].unique.length > 0){
@@ -700,7 +936,7 @@ function update_options_info(hosts_json, roles_json, options_json){
 							opt_input.setAttribute("hostname",host_list[i]);
 							opt_input.setAttribute("field",opt.option_name);
 							opt_input.setAttribute("optional",opt.optional);
-							opt_input.setAttribute("global-option",false);
+							opt_input.setAttribute("host-option",true);
 						
 							opt_wrapper.appendChild(opt_input);
 						
@@ -1023,7 +1259,7 @@ function update_options_request(){
 		}
 	});
 
-	let per_host_list = [...options_div.querySelectorAll(':scope input[global-option="false"]')];
+	let per_host_list = [...options_div.querySelectorAll(':scope input[host-option="true"]')];
 	
 	host_request_json = {}
 
@@ -1322,6 +1558,36 @@ function ansible_core(){
 }
 
 /**
+ * perform the deploy_radosgw playbook within a new terminal. 
+ */
+function ansible_radosgw(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_radosgw\n");
+	let radosgw_term = document.getElementById("terminal-radosgw");
+	if(!radosgw_term){radosgw_term = makeTerminal("terminal-radosgw");}
+	document.getElementById("terminal-radosgw-iframe").appendChild(radosgw_term);
+}
+
+/**
+ * perform the deploy_iscsi playbook within a new terminal. 
+ */
+ function ansible_iscsi(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_iscsi\n");
+	let iscsi_term = document.getElementById("terminal-iscsi");
+	if(!iscsi_term){iscsi_term = makeTerminal("terminal-iscsi");}
+	document.getElementById("terminal-iscsi-iframe").appendChild(iscsi_term);
+}
+
+/**
+ * perform the deploy_dashboard playbook within a new terminal. 
+ */
+ function ansible_dashboard(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_dashboard\n");
+	let dashboard_term = document.getElementById("terminal-dashboard");
+	if(!dashboard_term){dashboard_term = makeTerminal("terminal-dashboard");}
+	document.getElementById("terminal-dashboard-iframe").appendChild(dashboard_term);
+}
+
+/**
  * toggle the visibility of the panel body and icon of the button
  * corresponding to pb_id and btn_id respectively.
  * @param {string} btn_id 
@@ -1411,6 +1677,8 @@ function setup_deploy_step_nav_buttons(){
 				if(step_content){
 					let deploy_step_id = step_content.getAttribute("for");
 					if(deploy_step_id){
+						console.log("deploy_step_id: ",deploy_step_id);
+						console.log("step_content_id: ", step_content_id);
 						done_buttons[i].addEventListener("click", () => {
 							let deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
 							deploy_state[deploy_step_id].lock_state = "complete";
@@ -1541,6 +1809,7 @@ function setup_buttons(){
 	setup_progress_bar("deploy-step-cephfs");
 	setup_progress_bar("deploy-step-rgw");
 	setup_progress_bar("deploy-step-iscsi");
+	setup_progress_bar("deploy-step-dashboard");
 
 	document.getElementById("new-host-btn").addEventListener("click",add_host);
 	document.getElementById("update-roles-btn").addEventListener("click",update_role_request);
@@ -1551,6 +1820,9 @@ function setup_buttons(){
 	document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 	document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
 	document.getElementById("ansible-cephfs-btn").addEventListener("click",ansible_cephfs);
+	document.getElementById("ansible-radosgw-btn").addEventListener("click",ansible_radosgw);
+	document.getElementById("ansible-iscsi-btn").addEventListener("click",ansible_iscsi);
+	document.getElementById("ansible-dashboard-btn").addEventListener("click",ansible_dashboard);
 	document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 }
 

@@ -3,42 +3,42 @@
         "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
         "cwd": null,
         "result": 0,
-        "time_stamp": "2021-06-16-15-43"
+        "time_stamp": "2021-06-15-19-42"
     },
     "device_alias": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts device-alias.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-16-15-44"
+        "time_stamp": "2021-06-15-19-47"
     },
     "deploy_core": {
         "command": "ansible-playbook core.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-16-15-47"
-    },
-    "deploy_iscsi": {
-        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
-        "cwd": "/usr/share/ceph-ansible",
-        "result": 0,
-        "time_stamp": "2021-06-16-16-11"
-    },
-    "deploy_dashboard": {
-        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
-        "cwd": "/usr/share/ceph-ansible",
-        "result": 0,
-        "time_stamp": "2021-06-16-15-51"
+        "time_stamp": "2021-06-15-19-56"
     },
     "deploy_cephfs": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts cephfs.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-16-16-06"
+        "time_stamp": "2021-06-15-19-57"
     },
     "deploy_radosgw": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": 0,
-        "time_stamp": "2021-06-16-16-07"
+        "time_stamp": "2021-06-16-12-33"
+    },
+    "deploy_iscsi": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-16-12-59"
+    },
+    "deploy_dashboard": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-16-13-15"
     }
 }

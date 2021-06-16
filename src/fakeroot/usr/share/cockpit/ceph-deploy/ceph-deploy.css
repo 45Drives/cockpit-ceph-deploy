@@ -774,7 +774,7 @@ th,td {
     min-height: 50px;
 }
 
-#terminal-core, #terminal-cephfs, #terminal-device-alias, #terminal-ping {
+#terminal-core, #terminal-cephfs, #terminal-device-alias, #terminal-ping, #terminal-radosgw, #terminal-iscsi, #terminal-dashboard {
     height:500px;
     width:100%;
     overflow:auto;

@@ -53,6 +53,24 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None
+    },
+    "deploy_radosgw": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "deploy_iscsi": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "deploy_dashboard": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
     }
 }
 
