@@ -281,7 +281,7 @@ let g_option_scheme = {
 				"feedback":false,
 				"help":"",
 				"input_type":"button",
-				"default_value":"Add",
+				"default_value":"+",
 			},
 			{
 				"option_name":"virtual_ip_netmask",
@@ -512,9 +512,7 @@ function add_host(){
     show_modal_dialog("add-host-modal");
 	hostname_field.addEventListener("input",function(){
 		check_name_field("new-hostname-field","new-hostname-field-feedback","continue-add-host","hostname",true)});
-	//interface_field.addEventListener("input",function(){
-	//	check_name_field("new-interface-field","new-interface-field-feedback","continue-add-host","monitor_interface",false)});
-    document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
+	document.getElementById("close-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("cancel-add-host").addEventListener("click",function(){ hide_modal_dialog("add-host-modal"); });
     document.getElementById("continue-add-host").addEventListener("click",add_host_request);
 	document.getElementById("continue-add-host").innerText = "Add";
@@ -549,6 +547,75 @@ function check_name_field(name_field_id,feedback_field_id,button_id,label_name,r
 		if(field_text[field_text.length - 1].match(/[^a-z0-9_\-$]/))
 			invalid_chars.push("'"+field_text[field_text.length - 1]+"'");
 		info_message.innerText = label_name + " contains invalid characters: \n" + invalid_chars.join(", ");
+		return false;
+	}
+	button.disabled = false;
+	return true;
+}
+
+/**
+ * Checks to see if the text entered in a field is a valid hostname.
+ * @param {string} name_field_id 
+ * @param {string} feedback_field_id 
+ * @param {string} button_id 
+ * @param {string} label_name 
+ * @param {boolean} required_flag 
+ * @param {Array} choice_list
+ * @returns {boolean}
+ */
+ function check_choice_field(name_field_id,feedback_field_id,button_id,label_name,required_flag,choice_list) {
+	var field_text = document.getElementById(name_field_id).value;
+	var button = document.getElementById(button_id);
+	var info_message = document.getElementById(feedback_field_id);
+	info_message.innerText = " ";
+	if(field_text.length === 0 && required_flag){
+		button.disabled = true;
+		info_message.innerText = label_name + " cannot be empty.";
+		return false;
+	}
+	
+	else if(field_text.length > 0){
+		let match = false;
+		for(let choice of choice_list){
+			if(field_text == choice){
+				match = true;
+			}
+		}
+		if(!match){
+			button.disabled = true;
+			info_message.innerText = label_name + " must be one of the following: \n" + choice_list.join(", ");
+			return false;
+		}
+	}
+	button.disabled = false;
+	return true;
+}
+
+/**
+ * Checks to see if the text entered in a field contains only numeric characters
+ * @param {string} name_field_id 
+ * @param {string} feedback_field_id 
+ * @param {string} button_id 
+ * @param {string} label_name 
+ * @param {boolean} required_flag 
+ * @returns {boolean}
+ */
+function check_num_field(name_field_id,feedback_field_id,button_id,label_name,required_flag) {
+	var field_text = document.getElementById(name_field_id).value;
+	var button = document.getElementById(button_id);
+	var info_message = document.getElementById(feedback_field_id);
+	info_message.innerText = " ";
+	if(field_text.length === 0 && required_flag){
+		button.disabled = true;
+		info_message.innerText = label_name + " cannot be empty.";
+		return false;
+	}else if(field_text.length > 0 && !/^[0-9]*[$]?$/.test(field_text)){
+		button.disabled = true;
+		var invalid_chars = [];
+		for(let char of field_text)
+			if(/[^0-9]/.test(char))
+				invalid_chars.push("'"+char+"'");
+		info_message.innerText = label_name + " contains non-numeric characters: \n" + invalid_chars.join(", ");
 		return false;
 	}
 	button.disabled = false;
@@ -792,12 +859,27 @@ function update_options_info(hosts_json, roles_json, options_json){
 							);
 
 						}else if(opt.feedback_type === "num"){
-							//todo: ADD num listener
-							console.log("num");
+							opt_input.addEventListener("input",function(){
+								check_num_field(
+									opt_input.id,
+									feedback.id,
+									"global-options-btn",
+									opt.option_name,
+									!opt.optional
+								);
+							});
 						}
 						else if(opt.feedback_type === "choice"){
-							//todo: ADD CHOICE LISTENER
-							console.log("choice");
+							opt_input.addEventListener("input",function(){
+								check_choice_field(
+									opt_input.id,
+									feedback.id,
+									"global-options-btn",
+									opt.option_name,
+									!opt.optional,
+									opt.feedback_choice_options
+								);
+							});
 						}
 
 						opt_wrapper.appendChild(feedback);
@@ -831,7 +913,7 @@ function update_options_info(hosts_json, roles_json, options_json){
 						let opt_input = document.createElement("input");
 						switch(opt.option_format){
 							case "multi-checkbox":
-								opt_wrapper.innerText = opt.option_format;
+								//opt_wrapper.innerText = opt.option_format;
 								opt_input.type = opt.input_type;
 								opt_input.classList.add("ct-input","cd-field-checkbox");
 								opt_input.setAttribute("aria-invalid","false");
@@ -840,9 +922,39 @@ function update_options_info(hosts_json, roles_json, options_json){
 								opt_input.setAttribute("field",opt.option_name);
 								opt_input.setAttribute("optional",opt.optional);
 								opt_input.setAttribute("group-option",true);
+								opt_input.addEventListener("change",()=>{
+									let sub_opt_div = opt_wrapper.querySelector(`:scope [opt-parent="${opt_input.id}"]`);
+									let update_btn = document.getElementById("global-options-btn");
+									if(!sub_opt_div || !update_btn) return;
+									if(opt_input.checked){sub_opt_div.classList.add("hidden");}
+									else{sub_opt_div.classList.remove("hidden");}
+									update_btn.removeAttribute("disabled");
+								});
+
+								let opt_enable_wrapper = document.createElement("div");
+								opt_enable_wrapper.classList.add("cd-checkbox-wrapper");
+								opt_enable_wrapper.appendChild(opt_input);
+								opt_enable_wrapper.style.marginTop = "10px";
+
+								let enable_switch = document.createElement("label");
+								enable_switch.classList.add("switch");
+								let slider = document.createElement("span");
+								slider.classList.add("slider","round");
+								
+								let sub_opt_wrapper = document.createElement("div");
+								sub_opt_wrapper.setAttribute("opt-parent",opt.option_name + "-" + role); 
+
+								enable_switch.appendChild(opt_input);
+								enable_switch.appendChild(slider);
+								opt_enable_wrapper.appendChild(enable_switch);
+								opt_wrapper.appendChild(opt_enable_wrapper);
+								
 								for(let sub_opt of opt.multi_checkbox_entries){
 									let wrapper = document.createElement("div");
-									wrapper.classList.add("ct-validation-wrapper");
+									wrapper.classList.add("cd-checkbox-wrapper");
+
+									let box_div = document.createElement("div");
+									box_div.classList.add("cd-checkbox-wrapper");
 
 									let box_label = document.createElement("label");
 									box_label.classList.add("control-label");
@@ -852,14 +964,107 @@ function update_options_info(hosts_json, roles_json, options_json){
 									let box = document.createElement("input");
 									box.type = "checkbox";
 									box.classList.add("ct-input","cd-field-checkbox");
+									box.checked = sub_opt.default_value;
+									box.addEventListener("change",()=>{
+										document.getElementById("global-options-btn").removeAttribute("disabled");
+									});
 
+									box_div.appendChild(box);
+									wrapper.appendChild(box_div);
 									wrapper.appendChild(box_label);
-									wrapper.appendChild(box);
-									opt_wrapper.appendChild(wrapper);
+									sub_opt_wrapper.appendChild(wrapper);
 								}
+								opt_wrapper.appendChild(sub_opt_wrapper);
 								break;
 							case "multi-ip":
-								opt_wrapper.innerText = opt.option_format;
+								//TODO, create/populate these fields based on associated json
+								let button_div = document.createElement("div");
+								button_div.classList.add("cd-textfield-wrapper");
+
+								opt_input = document.createElement("div");
+								opt_input.id = opt.option_name + "-" + role;
+								//opt_input.type = opt.input_type;
+								opt_input.value = opt.default_value;
+								opt_input.classList.add("cd-div-button-positive","fa","fa-plus");
+								//opt_input.classList.add("btn","active","btn-primary");
+
+								let default_sub_opt_wrapper = document.createElement("div");
+								default_sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+								
+								let default_ip_field = document.createElement("input");
+								default_ip_field.classList.add("ct-input","cd-field");
+								default_ip_field.type = "text";
+								default_ip_field.style.width = "90%";
+								default_ip_field.setAttribute("opt-parent",opt_input.id);
+								default_ip_field.id = opt_input.id + "-entry-" + btoa(String(Math.random()));
+
+								//let default_del_field_btn = document.createElement("div");
+								//default_del_field_btn.classList.add("cd-host-list-entry-icon-del","fa","fa-times");
+
+								let default_feedback = document.createElement("div");
+								default_feedback.classList.add("cd-field-feedback");
+								default_feedback.id = default_ip_field.id + "-feedback";
+									default_ip_field.addEventListener("input",function(){
+										check_ip_field(
+											default_ip_field.id,
+											default_feedback.id,
+											"global-options-btn",
+											"virtual ip",
+											true)
+										}
+									);
+								
+								//default_del_field_btn.addEventListener("click",()=>{
+								//	default_sub_opt_wrapper.remove();
+								//	default_feedback.remove();
+								//});
+
+								default_sub_opt_wrapper.appendChild(default_ip_field);
+								//button_div.appendChild(opt_input);
+								default_sub_opt_wrapper.appendChild(opt_input);
+								//default_sub_opt_wrapper.appendChild(default_del_field_btn);
+								opt_wrapper.appendChild(default_sub_opt_wrapper);
+								opt_wrapper.appendChild(default_feedback);
+								//opt_wrapper.appendChild(button_div);
+								
+								// TODO: PUT PARSED IP ADDRESSES HERE!
+								opt_input.addEventListener("click",()=>{
+									let sub_opt_wrapper = document.createElement("div");
+									sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+									
+									let new_ip_field = document.createElement("input");
+									new_ip_field.classList.add("ct-input","cd-field");
+									new_ip_field.type = "text";
+									new_ip_field.style.width = "90%";
+									new_ip_field.setAttribute("opt-parent",opt_input.id);
+									new_ip_field.id = opt_input.id + "-entry-" + btoa(String(Math.random()));
+
+									let del_field_btn = document.createElement("div");
+									del_field_btn.classList.add("cd-host-list-entry-icon-del","fa","fa-times");
+
+									let feedback = document.createElement("div");
+									feedback.classList.add("cd-field-feedback");
+									feedback.id = new_ip_field.id + "-feedback";
+										new_ip_field.addEventListener("input",function(){
+											check_ip_field(
+												new_ip_field.id,
+												feedback.id,
+												"global-options-btn",
+												"virtual ip",
+												true)
+											}
+										);
+									
+									del_field_btn.addEventListener("click",()=>{
+										sub_opt_wrapper.remove();
+										feedback.remove();
+									});
+
+									sub_opt_wrapper.appendChild(new_ip_field);
+									sub_opt_wrapper.appendChild(del_field_btn);
+									opt_wrapper.appendChild(sub_opt_wrapper);
+									opt_wrapper.appendChild(feedback);
+								});
 								break;
 							default:
 								if(opt.input_type === "text"){
@@ -880,6 +1085,58 @@ function update_options_info(hosts_json, roles_json, options_json){
 								opt_input.setAttribute("optional",opt.optional);
 								opt_input.setAttribute("group-option",true);
 								opt_wrapper.appendChild(opt_input);
+								if(opt.feedback){
+									let feedback = document.createElement("div");
+									feedback.classList.add("cd-field-feedback");
+									feedback.id = opt.option_name + "-" + role + "-feedback";
+			
+									if(opt.feedback_type === "ip"){
+										opt_input.addEventListener("input",function(){
+											check_ip_field(
+												opt_input.id,
+												feedback.id,
+												"global-options-btn",
+												opt.option_name,
+												!opt.optional)
+											}
+										);
+									}else if(opt.feedback_type === "name"){
+										opt_input.addEventListener("input",function(){
+											check_name_field(
+												opt_input.id,
+												feedback.id,
+												"global-options-btn",
+												opt.option_name,
+												!opt.optional)
+											}
+										);
+			
+									}else if(opt.feedback_type === "num"){
+										opt_input.addEventListener("input",function(){
+											check_num_field(
+												opt_input.id,
+												feedback.id,
+												"global-options-btn",
+												opt.option_name,
+												!opt.optional
+											);
+										});
+									}
+									else if(opt.feedback_type === "choice"){
+										opt_input.addEventListener("input",function(){
+											check_choice_field(
+												opt_input.id,
+												feedback.id,
+												"global-options-btn",
+												opt.option_name,
+												!opt.optional,
+												opt.feedback_choice_options
+											);
+										});
+									}
+			
+									opt_wrapper.appendChild(feedback);
+								}
 						}
 
 						group_form.appendChild(opt_label);
@@ -967,12 +1224,27 @@ function update_options_info(hosts_json, roles_json, options_json){
 									);
 									
 								}else if(opt.feedback_type === "num"){
-									//todo: ADD num listener
-									console.log("num");
+									opt_input.addEventListener("input",function(){
+										check_num_field(
+											opt_input.id,
+											feedback.id,
+											"global-options-btn",
+											opt.option_name,
+											!opt.optional
+										);
+									});
 								}
 								else if(opt.feedback_type === "choice"){
-									//todo: ADD CHOICE LISTENER
-									console.log("choice");
+									opt_input.addEventListener("input",function(){
+										check_choice_field(
+											opt_input.id,
+											feedback.id,
+											"global-options-btn",
+											opt.option_name,
+											!opt.optional,
+											opt.feedback_choice_options
+										);
+									});
 								}
 							
 								opt_wrapper.appendChild(feedback);

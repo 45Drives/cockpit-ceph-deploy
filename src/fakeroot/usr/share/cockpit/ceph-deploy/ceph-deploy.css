@@ -417,6 +417,15 @@ input:checked + .slider:before {
     --ct-form-columns: 2;
 }
 
+.control-label{
+    margin-bottom: 0 !important;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    margin: 0 !important;
+    line-height: normal;
+}
+
 .ct-form {
     align-self: start;
     display: grid;
@@ -678,7 +687,7 @@ input:checked + .slider:before {
 
             .listing-ct-body .ct-form > .control-label:not(:first-child),
             .modal .ct-form > .control-label:not(:first-child) {
-                margin: 6px 0 0;
+                margin: 5px 0 0;
             }
 
         .listing-ct-body .ct-form > hr,
@@ -738,6 +747,19 @@ th,td {
 .cd-checkbox {
     background-color: var(--container-header);
     color: var(--selected);
+}
+
+.cd-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cd-textfield-wrapper{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 5px 5px 0;
 }
 
 .cd-field-checkbox {
@@ -1046,4 +1068,19 @@ th,td {
     align-items:center;
     justify-content: flex-end;
     padding: 5px 15px 30px 30px;
+}
+
+.cd-div-button-positive {
+	box-sizing: border-box;
+	flex-grow: 1;
+	width: 2%;
+	padding: 0.25em 0.25em 0.25em 0.25em;
+	text-align: center;
+	overflow: hidden; 
+	list-style: none;
+	cursor: pointer;
+}
+
+.cd-div-button-positive:hover {
+	color: var(--status-font-complete);
 }
