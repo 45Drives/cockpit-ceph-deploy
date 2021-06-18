@@ -125,6 +125,57 @@ input:checked + .slider:before {
 }
 
 /* END - SWITCH THEME */
+.cd-switch {
+	position: relative;
+	display: inline-block;
+	width: 30px;
+	height: 17px;
+}
+.cd-switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+.cd-slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--toggle-dark);
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+.cd-slider:before {
+	position: absolute;
+	content: "";
+	height: 12px;
+	width: 12px;
+	right: 2px;
+	bottom: 2px;
+	background-color: white;
+	-webkit-transition: 0.4s;
+	transition: 0.4s;
+}
+input:checked + .cd-slider {
+	background-color: var(--toggle-light);
+}
+input:focus + .cd-slider {
+	box-shadow: 0 0 1px var(--toggle-light);
+}
+input:checked + .cd-slider:before {
+	-webkit-transform: translateX(-13px);
+	-ms-transform: translateX(-13px);
+	transform: translateX(-13px);
+}
+.cd-slider.round {
+	border-radius: 17px;
+}
+.cd-slider.round:before {
+	border-radius: 50%;
+}
+
 
 .hidden {
 	display: none;
