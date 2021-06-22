@@ -766,8 +766,9 @@ function update_role_info(hosts_json,roles_json){
  * @param {Object} hosts_json 
  * @param {Object} roles_json 
  * @param {Object} options_json 
+ * @param {Object} groups_json
  */
-function update_options_info(hosts_json, roles_json, options_json){
+function update_options_info(hosts_json, roles_json, options_json, groups_json){
 	let options_div = document.getElementById("ansible-config-options");
 	if(options_div){
 		options_div.innerHTML = ""; //erase everything within the options div.
@@ -818,7 +819,7 @@ function update_options_info(hosts_json, roles_json, options_json){
 					let group_form = document.createElement("div");
 					group_form.classList.add("ct-form");
 					section_body.appendChild(group_form);
-					make_group_options(section_body,group_form,g_option_scheme[role].group,role);
+					make_group_options(section_body,group_form,g_option_scheme[role].group,role,groups_json);
 				}
 
 				// per-host options
@@ -889,55 +890,7 @@ function make_global_options(target_div,target_form,option_list,options_json){
 		opt_wrapper.appendChild(opt_input);
 
 		if(opt.feedback){
-			let feedback = document.createElement("div");
-			feedback.classList.add("cd-field-feedback");
-			feedback.id = opt.option_name + "-feedback";
-
-			if(opt.feedback_type === "ip"){
-				opt_input.addEventListener("input",function(){
-					check_ip_field(
-						opt.option_name,
-						opt.option_name + "-feedback",
-						"global-options-btn",
-						opt.option_name,
-						!opt.optional)
-					}
-				);
-			}else if(opt.feedback_type === "name"){
-				opt_input.addEventListener("input",function(){
-					check_name_field(
-						opt.option_name,
-						opt.option_name + "-feedback",
-						"global-options-btn",
-						opt.option_name,
-						!opt.optional)
-					}
-				);
-
-			}else if(opt.feedback_type === "num"){
-				opt_input.addEventListener("input",function(){
-					check_num_field(
-						opt_input.id,
-						feedback.id,
-						"global-options-btn",
-						opt.option_name,
-						!opt.optional
-					);
-				});
-			}
-			else if(opt.feedback_type === "choice"){
-				opt_input.addEventListener("input",function(){
-					check_choice_field(
-						opt_input.id,
-						feedback.id,
-						"global-options-btn",
-						opt.option_name,
-						!opt.optional,
-						opt.feedback_choice_options
-					);
-				});
-			}
-
+			let feedback = generate_option_feedback(opt,opt_input,opt.option_name + "-feedback");
 			opt_wrapper.appendChild(feedback);
 		}
 		target_form.appendChild(opt_wrapper);
@@ -991,55 +944,7 @@ function make_per_host_options(target_div,host_list,role,hosts_json){
 			opt_wrapper.appendChild(opt_input);
 		
 			if(opt.feedback){
-				let feedback = document.createElement("div");
-				feedback.classList.add("cd-field-feedback");
-				feedback.id = opt.option_name + "-" + host_list[i] + "-feedback";
-			
-				if(opt.feedback_type === "ip"){
-					opt_input.addEventListener("input",function(){
-						check_ip_field(
-							opt.option_name + "-" + host_list[i],
-							opt.option_name + "-" + host_list[i] + "-feedback",
-							"global-options-btn",
-							opt.option_name,
-							!opt.optional)
-						}
-					);
-				}else if(opt.feedback_type === "name"){
-					opt_input.addEventListener("input",function(){
-						check_name_field(
-							opt.option_name + "-" + host_list[i],
-							opt.option_name + "-" + host_list[i] + "-feedback",
-							"global-options-btn",
-							opt.option_name,
-							!opt.optional)
-						}
-					);
-					
-				}else if(opt.feedback_type === "num"){
-					opt_input.addEventListener("input",function(){
-						check_num_field(
-							opt_input.id,
-							feedback.id,
-							"global-options-btn",
-							opt.option_name,
-							!opt.optional
-						);
-					});
-				}
-				else if(opt.feedback_type === "choice"){
-					opt_input.addEventListener("input",function(){
-						check_choice_field(
-							opt_input.id,
-							feedback.id,
-							"global-options-btn",
-							opt.option_name,
-							!opt.optional,
-							opt.feedback_choice_options
-						);
-					});
-				}
-			
+				let feedback = generate_option_feedback(opt,opt_input,opt.option_name + "-" + host_list[i] + "-feedback");
 				opt_wrapper.appendChild(feedback);
 			}
 			host_form.appendChild(opt_wrapper);
@@ -1051,7 +956,8 @@ function make_per_host_options(target_div,host_list,role,hosts_json){
 	}
 }
 
-function make_group_options(target_div,target_form,group_options,role){
+function make_group_options(target_div,target_form,group_options,role,groups_json){
+	console.log("groups_json: ",groups_json);
 	for(let opt of group_options){
 		let opt_wrapper = document.createElement("div");
 		opt_wrapper.classList.add("ct-validation-wrapper");
@@ -1064,31 +970,31 @@ function make_group_options(target_div,target_form,group_options,role){
 		let opt_input = document.createElement("input");
 		if(opt.option_format){
 			if(opt.option_format=="toggle_parent"){
-				console.log("toggle");
 				let toggle_form = document.createElement("div");
 				toggle_form.classList.add("ct-form");
-				if(opt.default_value == false){toggle_form.classList.add("hidden");}
-				toggle_form.setAttribute("opt-parent",opt.option_name + "-" + role); 
+				toggle_form.setAttribute("opt-parent",opt.option_name);
+
 				target_div.appendChild(toggle_form);
-				make_toggle_options(toggle_form,opt,role);
+				make_toggle_options(toggle_form,opt,role,groups_json);
 
 				opt_input.type = opt.input_type;
 				opt_input.classList.add("ct-input","cd-field-checkbox");
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;// + "-" + role;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
-				// TODO: change this later to interrogate json.
-				opt_input.checked = opt.default_value;
-				
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_input.checked = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))?groups_json[role][opt.option_name]:opt.default_value;
+				if(opt_input.checked){toggle_form.classList.remove("hidden");}
+				else{toggle_form.classList.add("hidden");}
+
 				opt_input.addEventListener("change",()=>{
 					let update_btn = document.getElementById("global-options-btn");
 					if(opt_input.checked){toggle_form.classList.remove("hidden");}
 					else{toggle_form.classList.add("hidden");}
 					update_btn.removeAttribute("disabled");
-					console.log("checked:",opt_input.checked);
 				});
 
 				let opt_enable_wrapper = document.createElement("div");
@@ -1111,12 +1017,18 @@ function make_group_options(target_div,target_form,group_options,role){
 				opt_input.type = opt.input_type;
 				opt_input.classList.add("ct-input","cd-field-checkbox");
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
-				opt_input.checked = opt.default_value;
+				opt_input.setAttribute("option_format",opt.option_format);
+				if((groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))){
+					opt_input.checked =(groups_json[role][opt.option_name].length > 0)?true:false;
+				}else{
+					opt_input.checked = opt.default_value;
+				}
+				
 				opt_input.addEventListener("change",()=>{
 					let sub_opt_div = opt_wrapper.querySelector(`:scope [opt-parent="${opt_input.id}"]`);
 					let update_btn = document.getElementById("global-options-btn");
@@ -1137,7 +1049,7 @@ function make_group_options(target_div,target_form,group_options,role){
 				slider.classList.add("cd-slider","round");
 				
 				let sub_opt_wrapper = document.createElement("div");
-				sub_opt_wrapper.setAttribute("opt-parent",opt.option_name + "-" + role); 
+				sub_opt_wrapper.setAttribute("opt-parent",opt.option_name);
 				if(opt_input.checked){sub_opt_wrapper.classList.remove("hidden");}
 				else{sub_opt_wrapper.classList.add("hidden");}
 
@@ -1161,7 +1073,14 @@ function make_group_options(target_div,target_form,group_options,role){
 					let box = document.createElement("input");
 					box.type = "checkbox";
 					box.classList.add("ct-input","cd-field-checkbox");
-					box.checked = sub_opt.default_value;
+					// TODO: use parsed JSON for this one...
+					box.setAttribute("opt-parent",opt.option_name);
+					box.setAttribute("field",sub_opt.label);
+					if(groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)){
+						box.checked = (groups_json[role][opt.option_name].find((str) => str === sub_opt.label))?true:false;
+					}else{
+						box.checked = sub_opt.default_value;
+					}
 					box.addEventListener("change",()=>{
 						document.getElementById("global-options-btn").removeAttribute("disabled");
 					});
@@ -1174,15 +1093,18 @@ function make_group_options(target_div,target_form,group_options,role){
 				opt_wrapper.appendChild(sub_opt_wrapper);
 			}
 			else if(opt.option_format=="multi-ip"){
-				//TODO, create/populate these fields based on associated json
 				let button_div = document.createElement("div");
 				button_div.classList.add("cd-textfield-wrapper");
 
 				opt_input = document.createElement("div");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.value = opt.default_value;
 				opt_input.classList.add("cd-div-button-positive","fa","fa-plus");
 				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("group",role);
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_input.setAttribute("field",opt.option_name);
+				
 
 				let default_sub_opt_wrapper = document.createElement("div");
 				default_sub_opt_wrapper.classList.add("cd-textfield-wrapper");
@@ -1193,6 +1115,7 @@ function make_group_options(target_div,target_form,group_options,role){
 				default_ip_field.style.width = "90%";
 				default_ip_field.setAttribute("opt-parent",opt_input.id);
 				default_ip_field.id = opt_input.id + "-entry-" + btoa(String(Math.random()));
+				default_ip_field.value = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)&&groups_json[role][opt.option_name].length > 0)?groups_json[role][opt.option_name][0]:"";
 
 				let default_feedback = document.createElement("div");
 				default_feedback.classList.add("cd-field-feedback");
@@ -1202,17 +1125,61 @@ function make_group_options(target_div,target_form,group_options,role){
 							default_ip_field.id,
 							default_feedback.id,
 							"global-options-btn",
-							"virtual ip",
+							opt.option_name,
 							true)
 						}
 					);
-			
+				
+					
 				default_sub_opt_wrapper.appendChild(default_ip_field);
 				default_sub_opt_wrapper.appendChild(opt_input);
 				opt_wrapper.appendChild(default_sub_opt_wrapper);
 				opt_wrapper.appendChild(default_feedback);
 				
-				// TODO: PUT PARSED IP ADDRESSES HERE!
+				if(	groups_json.hasOwnProperty(role)&&
+						groups_json[role].hasOwnProperty(opt.option_name)&&
+						groups_json[role][opt.option_name].length > 1){
+						for(let i = 1; i < groups_json[role][opt.option_name].length; i++){
+							let sub_opt_wrapper = document.createElement("div");
+							sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+							
+							let new_ip_field = document.createElement("input");
+							new_ip_field.classList.add("ct-input","cd-field");
+							new_ip_field.type = "text";
+							new_ip_field.style.width = "90%";
+							new_ip_field.setAttribute("opt-parent",opt_input.id);
+							new_ip_field.id = opt_input.id + "-entry-" + btoa(String(Math.random()));
+							new_ip_field.value = groups_json[role][opt.option_name][i];
+		
+							let del_field_btn = document.createElement("div");
+							del_field_btn.classList.add("cd-host-list-entry-icon-del","fa","fa-times");
+		
+							let feedback = document.createElement("div");
+							feedback.classList.add("cd-field-feedback");
+							feedback.id = new_ip_field.id + "-feedback";
+								new_ip_field.addEventListener("input",function(){
+									check_ip_field(
+										new_ip_field.id,
+										feedback.id,
+										"global-options-btn",
+										opt.option_name,
+										true)
+									}
+								);
+							
+							del_field_btn.addEventListener("click",()=>{
+								sub_opt_wrapper.remove();
+								feedback.remove();
+								document.getElementById("global-options-btn").removeAttribute("disabled");
+							});
+		
+							sub_opt_wrapper.appendChild(new_ip_field);
+							sub_opt_wrapper.appendChild(del_field_btn);
+							opt_wrapper.appendChild(sub_opt_wrapper);
+							opt_wrapper.appendChild(feedback);
+						}	
+				}
+
 				opt_input.addEventListener("click",()=>{
 					let sub_opt_wrapper = document.createElement("div");
 					sub_opt_wrapper.classList.add("cd-textfield-wrapper");
@@ -1235,7 +1202,7 @@ function make_group_options(target_div,target_form,group_options,role){
 								new_ip_field.id,
 								feedback.id,
 								"global-options-btn",
-								"virtual ip",
+								opt.option_name,
 								true)
 							}
 						);
@@ -1243,6 +1210,7 @@ function make_group_options(target_div,target_form,group_options,role){
 					del_field_btn.addEventListener("click",()=>{
 						sub_opt_wrapper.remove();
 						feedback.remove();
+						document.getElementById("global-options-btn").removeAttribute("disabled");
 					});
 
 					sub_opt_wrapper.appendChild(new_ip_field);
@@ -1252,28 +1220,44 @@ function make_group_options(target_div,target_form,group_options,role){
 				});
 			}
 			else{
+				//default case
 				if(opt.input_type === "text"){
 					opt_input.type = opt.input_type;
 					opt_input.classList.add("ct-input","cd-field");
 					//TODO IMPLEMENT A CHECK FOR GROUPS.JSON or something like that for this value.
-					opt_input.value = opt.default_value;
+					//opt_input.value = opt.default_value;
+					opt_input.value = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)&&groups_json[role][opt.option_name] != "")?groups_json[role][opt.option_name]:opt.default_value;
 				}else if(opt.input_type === "checkbox"){
 					opt_input.type = opt.input_type;
 					opt_input.classList.add("ct-input","cd-field-checkbox");
+					opt_input.checked = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))?groups_json[role][opt.option_name]:opt.default_value;
 					opt_input.addEventListener("change",function(){
 						document.getElementById("global-options-btn").removeAttribute("disabled")});
 				}
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("option_format",opt.option_format);
 				opt_wrapper.appendChild(opt_input);
 				if(opt.feedback){
-					let feedback = document.createElement("div");
-					feedback.classList.add("cd-field-feedback");
-					feedback.id = opt.option_name + "-" + role + "-feedback";
+					let feedback = generate_option_feedback(opt,opt_input,opt.option_name + "-feedback");
+					opt_wrapper.appendChild(feedback);
+				}
+			}
+		}
+
+		target_form.appendChild(opt_label);
+		target_form.appendChild(opt_wrapper);
+	}
+}
+
+function generate_option_feedback(opt,opt_input,id){
+	let feedback = document.createElement("div");
+	feedback.classList.add("cd-field-feedback");
+	feedback.id = id;
 
 					if(opt.feedback_type === "ip"){
 						opt_input.addEventListener("input",function(){
@@ -1319,18 +1303,10 @@ function make_group_options(target_div,target_form,group_options,role){
 							);
 						});
 					}
-
-					opt_wrapper.appendChild(feedback);
-				}
-			}
-		}
-
-		target_form.appendChild(opt_label);
-		target_form.appendChild(opt_wrapper);
-	}
+					return feedback;
 }
 
-function make_toggle_options(target_form,parent_opt,role){
+function make_toggle_options(target_form,parent_opt,role,groups_json){
 	for(let opt of parent_opt.toggle_options){
 		let opt_wrapper = document.createElement("div");
 		opt_wrapper.classList.add("ct-validation-wrapper");
@@ -1341,18 +1317,24 @@ function make_toggle_options(target_form,parent_opt,role){
 		opt_label.innerText = (opt.optional ? "" : "* ") + opt.label;
 
 		let opt_input = document.createElement("input");
+		opt_input.setAttribute("opt-parent",parent_opt.option_name);
 		if(opt.option_format){
 			if(opt.option_format == "multi-checkbox"){
 				opt_input.type = opt.input_type;
 				opt_input.classList.add("ct-input","cd-field-checkbox");
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
-				// TODO: update this based on JSON.
-				opt_input.checked = opt.default_value;
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_input.setAttribute("field",opt.option_name);
+				if((groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))){
+					opt_input.checked =(groups_json[role][opt.option_name].length > 0)?true:false;
+				}else{
+					opt_input.checked = opt.default_value;
+				}
 				opt_input.addEventListener("change",()=>{
 					let sub_opt_div = opt_wrapper.querySelector(`:scope [opt-parent="${opt_input.id}"]`);
 					let update_btn = document.getElementById("global-options-btn");
@@ -1373,7 +1355,7 @@ function make_toggle_options(target_form,parent_opt,role){
 				slider.classList.add("cd-slider","round");
 				
 				let sub_opt_wrapper = document.createElement("div");
-				sub_opt_wrapper.setAttribute("opt-parent",opt.option_name + "-" + role); 
+				sub_opt_wrapper.setAttribute("opt-parent",opt.option_name);
 				if(opt_input.checked){sub_opt_wrapper.classList.remove("hidden");}
 				else{sub_opt_wrapper.classList.add("hidden");}
 
@@ -1397,7 +1379,13 @@ function make_toggle_options(target_form,parent_opt,role){
 					let box = document.createElement("input");
 					box.type = "checkbox";
 					box.classList.add("ct-input","cd-field-checkbox");
-					box.checked = sub_opt.default_value;
+					if(groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)){
+						box.checked = (groups_json[role][opt.option_name].find((str) => str === sub_opt.label))?true:false;
+					}else{
+						box.checked = sub_opt.default_value;
+					}
+					box.setAttribute("opt-parent",opt.option_name);
+					box.setAttribute("field",sub_opt.label);
 					box.addEventListener("change",()=>{
 						document.getElementById("global-options-btn").removeAttribute("disabled");
 					});
@@ -1411,14 +1399,18 @@ function make_toggle_options(target_form,parent_opt,role){
 			}
 			else if(opt.option_format == "multi-ip"){
 				//TODO, create/populate these fields based on associated json
+				//NEXT 
 				let button_div = document.createElement("div");
 				button_div.classList.add("cd-textfield-wrapper");
 
 				opt_input = document.createElement("div");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.value = opt.default_value;
 				opt_input.classList.add("cd-div-button-positive","fa","fa-plus");
 				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("group",role);
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_input.setAttribute("field",opt.option_name);
 				
 
 				let default_sub_opt_wrapper = document.createElement("div");
@@ -1439,7 +1431,7 @@ function make_toggle_options(target_form,parent_opt,role){
 							default_ip_field.id,
 							default_feedback.id,
 							"global-options-btn",
-							"virtual ip",
+							opt.option_name,
 							true)
 						}
 					);
@@ -1473,7 +1465,7 @@ function make_toggle_options(target_form,parent_opt,role){
 								new_ip_field.id,
 								feedback.id,
 								"global-options-btn",
-								"virtual ip",
+								opt.option_name,
 								true)
 							}
 						);
@@ -1493,71 +1485,24 @@ function make_toggle_options(target_form,parent_opt,role){
 				if(opt.input_type === "text"){
 					opt_input.type = opt.input_type;
 					opt_input.classList.add("ct-input","cd-field");
-					//TODO IMPLEMENT A CHECK FOR GROUPS.JSON or something like that for this value.
-					opt_input.value = opt.default_value;
+					opt_input.value = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)&&groups_json[role][opt.option_name] != "")?groups_json[role][opt.option_name]:opt.default_value;
 				}else if(opt.input_type === "checkbox"){
 					opt_input.type = opt.input_type;
 					opt_input.classList.add("ct-input","cd-field-checkbox");
+					opt_input.checked = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))?groups_json[role][opt.option_name]:opt.default_value;
 					opt_input.addEventListener("change",function(){
 						document.getElementById("global-options-btn").removeAttribute("disabled")});
 				}
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("option_format",opt.option_format);
 				opt_wrapper.appendChild(opt_input);
 				if(opt.feedback){
-					let feedback = document.createElement("div");
-					feedback.classList.add("cd-field-feedback");
-					feedback.id = opt.option_name + "-" + role + "-feedback";
-
-					if(opt.feedback_type === "ip"){
-						opt_input.addEventListener("input",function(){
-							check_ip_field(
-								opt_input.id,
-								feedback.id,
-								"global-options-btn",
-								opt.option_name,
-								!opt.optional)
-							}
-						);
-					}else if(opt.feedback_type === "name"){
-						opt_input.addEventListener("input",function(){
-							check_name_field(
-								opt_input.id,
-								feedback.id,
-								"global-options-btn",
-								opt.option_name,
-								!opt.optional)
-							}
-						);
-
-					}else if(opt.feedback_type === "num"){
-						opt_input.addEventListener("input",function(){
-							check_num_field(
-								opt_input.id,
-								feedback.id,
-								"global-options-btn",
-								opt.option_name,
-								!opt.optional
-							);
-						});
-					}
-					else if(opt.feedback_type === "choice"){
-						opt_input.addEventListener("input",function(){
-							check_choice_field(
-								opt_input.id,
-								feedback.id,
-								"global-options-btn",
-								opt.option_name,
-								!opt.optional,
-								opt.feedback_choice_options
-							);
-						});
-					}
-
+					let feedback = generate_option_feedback(opt,opt_input,opt.option_name + "-feedback");
 					opt_wrapper.appendChild(feedback);
 				}
 			}
@@ -1595,7 +1540,7 @@ function get_param_file_content(){
 			if(result_json.hasOwnProperty("old_file_content")){
 				update_host_info(result_json.old_file_content.hosts);
 				update_role_info(result_json.old_file_content.hosts, result_json.old_file_content.roles);
-				update_options_info(result_json.old_file_content.hosts, result_json.old_file_content.roles,result_json.old_file_content.options);
+				update_options_info(result_json.old_file_content.hosts, result_json.old_file_content.roles,result_json.old_file_content.options,result_json.old_file_content.groups);
 			}
 		}else{
 			msg_color = "#bd3030";
@@ -1829,7 +1774,6 @@ function update_options_request(){
 		if(!host_request_json.hasOwnProperty(element.hostname)){
 			host_request_json[element.getAttribute("hostname")] = {"hostname": element.getAttribute("hostname")};
 		}
-
 		if(element.type == "text"){
 			host_request_json[element.getAttribute("hostname")][element.getAttribute("field")] = element.value;
 		}
@@ -1840,29 +1784,101 @@ function update_options_request(){
 
 	group_request_json = {}
 	let group_list = [...options_div.querySelectorAll('[group-option="true"]')];
-	console.log("group_list: ",group_list);
-	//TODO: CONTINUE FROM HERE!
+	group_list.forEach(element => {
 
-	
+		if(!element.getAttribute("opt-parent")){
+			// element is not a child option.
+			if(!group_request_json.hasOwnProperty(element.getAttribute("group"))){
+				group_request_json[element.getAttribute("group")] = {};
+			}
+			
+			if(element.getAttribute("option_format") == "default"){
+				// simply use the textfield value or checkbox value as normal
+				if(element.type == "text"){
+					group_request_json[element.getAttribute("group")][element.getAttribute("field")] = element.value;
+				}
+				else if(element.type == "checkbox"){
+					group_request_json[element.getAttribute("group")][element.getAttribute("field")] = (element.checked?true:false);
+				}	
+			}
+			else if(element.getAttribute("option_format") == "toggle_parent"){
+				if(element.type == "checkbox" && element.checked){
+					let toggle_opt_list = [...options_div.querySelectorAll(`[opt-parent=${element.id}][group-option="true"]`)];
+					group_request_json[element.getAttribute("group")][element.getAttribute("field")] = true;
+					toggle_opt_list.forEach(sub_opt => {
+						if(sub_opt.getAttribute("option_format") == "default"){
+							if(sub_opt.type == "text"){
+								group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")] = sub_opt.value;
+							}
+							else if(sub_opt.type == "checkbox"){
+								group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")] = (sub_opt.checked?true:false);
+							}	
+						}else if(sub_opt.getAttribute("option_format") == "multi-ip"){
+							let sub_opt_multi_ip_list = [...options_div.querySelectorAll(`[opt-parent=${sub_opt.id}][type="text"]`)];
+							sub_opt_multi_ip_list.forEach(ip_addr => {
+								group_request_json[element.getAttribute("group")][element.getAttribute("field")].push(ip_addr.value);
+							});
+						}
+						else if(sub_opt.getAttribute("option_format") == "multi-checkbox"){
+							if(sub_opt.checked){
+								group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")] = [];
+								let sub_opt_child_list = [...options_div.querySelectorAll(`[opt-parent=${sub_opt.id}][type="checkbox"]`)];
+								console.log("sub_opt_child_list: ",sub_opt_child_list);
+								sub_opt_child_list.forEach(sub_opt_child => {
+									if(sub_opt_child.checked){
+										group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")].push(sub_opt_child.getAttribute("field"));
+									}
+								});
+							}
+						}
+					});
+				}
+			}
+			else if(element.getAttribute("option_format") == "multi-ip"){
+				group_request_json[element.getAttribute("group")][element.getAttribute("field")] = [];
+				let multi_ip_list = [...options_div.querySelectorAll(`[opt-parent=${element.id}][type="text"]`)];
+				multi_ip_list.forEach(ip_addr => {
+					group_request_json[element.getAttribute("group")][element.getAttribute("field")].push(ip_addr.value);
+				});
+			}
+			else if(element.getAttribute("option_format") == "multi-checkbox"){
+				if(element.checked){
+					group_request_json[element.getAttribute("group")][element.getAttribute("field")] = [];
+					let multi_checkbox_child_list = [...options_div.querySelectorAll(`[opt-parent=${element.id}][type="checkbox"]`)];
+					multi_checkbox_child_list.forEach(child => {
+						if(child.checked){
+							group_request_json[element.getAttribute("group")][element.getAttribute("field")].push(child.getAttribute("field"));
+						}
+					});
+				}
+			}
+			else{
+				console.log("unknown option_format: ", element.getAttribute("option_format") );
+				console.log("element with unknwon option_format: ",element);
+			}
+		}
+		
+	});
+
 	var options_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
 	var options_proc = cockpit.spawn(options_spawn_args, {superuser: "require"});
 	options_proc.done(function(data){
 		show_snackbar_msg("Message: ","Global options have been updated", "#20a030","update-options-snackbar");
 		var host_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-h",JSON.stringify(host_request_json),"-w"];
-		var result_json = null;
-		var proc = cockpit.spawn(host_spawn_args, {superuser: "require"});
-		proc.done(function(data) {
+		var host_result_json = null;
+		var host_proc = cockpit.spawn(host_spawn_args, {superuser: "require"});
+		host_proc.done(function(data) {
 			var msg_label = "";
 			var msg_content = "";
 			var msg_color = "";
 			try {
-				result_json = JSON.parse(data);
+				host_result_json = JSON.parse(data);
 			} catch (e) {
 				msg_color = "#bd3030";
 				msg_label = "Error:";
 				msg_content = "Unexpected return value.";
 			}
-			if (result_json.hasOwnProperty("success_msg")){
+			if (host_result_json.hasOwnProperty("success_msg")){
 				msg_color = "#20a030";
 				msg_label = "Add Host: ";
 				msg_content = "Host Added Succcessfully.";
@@ -1872,21 +1888,50 @@ function update_options_request(){
 				msg_content = "Unexpected return value.";
 			}
 			hide_modal_dialog("add-host-modal");
-			get_param_file_content();
 			show_snackbar_msg(msg_label,msg_content,msg_color,"add-host-snackbar");
+			var group_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-g",JSON.stringify(group_request_json),"-w"];
+			var group_proc = cockpit.spawn(group_spawn_args,{superuser: "require"});
+			var group_result_json = null;
+			group_proc.done(function(data){
+				var msg_label = "";
+				var msg_content = "";
+				var msg_color = "";
+				try {
+					group_result_json = JSON.parse(data);
+				} catch (e) {
+					msg_color = "#bd3030";
+					msg_label = "Error:";
+					msg_content = "Unexpected return value.";
+				}
+				if (host_result_json.hasOwnProperty("success_msg")){
+					msg_color = "#20a030";
+					msg_label = "Group Settings: ";
+					msg_content = "Group Settings Updated.";
+				}else{
+					msg_color = "#bd3030";
+					msg_label = "Error:";
+					msg_content = "Unexpected return value.";
+				}
+				get_param_file_content();
+			});
+			group_proc.fail(function(ex, data) {
+				console.log("group_proc (FAIL): ",data);
+				show_snackbar_msg("Error: ","Failed to modify global options","#bd3030","update-roles-snackbar");
+				console.log("group_proc (FAIL): ",ex);
+			});
 		});
-		proc.fail(function(ex, data) {
+		host_proc.fail(function(ex, data) {
 			document.getElementById("add-host-result-msg").style.display = "block";
 			var msg_label = document.getElementById("add-host-result-msg-label");
 			msg_label.innerHTML = "Error:";
 			var msg_content = document.getElementById("add-host-result-msg-content");
 			try {
-				result_json = JSON.parse(data);
+				host_result_json = JSON.parse(data);
 			} catch (e) {
 				msg_content.innerHTML = "Unable to add host";
 			}
-			if (result_json.hasOwnProperty("error_msg")){
-				msg_content.innerHTML = result_json.error_msg;
+			if (host_result_json.hasOwnProperty("error_msg")){
+				msg_content.innerHTML = host_result_json.error_msg;
 			}else{
 				msg_content.innerHTML = "Unable to add host";
 			}
@@ -2245,8 +2290,6 @@ function setup_deploy_step_nav_buttons(){
 				if(step_content){
 					let deploy_step_id = step_content.getAttribute("for");
 					if(deploy_step_id){
-						console.log("deploy_step_id: ",deploy_step_id);
-						console.log("step_content_id: ", step_content_id);
 						done_buttons[i].addEventListener("click", () => {
 							let deploy_state = JSON.parse(localStorage.getItem("ceph_deploy_state")??JSON.stringify(g_ceph_deploy_default_state));
 							deploy_state[deploy_step_id].lock_state = "complete";
@@ -2377,6 +2420,7 @@ function setup_buttons(){
 	setup_progress_bar("deploy-step-cephfs");
 	setup_progress_bar("deploy-step-rgw");
 	setup_progress_bar("deploy-step-iscsi");
+	setup_progress_bar("deploy-step-rgwlb");
 	setup_progress_bar("deploy-step-dashboard");
 
 	document.getElementById("new-host-btn").addEventListener("click",add_host);

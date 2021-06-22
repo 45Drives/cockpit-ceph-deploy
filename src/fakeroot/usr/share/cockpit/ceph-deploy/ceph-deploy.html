@@ -1032,6 +1032,71 @@
           </div>
         </div>
 
+                <!-- RGWLOADBALANCERS -->
+                <div id="step-rgwlb" class="hidden" for="deploy-step-rgwlb">
+                  <div class="cd-top-nav-button-group">
+                    <div class="cd-progress-bar" id="progress-bar-step-rgwlb">
+                      <div class="progress-bar-main-back" title="main menu">
+                        Ceph Deploy
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                      <div class="progress-bar-title">RGWLB</div>
+                      <div
+                        class="progress-step progress-current-step"
+                        data-progress-bar-idx="0"
+                      >
+                        Playbook (radosgw-lb.yml)
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cd-block step-rgwlb hidden" data-step-content-idx="0">
+                    <div class="panel panel-default cd-panel">
+                      <div class="cd-row cd-panel-heading">
+                        <h3 class="panel-title cd-row-child">Radosgw-lb: Ansible Playbook - /usr/share/ceph-ansible/radosgw-lb.yml</h3>
+                        <div class="cd-row-right cd-row-child cd-panel-nav">
+                          <i
+                            id="step-3-0-panel-show"
+                            class="fas fa-angle-up cd-panel-vis-toggle"
+                            for="rgwlb-step-1-body"
+                          ></i>
+                        </div>
+                      </div>
+                      <div id="rgwlb-step-1-body" class="cd-panel-body">
+                        <p class="cd-para">click "run" to perform the radosgw-lb.yml playbook</p>
+                        <div id="terminal-rgwlb-iframe"></div>
+                        <div class="cd-row-right cd-row-child">
+                          <button class="btn active btn-primary" id="ansible-rgwlb-btn">
+                            Run
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+                      <button
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-prev-btn"
+                        for="step-rgwlb"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        id="deploy_rgwlb"
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-done-btn"
+                        for="step-rgwlb"
+                        disabled
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- CEPH-DASHBOARD -->
                 <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
                   <div class="cd-top-nav-button-group">

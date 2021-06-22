@@ -27,6 +27,31 @@ from typing import List
 #####################################
 # DATA CLASSES
 #####################################
+@dataclass()
+class Rgwloadbalancers:
+	haproxy_frontend_port: str=""
+	virtual_ips: List = field(default_factory=lambda: [])
+	virtual_ip_netmask: str=""
+	virtual_ip_interface: str=""
+	haproxy_frontend_ssl_port: str=""
+	haproxy_frontend_ssl_certificate: str=""
+	haproxy_ssl_dh_param: str=""
+	haproxy_ssl_ciphers: List = field(default_factory=lambda: [])
+	haproxy_ssl_options: List = field(default_factory=lambda: [])
+	enable_ssl: bool=False
+
+	def load_dictionary(self, dict_variable: dict):
+		ret_val = False
+		if isinstance(dict_variable,dict):
+			for key in dict_variable.keys():
+				if key in asdict(self).keys():
+					if type(dict_variable[key]) == type(getattr(self,key)):
+						setattr(self,key,dict_variable[key])
+						ret_val = True
+		else:
+			error_msg = {"error_msg": "unable to load dictionary."}
+			print(json.dumps(error_msg,indent=4))
+		return ret_val
 
 @dataclass()
 class Host:
@@ -136,6 +161,8 @@ def get_default_params():
 	default_params["roles"] = copy.deepcopy(asdict(default_roles))
 	default_options = Options()
 	default_params["options"] = copy.deepcopy(asdict(default_options))
+	default_groups = {}
+	default_params["groups"] = copy.deepcopy((default_groups))
 	return default_params.copy()
 
 def load_param_file():
@@ -177,6 +204,38 @@ def check_root():
 		error_msg = {"error_msg":"/usr/share/cockpit/ceph-deploy/helper_scripts/core_params must be run with root privileges"}
 		print(json.dumps(error_msg,indent=4))
 		sys.exit(root_test)
+
+def load_groups(group_string):
+	try:
+		groups_obj = json.loads(group_string)
+	except ValueError as err:
+		# failed to get json from command line arguments
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":"Error parsing groups JSON" + error_string }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+	
+	groups_dict = {}
+
+	if len(groups_obj.keys()) > 0:
+		for groupname in groups_obj.keys():
+			if isinstance(groups_obj[groupname],dict):
+				if groupname == "rgwloadbalancers":
+					rgwlb = Rgwloadbalancers()
+					rgwlb.load_dictionary(groups_obj[groupname])
+					valid_group_dict = asdict(rgwlb)
+					groups_dict[groupname] = copy.deepcopy(valid_group_dict)
+			else:
+				error_msg = { "error_msg":"Invalid format, group must be a JSON object." }
+				print(json.dumps(error_msg,indent=4))
+				sys.exit(1)
+	else:
+		error_msg = { "error_msg":"Cannot operate on empth group (JSON)" }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	return copy.deepcopy(groups_dict)
+
 
 def load_hosts(host_string):
 	# parameters have been provided
@@ -282,7 +341,7 @@ def load_opts(options_string):
 	return copy.deepcopy(opts_dict)
 
 
-def delete_items(hosts,roles,opts,param_file_content):
+def delete_items(hosts,roles,opts,groups,param_file_content):
 	if bool(opts):
 		for option_field in opts.keys():
 			param_file_content["options"][option_field] = ""
@@ -298,6 +357,10 @@ def delete_items(hosts,roles,opts,param_file_content):
 			for role_name in param_file_content["roles"].keys():
 				if host in param_file_content["roles"][role_name]:
 					param_file_content["roles"][role_name].remove(host)
+	if bool(groups):
+		for group in groups.keys():
+			if group in param_file_content["groups"].keys():
+				del param_file_content["groups"][group]
 
 	result_msg = write_to_parameter_file(param_file_content)
 	if "success_msg" in result_msg.keys():
@@ -325,7 +388,7 @@ def write_to_parameter_file(new_content):
 	success_msg["new_file_content"] = g_param_file_content
 	return success_msg
 
-def merge_with_existing(hosts,roles,opts,param_file_content):
+def merge_with_existing(hosts,roles,opts,groups,param_file_content):
 	debug_print(json.dumps(param_file_content,indent=4),"param_file_content (before merge)")
 	for hostname in hosts.keys():
 		param_file_content["hosts"][hostname] = copy.deepcopy(hosts[hostname])
@@ -333,6 +396,8 @@ def merge_with_existing(hosts,roles,opts,param_file_content):
 		param_file_content["roles"][role_name] = copy.deepcopy(list(set(param_file_content["roles"][role_name] + roles[role_name])))
 	for opt_name in opts.keys():
 		param_file_content["options"][opt_name] = copy.deepcopy(opts[opt_name])
+	for group_name in groups.keys():
+		param_file_content["groups"][group_name] = copy.deepcopy(groups[group_name])
 	debug_print(json.dumps(param_file_content,indent=4),"param_file_content (after merge)")
 
 	result_msg = write_to_parameter_file(param_file_content)
@@ -363,6 +428,7 @@ def main():
 	parser.add_option("-h","--hosts",action="store",dest="hosts",default=None)
 	parser.add_option("-r","--roles",action="store",dest="roles",default=None)
 	parser.add_option("-o","--options",action="store",dest="opts",default=None)
+	parser.add_option("-g","--groups",action="store",dest="groups",default=None)
 	parser.add_option("-s","--show-existing",action="store_true",dest="show_existing",default=False)
 	parser.add_option("-w","--write",action="store_true",dest="write",default=False)
 	parser.add_option("-x","--delete",action="store_true",dest="delete_items",default=False)
@@ -387,6 +453,7 @@ def main():
 	hosts = {}
 	roles = {}
 	opts = {}
+	groups = {}
 
 	if options.show_existing:
 		# show existing file content and exit
@@ -404,11 +471,15 @@ def main():
 		opts = load_opts(options.opts)
 		debug_print(json.dumps(opts,indent=4),"opts")
 
+	if options.groups != None:
+		groups = load_groups(options.groups)
+		debug_print(json.dumps(groups,indent=4),"groups")
+
 	if options.delete_items:
-		delete_items(hosts,roles,opts,copy.deepcopy(g_param_file_content))
+		delete_items(hosts,roles,opts,groups,copy.deepcopy(g_param_file_content))
 
 	if options.write:
-		merge_with_existing(hosts,roles,opts,copy.deepcopy(g_param_file_content))
+		merge_with_existing(hosts,roles,opts,groups,copy.deepcopy(g_param_file_content))
 
 
 if __name__ == "__main__":
