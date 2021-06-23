@@ -45,7 +45,7 @@
                 <i class="fas fa-sun" id="houston-theme-icon"></i>
                 <div class="horizontal-spacer-sm"></div>
                 <label class="switch">
-                  <input type="checkbox" id="toggle-theme"/>
+                  <input type="checkbox" id="toggle-theme" />
                   <span class="slider round"></span>
                 </label>
               </div>
@@ -344,18 +344,12 @@
                 <i class="fas fa-chevron-right"></i>
               </div>
               <div class="progress-step" data-progress-bar-idx="2">
-                Inventory File (hosts)
+                Inventory File Generation
               </div>
               <div class="progress-step-divider">
                 <i class="fas fa-chevron-right"></i>
               </div>
               <div class="progress-step" data-progress-bar-idx="3">
-                Inventory File (all.yml)
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-step" data-progress-bar-idx="4">
                 Ping Test
               </div>
             </div>
@@ -481,12 +475,10 @@
               <div id="ansible-config-options-panel-body" class="cd-panel-body">
                 <div id="ansible-config-options" class="cd-panel-body">
                   <p class="cd-para">Ceph Core: (mons,mgrs,osds,metrics)</p>
-                  <div class="ct-form" id="core-options">
-                  </div>
+                  <div class="ct-form" id="core-options"></div>
                   <p class="cd-para">RADOS Options:</p>
-                  
-                  <div class="ct-form" id="rgw-options">
-                  </div>
+
+                  <div class="ct-form" id="rgw-options"></div>
                 </div>
                 <div class="cd-row-right cd-row-child">
                   <button
@@ -518,81 +510,59 @@
             </div>
           </div>
 
-          <!-- ANSIBLE-CONFIGURATION: STEP 2 -->
-          <!-- HOST FILE -->
+
+          <!-- ANSIBLE-CONFIGURATION: STEP 2-->
+          
           <div
             class="cd-block step-ansible-config hidden"
             data-step-content-idx="2"
           >
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation - hosts
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-2-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-3-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-3-body" class="cd-panel-body">
-                <div id="inv-file-hosts-default">
-                  <p class="cd-para">
-                    Click "Generate" to generate the hosts inventory file
-                    (/usr/share/ceph-ansible/hosts)
-                  </p>
-                </div>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-host-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-host-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-                <pre id="host-file-content" class="hidden">
-    Click "Generate" to create and display the "hosts" file content.
-    </pre
-                >
+          <!-- HOSTS -->
+          <div class="panel panel-default cd-panel">
+            <div class="cd-row cd-panel-heading">
+              <h3 class="panel-title cd-row-child">
+                Ansible Configuration: Inventory File Generation - hosts
+              </h3>
+              <div class="cd-row-right cd-row-child cd-panel-nav">
+                <i
+                  id="step-2-0-panel-show"
+                  class="fas fa-angle-up cd-panel-vis-toggle"
+                  for="ansible-config-hosts-body"
+                ></i>
               </div>
             </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="2">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
+            <div id="ansible-config-hosts-body" class="cd-panel-body">
+              <div id="inv-file-hosts-default">
+                <p class="cd-para">
+                  Click "Generate" to generate the hosts inventory file
+                  (/usr/share/ceph-ansible/hosts)
+                </p>
+              </div>
+
+              <div class="cd-row-right cd-row-child">
+                <button
+                  class="btn active btn-primary"
+                  id="generate-host-file-btn"
+                >
+                  Generate
+                </button>
+              </div>
+
+              <div class="cd-row-right cd-row-child">
+                <button
+                  class="btn active btn-primary hidden"
+                  id="show-host-file-btn"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <pre id="host-file-content" class="hidden">
+  Click "Generate" to create and display the "hosts" file content.
+  </pre
               >
-                Prev
-              </button>
-              <button
-                id="ansible-config-inv-hosts-nxt"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-ansible-config"
-              >
-                Next
-              </button>
             </div>
           </div>
-
-          <!-- ANSIBLE-CONFIGURATION: STEP 3-->
           <!-- ALL.YML -->
-          <div
-            class="cd-block step-ansible-config hidden"
-            data-step-content-idx="3"
-          >
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
                 <h3 class="panel-title cd-row-child">
@@ -602,11 +572,11 @@
                   <i
                     id="step-2-1-panel-show"
                     class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-4-body"
+                    for="ansible-config-all-body"
                   ></i>
                 </div>
               </div>
-              <div id="ansible-config-4-body" class="cd-panel-body">
+              <div id="ansible-config-all-body" class="cd-panel-body">
                 <p class="cd-para" id="inv-file-all-default">
                   Click "Generate" to generate all.yml using the
                   (/usr/share/ceph-ansible/group_vars/all.yml)
@@ -635,30 +605,75 @@
                 >
               </div>
             </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="3">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
-              >
-                Prev
-              </button>
-              <button
-                id="ansible-config-inv-all-nxt"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-ansible-config"
-              >
-                Next
-              </button>
-            </div>
+            
+            <!-- RGWLOADBALANCERS.YML -->
+            <div class="panel panel-default cd-panel hidden" id="rgwloadbalancers-inv-panel">
+              <div class="cd-row cd-panel-heading">
+                <h3 class="panel-title cd-row-child">
+                  Ansible Configuration: Inventory File Generation - rgwloadbalancers.yml
+                </h3>
+                <div class="cd-row-right cd-row-child cd-panel-nav">
+                  <i
+                    id="step-2-1-panel-show"
+                    class="fas fa-angle-up cd-panel-vis-toggle"
+                    for="ansible-config-rgwlb-body"
+                  ></i>
+                </div>
+              </div>
+              <div id="ansible-config-rgwlb-body" class="cd-panel-body">
+                <p class="cd-para" id="inv-file-rgwlb-default">
+                  Click "Generate" to generate remaining inventory files
+                  (/usr/share/ceph-ansible/group_vars/rgwloadbalancers.yml)
+                </p>
+
+                <div class="cd-row-right cd-row-child">
+                  <button
+                    class="btn active btn-primary"
+                    id="generate-rgwlb-file-btn"
+                  >
+                    Generate
+                  </button>
+                </div>
+                <div class="cd-row-right cd-row-child">
+                  <button
+                    class="btn active btn-primary hidden"
+                    id="show-rgwlb-file-btn"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+
+                <pre id="rgwlb-file-content" class="hidden">
+            Click "Generate" to create and display the "rgwloadbalancers.yml" file content.
+            </pre
+                >
+              </div>
+          
           </div>
-          <!-- ANSIBLE-CONFIGURATION: STEP 4 -->
-          <!-- PING TEST-->
+          <div class="cd-step-bottom-nav-group" data-nav-idx="2">
+            <button
+              type="button"
+              class="btn btn-primary cd-deploy-step-prev-btn"
+              for="step-ansible-config"
+            >
+              Prev
+            </button>
+            <button
+              id="ansible-config-inv-nxt"
+              type="button"
+              class="btn btn-primary cd-deploy-step-next-btn"
+              for="step-ansible-config"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+          <!-- ANSIBLE-CONFIGURATION: STEP 3 -->
           <div
             class="cd-block step-ansible-config hidden"
-            data-step-content-idx="4"
+            data-step-content-idx="3"
           >
+          <!-- PING TEST-->
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
                 <h3 class="panel-title cd-row-child">
@@ -668,11 +683,11 @@
                   <i
                     id="step-2-2-panel-show"
                     class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-5-body"
+                    for="ansible-config-4-body"
                   ></i>
                 </div>
               </div>
-              <div id="ansible-config-5-body" class="cd-panel-body">
+              <div id="ansible-config-4-body" class="cd-panel-body">
                 <p class="cd-para">
                   Click "Run" to test Ansible Connectivity using Ansible Ping.
                 </p>
@@ -684,7 +699,7 @@
                 </div>
               </div>
             </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="4">
+            <div class="cd-step-bottom-nav-group" data-nav-idx="3">
               <button
                 type="button"
                 class="btn btn-primary cd-deploy-step-prev-btn"
@@ -927,7 +942,10 @@
           <div class="cd-block step-rgw hidden" data-step-content-idx="0">
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">RADOS Gateway: Ansible Playbook - /usr/share/ceph-ansible/radosgw.yml</h3>
+                <h3 class="panel-title cd-row-child">
+                  RADOS Gateway: Ansible Playbook -
+                  /usr/share/ceph-ansible/radosgw.yml
+                </h3>
                 <div class="cd-row-right cd-row-child cd-panel-nav">
                   <i
                     id="step-3-0-panel-show"
@@ -937,10 +955,15 @@
                 </div>
               </div>
               <div id="rgw-step-1-body" class="cd-panel-body">
-                <p class="cd-para">click "run" to perform the radosgw.yml playbook</p>
+                <p class="cd-para">
+                  click "run" to perform the radosgw.yml playbook
+                </p>
                 <div id="terminal-radosgw-iframe"></div>
                 <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-radosgw-btn">
+                  <button
+                    class="btn active btn-primary"
+                    id="ansible-radosgw-btn"
+                  >
                     Run
                   </button>
                 </div>
@@ -992,7 +1015,9 @@
           <div class="cd-block step-iscsi hidden" data-step-content-idx="0">
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">ISCSI: Ansible Playbook - /usr/share/ceph-ansible/iscsi.yml</h3>
+                <h3 class="panel-title cd-row-child">
+                  ISCSI: Ansible Playbook - /usr/share/ceph-ansible/iscsi.yml
+                </h3>
                 <div class="cd-row-right cd-row-child cd-panel-nav">
                   <i
                     id="step-3-0-panel-show"
@@ -1002,7 +1027,9 @@
                 </div>
               </div>
               <div id="iscsi-step-1-body" class="cd-panel-body">
-                <p class="cd-para">click "run" to perform the iscsi.yml playbook</p>
+                <p class="cd-para">
+                  click "run" to perform the iscsi.yml playbook
+                </p>
                 <div id="terminal-iscsi-iframe"></div>
                 <div class="cd-row-right cd-row-child">
                   <button class="btn active btn-primary" id="ansible-iscsi-btn">
@@ -1032,135 +1059,148 @@
           </div>
         </div>
 
-                <!-- RGWLOADBALANCERS -->
-                <div id="step-rgwlb" class="hidden" for="deploy-step-rgwlb">
-                  <div class="cd-top-nav-button-group">
-                    <div class="cd-progress-bar" id="progress-bar-step-rgwlb">
-                      <div class="progress-bar-main-back" title="main menu">
-                        Ceph Deploy
-                      </div>
-                      <div class="progress-step-divider">
-                        <i class="fas fa-chevron-right"></i>
-                      </div>
-                      <div class="progress-bar-title">RGWLB</div>
-                      <div
-                        class="progress-step progress-current-step"
-                        data-progress-bar-idx="0"
-                      >
-                        Playbook (radosgw-lb.yml)
-                      </div>
-                      <div class="progress-step-divider">
-                        <i class="fas fa-chevron-right"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="cd-block step-rgwlb hidden" data-step-content-idx="0">
-                    <div class="panel panel-default cd-panel">
-                      <div class="cd-row cd-panel-heading">
-                        <h3 class="panel-title cd-row-child">Radosgw-lb: Ansible Playbook - /usr/share/ceph-ansible/radosgw-lb.yml</h3>
-                        <div class="cd-row-right cd-row-child cd-panel-nav">
-                          <i
-                            id="step-3-0-panel-show"
-                            class="fas fa-angle-up cd-panel-vis-toggle"
-                            for="rgwlb-step-1-body"
-                          ></i>
-                        </div>
-                      </div>
-                      <div id="rgwlb-step-1-body" class="cd-panel-body">
-                        <p class="cd-para">click "run" to perform the radosgw-lb.yml playbook</p>
-                        <div id="terminal-rgwlb-iframe"></div>
-                        <div class="cd-row-right cd-row-child">
-                          <button class="btn active btn-primary" id="ansible-rgwlb-btn">
-                            Run
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-                      <button
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-prev-btn"
-                        for="step-rgwlb"
-                      >
-                        Prev
-                      </button>
-                      <button
-                        id="deploy_rgwlb"
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-done-btn"
-                        for="step-rgwlb"
-                        disabled
-                      >
-                        Done
-                      </button>
-                    </div>
-                  </div>
+        <!-- RGWLOADBALANCERS -->
+        <div id="step-rgwlb" class="hidden" for="deploy-step-rgwlb">
+          <div class="cd-top-nav-button-group">
+            <div class="cd-progress-bar" id="progress-bar-step-rgwlb">
+              <div class="progress-bar-main-back" title="main menu">
+                Ceph Deploy
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+              <div class="progress-bar-title">RGWLB</div>
+              <div
+                class="progress-step progress-current-step"
+                data-progress-bar-idx="0"
+              >
+                Playbook (radosgw-lb.yml)
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+          </div>
+          <div class="cd-block step-rgwlb hidden" data-step-content-idx="0">
+            <div class="panel panel-default cd-panel">
+              <div class="cd-row cd-panel-heading">
+                <h3 class="panel-title cd-row-child">
+                  Radosgw-lb: Ansible Playbook -
+                  /usr/share/ceph-ansible/radosgw-lb.yml
+                </h3>
+                <div class="cd-row-right cd-row-child cd-panel-nav">
+                  <i
+                    id="step-3-0-panel-show"
+                    class="fas fa-angle-up cd-panel-vis-toggle"
+                    for="rgwlb-step-1-body"
+                  ></i>
                 </div>
+              </div>
+              <div id="rgwlb-step-1-body" class="cd-panel-body">
+                <p class="cd-para">
+                  click "run" to perform the radosgw-lb.yml playbook
+                </p>
+                <div id="terminal-rgwlb-iframe"></div>
+                <div class="cd-row-right cd-row-child">
+                  <button class="btn active btn-primary" id="ansible-rgwlb-btn">
+                    Run
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+              <button
+                type="button"
+                class="btn btn-primary cd-deploy-step-prev-btn"
+                for="step-rgwlb"
+              >
+                Prev
+              </button>
+              <button
+                id="deploy_rgwlb"
+                type="button"
+                class="btn btn-primary cd-deploy-step-done-btn"
+                for="step-rgwlb"
+                disabled
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
 
-                <!-- CEPH-DASHBOARD -->
-                <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
-                  <div class="cd-top-nav-button-group">
-                    <div class="cd-progress-bar" id="progress-bar-step-dashboard">
-                      <div class="progress-bar-main-back" title="main menu">
-                        Ceph Deploy
-                      </div>
-                      <div class="progress-step-divider">
-                        <i class="fas fa-chevron-right"></i>
-                      </div>
-                      <div class="progress-bar-title">Ceph Dashboard</div>
-                      <div
-                        class="progress-step progress-current-step"
-                        data-progress-bar-idx="0"
-                      >
-                        Playbook (dashboard.yml)
-                      </div>
-                      <div class="progress-step-divider">
-                        <i class="fas fa-chevron-right"></i>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="cd-block step-dashboard hidden" data-step-content-idx="0">
-                    <div class="panel panel-default cd-panel">
-                      <div class="cd-row cd-panel-heading">
-                        <h3 class="panel-title cd-row-child">Ceph Dashboard: Ansible Playbook - /usr/share/ceph-ansible/dashboard.yml</h3>
-                        <div class="cd-row-right cd-row-child cd-panel-nav">
-                          <i
-                            id="step-3-0-panel-show"
-                            class="fas fa-angle-up cd-panel-vis-toggle"
-                            for="dashboard-step-1-body"
-                          ></i>
-                        </div>
-                      </div>
-                      <div id="dashboard-step-1-body" class="cd-panel-body">
-                        <p class="cd-para">click "run" to perform the dashboard.yml playbook</p>
-                        <div id="terminal-dashboard-iframe"></div>
-                        <div class="cd-row-right cd-row-child">
-                          <button class="btn active btn-primary" id="ansible-dashboard-btn">
-                            Run
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-                      <button
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-prev-btn"
-                        for="step-dashboard"
-                      >
-                        Prev
-                      </button>
-                      <button
-                        id="deploy_dashboard"
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-done-btn"
-                        for="step-dashboard"
-                        disabled
-                      >
-                        Done
-                      </button>
-                    </div>
-                  </div>
+        <!-- CEPH-DASHBOARD -->
+        <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
+          <div class="cd-top-nav-button-group">
+            <div class="cd-progress-bar" id="progress-bar-step-dashboard">
+              <div class="progress-bar-main-back" title="main menu">
+                Ceph Deploy
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+              <div class="progress-bar-title">Ceph Dashboard</div>
+              <div
+                class="progress-step progress-current-step"
+                data-progress-bar-idx="0"
+              >
+                Playbook (dashboard.yml)
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+          </div>
+          <div class="cd-block step-dashboard hidden" data-step-content-idx="0">
+            <div class="panel panel-default cd-panel">
+              <div class="cd-row cd-panel-heading">
+                <h3 class="panel-title cd-row-child">
+                  Ceph Dashboard: Ansible Playbook -
+                  /usr/share/ceph-ansible/dashboard.yml
+                </h3>
+                <div class="cd-row-right cd-row-child cd-panel-nav">
+                  <i
+                    id="step-3-0-panel-show"
+                    class="fas fa-angle-up cd-panel-vis-toggle"
+                    for="dashboard-step-1-body"
+                  ></i>
                 </div>
+              </div>
+              <div id="dashboard-step-1-body" class="cd-panel-body">
+                <p class="cd-para">
+                  click "run" to perform the dashboard.yml playbook
+                </p>
+                <div id="terminal-dashboard-iframe"></div>
+                <div class="cd-row-right cd-row-child">
+                  <button
+                    class="btn active btn-primary"
+                    id="ansible-dashboard-btn"
+                  >
+                    Run
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+              <button
+                type="button"
+                class="btn btn-primary cd-deploy-step-prev-btn"
+                for="step-dashboard"
+              >
+                Prev
+              </button>
+              <button
+                id="deploy_dashboard"
+                type="button"
+                class="btn btn-primary cd-deploy-step-done-btn"
+                for="step-dashboard"
+                disabled
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- Modal Menus -->
 

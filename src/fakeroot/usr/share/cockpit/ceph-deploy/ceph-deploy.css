@@ -20,7 +20,7 @@
     --panel: #f8f8f8;
     --bg-complete: #d9e8be;
     --border-complete: #658036;
-    --bg-progress-bar-current: #dbedff;
+    --bg-progress-bar-current: #e3e8ec;
 }
 [data-theme="dark"] {
 	/* Dark style */
@@ -840,6 +840,17 @@ th,td {
     border-radius: 4px;
 }
 
+#rgwlb-file-content {
+    font-size: small;
+    overflow-y: scroll;
+    max-height: 600px;
+    min-height: 50px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
 #ansible-ping-output {
     font-size: small;
     overflow-y: scroll;
@@ -1065,8 +1076,7 @@ th,td {
     font-size: medium;
     padding: 5px 5px 5px 5px;
     flex-grow: 0;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    border: none;
 }
 
 .progress-current-step{
@@ -1085,9 +1095,10 @@ th,td {
     font-size: medium;
     padding: 5px 5px 5px 5px;
     flex-grow: 0;
-    background-color: var(--bg-complete);
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    /*background-color: var(--bg-complete);*/
+    /*border: 1px solid var(--border);*/
+    border: none;
+    /*border-radius: 4px;*/
 }
 
 .progress-step-divider {

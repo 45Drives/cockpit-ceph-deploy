@@ -17,8 +17,19 @@
 
 let g_core_params = null;
 let g_deploy_file = null;
+let g_inv_default_requirements = {
+	"all.yml":{
+		"content": null,
+		"completed": false
+	},
+	"hosts":{
+		"content": null,
+		"completed": false
+	}
+}
 let g_option_scheme = {
 	"mons":{
+		"inventory_file":false,
 		"global": [
 			{
 				"option_name":"monitor_interface",
@@ -60,11 +71,13 @@ let g_option_scheme = {
 		"group": []
 	},
 	"mgrs":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"osds":{
+		"inventory_file":false,
 		"global": [
 			{
 				"option_name":"public_network",
@@ -103,31 +116,37 @@ let g_option_scheme = {
 		"group": []
 	},
 	"metrics":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"mdss":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"smbs":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"nfss":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"iscsigws":{
+		"inventory_file":false,
 		"global": [],
 		"unique": [],
 		"group": []
 	},
 	"rgws":{
+		"inventory_file":false,
 		"global": [
 			{
 				"option_name":"radosgw_civetweb_port",
@@ -178,6 +197,7 @@ let g_option_scheme = {
 		"group": []
 	},
 	"rgwloadbalancers":{
+		"inventory_file":true,
 		"global": [],
 		"unique": [],
 		"group": [
@@ -320,6 +340,7 @@ let g_option_scheme = {
 		]
 	},
 	"client":{
+		"inventory_file":null,
 		"global": [],
 		"unique": [],
 		"group": []
@@ -759,6 +780,59 @@ function update_role_info(hosts_json,roles_json){
 	}
 }
 
+function modify_inventory_file_requirement(role,add_requirement){
+	let inv_file_params = {
+		"rgwloadbalancers":{
+			"file_name":"rgwloadbalancers.yml",
+			"div_id":"rgwloadbalancers-inv-panel"
+		}
+	}
+
+	if(add_requirement){
+		//we need to ensure that this requirement is added to the list of required inventory files.
+		let inv_file_req_str = localStorage.getItem("inventory_files")??JSON.stringify(g_inv_default_requirements);
+		let inv_file_req_obj = JSON.parse(inv_file_req_str);
+		if(!inv_file_req_obj.hasOwnProperty(inv_file_params[role].file_name)){
+			inv_file_req_obj[inv_file_params[role].file_name] = {};
+			inv_file_req_obj[inv_file_params[role].file_name].content = null;
+			inv_file_req_obj[inv_file_params[role].file_name].completed = false;
+		}
+		localStorage.setItem("inventory_files",JSON.stringify(inv_file_req_obj));
+		
+		let target_div = document.getElementById(inv_file_params[role].div_id);
+		if(target_div){
+			target_div.classList.remove("hidden");
+			Object.entries(inv_file_req_obj).forEach(([key,obj]) => {
+				console.log(key,obj.completed);
+				if(!obj.completed){
+					let next_button = document.getElementById("ansible-config-inv-nxt");
+					if(next_button){next_button.disabled=true;}
+				}
+			});
+
+		}
+	}else{
+		//we need to hide the inventory file generation content, and remove this from the list of requirements
+		let inv_file_req_str = localStorage.getItem("inventory_files")??JSON.stringify(g_inv_default_requirements);
+		let inv_file_req_obj = JSON.parse(inv_file_req_str);
+		if(inv_file_req_obj.hasOwnProperty(inv_file_params[role].file_name)){
+			delete inv_file_req_obj[inv_file_params[role].file_name];
+		}
+		localStorage.setItem("inventory_files",JSON.stringify(inv_file_req_obj));
+
+		if(inventory_file_generation_completed_check()){
+			document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+		}else{
+			document.getElementById("ansible-config-inv-nxt").disabled=true;
+		}
+
+		let target_div = document.getElementById(inv_file_params[role].div_id);
+		if(target_div){
+			target_div.classList.add("hidden");
+		}
+	}
+}
+
 /**
  * updates the text fields based on the values of the options_json provided.
  * This will also forbid progress (by disabling the next button) if the required fields
@@ -781,6 +855,9 @@ function update_options_info(hosts_json, roles_json, options_json, groups_json){
 				(g_option_scheme[role].unique.length > 0)
 				)){
 				// At least one host is assigned this role
+				if(g_option_scheme[role].inventory_file){
+					modify_inventory_file_requirement(role,true);
+				}
 
 				//create a box to house all global and per-host options
 				let role_option_div = document.createElement("div");
@@ -833,6 +910,9 @@ function update_options_info(hosts_json, roles_json, options_json, groups_json){
 				role_option_div.appendChild(section_header);
 				role_option_div.appendChild(section_body);
 				options_div.appendChild(role_option_div);
+			}
+			else if(g_option_scheme[role].inventory_file){
+				modify_inventory_file_requirement(role,false);
 			}
 		});
 	}
@@ -1959,6 +2039,18 @@ function show_all_file(){
 	}
 }
 
+function show_rgwlb_file(){
+	let rgwlb_file_content = document.getElementById("rgwlb-file-content");
+	let show_button = document.getElementById("show-rgwlb-file-btn");
+	if(rgwlb_file_content && rgwlb_file_content.classList.contains("hidden")){
+		rgwlb_file_content.classList.remove("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+	}else{
+		rgwlb_file_content.classList.add("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye"></i>';
+	}
+}
+
 /**
  * hides/unhides the host-file-content div, and updates the icon on the show button.
  */
@@ -2008,7 +2100,13 @@ function generate_host_file(){
 				show_button.addEventListener("click",show_host_file);
 				document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
 				document.getElementById("inv-file-hosts-default").classList.add("hidden");
-				document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
+				update_localStorage_inv_file("hosts",data,true);
+				if(inventory_file_generation_completed_check()){
+					console.log("inventory_file_generation_completed_check: ",inventory_file_generation_completed_check())
+					document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+				}else{
+					document.getElementById("ansible-config-inv-nxt").disabled=true;
+				}
 			});
 			host_file_content_proc.fail(function(ex,data){
 				console.log("host_file_content_proc (FAIL): ",data);
@@ -2055,11 +2153,60 @@ function generate_all_file(){
 				show_button.addEventListener("click",show_all_file);
 				document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
 				document.getElementById("inv-file-all-default").classList.add("hidden");
-				document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
-
+				update_localStorage_inv_file("all.yml",data,true);
+				if(inventory_file_generation_completed_check()){
+					document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+				}
 			});
 			all_file_content_proc.fail(function(ex,data){
 				console.log("all_file_content_proc (FAIL): ",data);
+			});
+		}else{
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		show_snackbar_msg(msg_label,msg_content,msg_color,"snackbar");
+	});
+}
+
+function generate_rgwloadbalancers_file(){
+	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_rgwloadbalancers"];
+	var result_json = null;
+	var generate_rgwlb_file_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	generate_rgwlb_file_proc.done(function(data){
+		let msg_color = "";
+		let msg_label = "";
+		let msg_content = "";
+		try {
+			result_json = JSON.parse(data);
+		} catch (e) {
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		if (result_json.hasOwnProperty("success_msg")){
+			msg_color = "#20a030";
+			msg_label = "Message: ";
+			msg_content = result_json.success_msg;
+			var rgwlb_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
+			rgwlb_file_content_proc.done(function(data){
+				document.getElementById("rgwlb-file-content").innerText = data;
+				document.getElementById("rgwlb-file-content").classList.remove("hidden");
+				localStorage.setItem("rgwloadbalancers.yml",data);
+				let show_button = document.getElementById("show-rgwlb-file-btn");
+				show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+				show_button.classList.remove("hidden");
+				show_button.addEventListener("click",show_rgwlb_file);
+				document.getElementById("generate-rgwlb-file-btn").innerHTML = "Generate Again";
+				document.getElementById("inv-file-rgwlb-default").classList.add("hidden");
+				update_localStorage_inv_file("rgwloadbalancers.yml",data,true);
+				if(inventory_file_generation_completed_check()){
+					document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+				}
+			});
+			rgwlb_file_content_proc.fail(function(ex,data){
+				console.log("rgwlb_file_content_proc (FAIL): ",data);
 			});
 		}else{
 			msg_color = "#bd3030";
@@ -2189,6 +2336,14 @@ function ansible_radosgw(){
 	if(!iscsi_term){iscsi_term = makeTerminal("terminal-iscsi");}
 	document.getElementById("terminal-iscsi-iframe").appendChild(iscsi_term);
 }
+
+function ansible_rgwlb(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_rgwlb\n");
+	let rgwlb_term = document.getElementById("terminal-rgwlb");
+	if(!rgwlb_term){rgwlb_term = makeTerminal("terminal-rgwlb");}
+	document.getElementById("terminal-rgwlb-iframe").appendChild(rgwlb_term);
+}
+
 
 /**
  * perform the deploy_dashboard playbook within a new terminal. 
@@ -2428,12 +2583,14 @@ function setup_buttons(){
 	document.getElementById("global-options-btn").addEventListener("click",update_options_request);
 	document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
 	document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
+	document.getElementById("generate-rgwlb-file-btn").addEventListener("click",generate_rgwloadbalancers_file);
 	document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
 	document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 	document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
 	document.getElementById("ansible-cephfs-btn").addEventListener("click",ansible_cephfs);
 	document.getElementById("ansible-radosgw-btn").addEventListener("click",ansible_radosgw);
 	document.getElementById("ansible-iscsi-btn").addEventListener("click",ansible_iscsi);
+	document.getElementById("ansible-rgwlb-btn").addEventListener("click",ansible_rgwlb);
 	document.getElementById("ansible-dashboard-btn").addEventListener("click",ansible_dashboard);
 	document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 }
@@ -2506,6 +2663,27 @@ function setup_main_menu(){
 	}
 }
 
+function inventory_file_generation_completed_check(){
+	let inv_file_req_str = localStorage.getItem("inventory_files")??JSON.stringify(g_inv_default_requirements);
+	let inv_file_req_obj = JSON.parse(inv_file_req_str);
+	let ret_val = true;
+	Object.entries(inv_file_req_obj).forEach(([key,obj]) => {
+		if(!obj.completed){ret_val = false;}
+	});
+	return ret_val;
+}
+
+function update_localStorage_inv_file(key,content,completed_flag){
+	let inv_file_req_str = localStorage.getItem("inventory_files")??JSON.stringify(g_inv_default_requirements);
+	let inv_file_req_obj = JSON.parse(inv_file_req_str);
+	if(!inv_file_req_obj.hasOwnProperty(key)){
+		inv_file_req_obj[key] = {};
+	}
+	inv_file_req_obj[key].content = content;
+	inv_file_req_obj[key].completed = completed_flag;
+	localStorage.setItem("inventory_files",JSON.stringify(inv_file_req_obj));
+}
+
 /**
  * update the files stored on the administrator node that are used to store deploy state.
  */
@@ -2551,9 +2729,12 @@ function sync_ceph_deploy_state(){
 			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 			document.getElementById("generate-host-file-btn").innerHTML = "Generate Again";
 			document.getElementById("inv-file-hosts-default").classList.add("hidden");
-			document.getElementById("ansible-config-inv-hosts-nxt").removeAttribute("disabled");
+			update_localStorage_inv_file("hosts",content,true);
+			if(inventory_file_generation_completed_check()){
+				document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+			}
 		}else{
-			document.getElementById("ansible-config-inv-hosts-nxt").disabled=true;
+			document.getElementById("ansible-config-inv-nxt").disabled=true;
 		}
 	});
 
@@ -2570,9 +2751,36 @@ function sync_ceph_deploy_state(){
 			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 			document.getElementById("generate-all-file-btn").innerHTML = "Generate Again";
 			document.getElementById("inv-file-all-default").classList.add("hidden");
-			document.getElementById("ansible-config-inv-all-nxt").removeAttribute("disabled");
+			update_localStorage_inv_file("all.yml",content,true);
+			if(inventory_file_generation_completed_check()){
+				document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+			}else{
+				document.getElementById("ansible-config-inv-nxt").disabled=true;
+			}
 		}else{
-			document.getElementById("ansible-config-inv-all-nxt").disabled=true;
+			document.getElementById("ansible-config-inv-nxt").disabled=true;
+		}
+	});
+
+	let rgwlb_content = cockpit.file("/usr/share/ceph-ansible/group_vars/rgwloadbalancers.yml").read();
+	rgwlb_content.then((content,tag) => {
+		if(content){
+			localStorage.setItem("rgwloadbalancers.yml",content);
+			let rgwlb_file_div_content = document.getElementById("rgwlb-file-content")
+			rgwlb_file_div_content.innerHTML = content;
+			rgwlb_file_div_content.classList.remove("hidden");
+			let show_button = document.getElementById("show-all-file-btn");
+			show_button.addEventListener("click",show_rgwlb_file);
+			show_button.classList.remove("hidden");
+			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+			document.getElementById("generate-rgwlb-file-btn").innerHTML = "Generate Again";
+			document.getElementById("inv-file-rgwlb-default").classList.add("hidden");
+			update_localStorage_inv_file("rgwloadbalancers.yml",content,true);
+			if(inventory_file_generation_completed_check()){
+				document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+			}else{
+				document.getElementById("ansible-config-inv-nxt").disabled=true;
+			}
 		}
 	});
 }
@@ -2586,6 +2794,7 @@ function get_ceph_deploy_initial_state(){
 				//defer to the state on the server as it is possible that more than one browser was used.
 				localStorage.setItem("ceph_deploy_state",content);
 				ceph_deploy_state_file.close();
+				localStorage.removeItem("inventory_files");
 				resolve();
 			}else if(!content){
 				//file does not exist locally
@@ -2594,6 +2803,7 @@ function get_ceph_deploy_initial_state(){
 					console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
 					ceph_deploy_state_file.close();
 					localStorage.setItem("ceph_deploy_state",JSON.stringify(g_ceph_deploy_default_state));
+					localStorage.removeItem("inventory_files");
 					resolve();
 				});
 				create_state_file.catch(e => {
