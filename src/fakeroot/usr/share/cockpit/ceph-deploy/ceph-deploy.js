@@ -137,7 +137,80 @@ let g_option_scheme = {
 		"inventory_file":false,
 		"global": [],
 		"unique": [],
-		"group": []
+		"group": [
+			{
+				"option_name":"nfs_configuration",
+				"option_format":"radio",
+				"radio_options":[
+					{
+						"radio_id":"nfs_active_active",
+						"radio_value": "Active-Active",
+						"radio_sub_options":[
+							{
+								"option_name":"ceph_nfs_rados_backend_driver_aa",
+								"radio_option_name":"ceph_nfs_rados_backend_driver",
+								"option_format":"default",
+								"optional":true,
+								"label":"ceph_nfs_rados_backend_driver",
+								"feedback":true,
+								"feedback_type":"fixed",
+								"feedback_choice_options":["rados_cluster"],
+								"help":"",
+								"input_type":"text",
+								"default_value":"rados_cluster"
+							}
+						]
+					},
+					{
+						"radio_id":"nfs_active_passive",
+						"radio_value": "Active-Passive",
+						"radio_sub_options":[
+							{
+								"option_name":"ceph_nfs_rados_backend_driver_ap",
+								"radio_option_name":"ceph_nfs_rados_backend_driver",
+								"option_format":"default",
+								"optional":true,
+								"label":"ceph_nfs_rados_backend_driver",
+								"feedback":true,
+								"feedback_type":"fixed",
+								"feedback_choice_options":["rados_ng"],
+								"help":"",
+								"input_type":"text",
+								"default_value":"rados_ng"
+							},
+							{
+								"option_name":"ceph_nfs_floating_ip_address",
+								"option_format":"default",
+								"optional":true,
+								"label":"ceph_nfs_floating_ip_address",
+								"feedback":true,
+								"feedback_type":"ip",
+								"help":"",
+								"input_type":"text",
+								"default_value":""
+							},
+							{
+								"option_name":"ceph_nfs_floating_ip_cidr",
+								"option_format":"default",
+								"optional":true,
+								"label":"ceph_nfs_floating_ip_cidr",
+								"feedback":true,
+								"feedback_type":"num",
+								"help":"",
+								"input_type":"text",
+								"default_value":""
+							}
+						]
+					},
+				],
+				"optional":true,
+				"label":"NFS Configuration",
+				"feedback":false,
+				"help":"",
+				"input_type":"radio",
+				"default_value":"Active-Active"
+			},
+		]
 	},
 	"iscsigws":{
 		"inventory_file":false,
@@ -803,7 +876,6 @@ function modify_inventory_file_requirement(role,add_requirement){
 		if(target_div){
 			target_div.classList.remove("hidden");
 			Object.entries(inv_file_req_obj).forEach(([key,obj]) => {
-				console.log(key,obj.completed);
 				if(!obj.completed){
 					let next_button = document.getElementById("ansible-config-inv-nxt");
 					if(next_button){next_button.disabled=true;}
@@ -1037,7 +1109,6 @@ function make_per_host_options(target_div,host_list,role,hosts_json){
 }
 
 function make_group_options(target_div,target_form,group_options,role,groups_json){
-	console.log("groups_json: ",groups_json);
 	for(let opt of group_options){
 		let opt_wrapper = document.createElement("div");
 		opt_wrapper.classList.add("ct-validation-wrapper");
@@ -1060,7 +1131,7 @@ function make_group_options(target_div,target_form,group_options,role,groups_jso
 				opt_input.type = opt.input_type;
 				opt_input.classList.add("ct-input","cd-field-checkbox");
 				opt_input.setAttribute("aria-invalid","false");
-				opt_input.id = opt.option_name;// + "-" + role;
+				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
 				opt_input.setAttribute("field",opt.option_name);
 				opt_input.setAttribute("optional",opt.optional);
@@ -1092,7 +1163,64 @@ function make_group_options(target_div,target_form,group_options,role,groups_jso
 				opt_enable_wrapper.appendChild(enable_switch);
 				opt_wrapper.appendChild(opt_enable_wrapper);
 			}
-				
+			else if(opt.option_format=="radio"){
+				opt_input = document.createElement("div");
+				opt_input.classList.add("cd-radio-row");
+				opt_input.id = opt.option_name;
+				for(let radio_opt of opt.radio_options){
+					let radio_input = document.createElement("input");
+					radio_input.type = "radio";
+					radio_input.id = radio_opt.radio_id;
+					radio_input.name = opt.option_name;
+					radio_input.value = radio_opt.radio_value;
+					let radio_label = document.createElement("label");
+					radio_label.setAttribute("for",radio_opt.radio_id);
+					radio_label.innerText = radio_opt.radio_value;
+					opt_input.appendChild(radio_input);
+					opt_input.appendChild(radio_label);
+
+					let radio_form = document.createElement("div");
+					radio_form.classList.add("ct-form");
+					radio_form.setAttribute("opt-parent",radio_input.id);
+					target_div.appendChild(radio_form);
+					make_radio_options(radio_form,radio_opt,role,groups_json);
+
+					radio_input.checked = (
+						groups_json.hasOwnProperty(role)&&
+						groups_json[role].hasOwnProperty(radio_opt.radio_id))?groups_json[role][radio_opt.radio_id]:(opt.default_value == radio_input.value);
+
+					console.log("groups_json[role][radio_opt.radio_id]",groups_json[role][radio_opt.radio_id]);
+
+					if(radio_input.checked){radio_form.classList.remove("hidden");}
+					else{radio_form.classList.add("hidden");}
+	
+					radio_input.addEventListener("change",()=>{
+						let update_btn = document.getElementById("global-options-btn");
+						console.log("radio_input.id: ",radio_input.id);
+						console.log("radio_input.checked: ",radio_input.checked);
+						if(radio_input.checked){radio_form.classList.remove("hidden");}
+						else{radio_form.classList.add("hidden");}
+						let radio_btn_list = [...opt_input.querySelectorAll(`:scope input[name=${opt_input.id}]`)];
+						console.log("radio_btn_list: ",radio_btn_list);
+						radio_btn_list.forEach(radio_btn => {
+							if(radio_btn && radio_btn.id != radio_input.id){
+								let div_to_hide = target_div.querySelector(`:scope div[opt-parent="${radio_btn.id}"]`);
+								if(div_to_hide){
+									div_to_hide.classList.add("hidden");
+								}
+							}
+						});			
+						update_btn.removeAttribute("disabled");
+					});
+				}
+				opt_input.id = opt.option_name;
+				opt_input.setAttribute("group",role);
+				opt_input.setAttribute("field",opt.option_name);
+				opt_input.setAttribute("optional",opt.optional);
+				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_wrapper.appendChild(opt_input);
+			}
 			else if(opt.option_format=="multi-checkbox"){
 				opt_input.type = opt.input_type;
 				opt_input.classList.add("ct-input","cd-field-checkbox");
@@ -1383,7 +1511,64 @@ function generate_option_feedback(opt,opt_input,id){
 							);
 						});
 					}
+					else if(opt.feedback_type === "fixed"){
+						opt_input.setAttribute("disabled",true);
+						opt_input.classList.remove("cd-field");
+						opt_input.classList.add("cd-field-disabled");
+					}
 					return feedback;
+}
+
+function make_radio_options(radio_form,parent_radio,role,groups_json){
+	for(let opt of parent_radio.radio_sub_options){
+		let opt_wrapper = document.createElement("div");
+		opt_wrapper.classList.add("ct-validation-wrapper");
+
+		let opt_label = document.createElement("label");
+		opt_label.classList.add("control-label");
+		opt_label.setAttribute("for",opt.option_name);
+		opt_label.innerText = (opt.optional ? "" : "* ") + opt.label;
+
+		let opt_input = document.createElement("input");
+		opt_input.setAttribute("opt-parent",parent_radio.radio_id);
+		if(opt.option_format){
+			if(opt.option_format == "multi-checkbox"){
+				//TODO: implement if needed in future
+				console.log("make_radio_options(): ",opt.option_format);
+			}
+			else if(opt.option_format == "multi-ip"){
+				//TODO: implement if needed in future
+				console.log("make_radio_options(): ",opt.option_format);
+			}			
+			else{
+				if(opt.input_type === "text"){
+					opt_input.type = opt.input_type;
+					opt_input.classList.add("ct-input","cd-field");
+					opt_input.value = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name)&&groups_json[role][opt.option_name] != "")?groups_json[role][opt.option_name]:opt.default_value;
+				}else if(opt.input_type === "checkbox"){
+					opt_input.type = opt.input_type;
+					opt_input.classList.add("ct-input","cd-field-checkbox");
+					opt_input.checked = (groups_json.hasOwnProperty(role)&&groups_json[role].hasOwnProperty(opt.option_name))?groups_json[role][opt.option_name]:opt.default_value;
+					opt_input.addEventListener("change",function(){
+						document.getElementById("global-options-btn").removeAttribute("disabled")});
+				}
+				opt_input.setAttribute("aria-invalid","false");
+				opt_input.id = opt.option_name;
+				opt_input.setAttribute("group",role);
+				opt_input.setAttribute("field",opt.option_name);
+				opt_input.setAttribute("optional",opt.optional);
+				opt_input.setAttribute("group-option",true);
+				opt_input.setAttribute("option_format",opt.option_format);
+				opt_wrapper.appendChild(opt_input);
+				if(opt.feedback){
+					let feedback = generate_option_feedback(opt,opt_input,opt.option_name + "-feedback");
+					opt_wrapper.appendChild(feedback);
+				}
+			}
+		}
+		radio_form.appendChild(opt_label);
+		radio_form.appendChild(opt_wrapper);
+	}		
 }
 
 function make_toggle_options(target_form,parent_opt,role,groups_json){
@@ -1478,8 +1663,6 @@ function make_toggle_options(target_form,parent_opt,role,groups_json){
 				opt_wrapper.appendChild(sub_opt_wrapper);
 			}
 			else if(opt.option_format == "multi-ip"){
-				//TODO, create/populate these fields based on associated json
-				//NEXT 
 				let button_div = document.createElement("div");
 				button_div.classList.add("cd-textfield-wrapper");
 
@@ -1516,13 +1699,11 @@ function make_toggle_options(target_form,parent_opt,role,groups_json){
 						}
 					);
 			
-
 				default_sub_opt_wrapper.appendChild(default_ip_field);
 				default_sub_opt_wrapper.appendChild(opt_input);
 				opt_wrapper.appendChild(default_sub_opt_wrapper);
 				opt_wrapper.appendChild(default_feedback);
 				
-				// TODO: PUT PARSED IP ADDRESSES HERE!
 				opt_input.addEventListener("click",()=>{
 					let sub_opt_wrapper = document.createElement("div");
 					sub_opt_wrapper.classList.add("cd-textfield-wrapper");
@@ -1903,7 +2084,6 @@ function update_options_request(){
 							if(sub_opt.checked){
 								group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")] = [];
 								let sub_opt_child_list = [...options_div.querySelectorAll(`[opt-parent=${sub_opt.id}][type="checkbox"]`)];
-								console.log("sub_opt_child_list: ",sub_opt_child_list);
 								sub_opt_child_list.forEach(sub_opt_child => {
 									if(sub_opt_child.checked){
 										group_request_json[sub_opt.getAttribute("group")][sub_opt.getAttribute("field")].push(sub_opt_child.getAttribute("field"));
@@ -1913,6 +2093,35 @@ function update_options_request(){
 						}
 					});
 				}
+			}
+			else if(element.getAttribute("option_format") == "radio"){
+				console.log("radio");
+				let radio_btn_list = [...element.querySelectorAll(`:scope input[name=${element.id}]`)];
+				radio_btn_list.forEach(radio_btn =>{
+					if(radio_btn.checked){
+						group_request_json[element.getAttribute("group")][radio_btn.id] = true;
+						let radio_sub_options = [...options_div.querySelectorAll(`[opt-parent=${radio_btn.id}][group-option="true"]`)];
+						console.log(radio_sub_options);
+						radio_sub_options.forEach(radio_sub_opt =>{
+							if(radio_sub_opt.getAttribute("option_format") == "default"){
+								if(radio_sub_opt.type == "text"){
+									group_request_json[element.getAttribute("group")][radio_sub_opt.getAttribute("field")] = radio_sub_opt.value;
+								}
+								else if(radio_sub_opt.type == "checkbox"){
+									// todo: implement later if needed
+									console.log("radio_sub_opt.type: ",radio_sub_opt.type);
+								}
+							}
+							else{
+								// todo: implement later if needed
+								console.log("radio_sub_opt.option_format: ",radio_sub_opt.getAttribute("option_format"));
+							}
+						});
+					}
+					else{
+						group_request_json[element.getAttribute("group")][radio_btn.id] = false;
+					}
+				});
 			}
 			else if(element.getAttribute("option_format") == "multi-ip"){
 				group_request_json[element.getAttribute("group")][element.getAttribute("field")] = [];
@@ -1939,6 +2148,8 @@ function update_options_request(){
 		}
 		
 	});
+
+	console.log("group_request_json: ",group_request_json);
 
 	var options_spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/core_params","-o",JSON.stringify(options_request_json),"-w"];
 	var options_proc = cockpit.spawn(options_spawn_args, {superuser: "require"});
@@ -2102,7 +2313,6 @@ function generate_host_file(){
 				document.getElementById("inv-file-hosts-default").classList.add("hidden");
 				update_localStorage_inv_file("hosts",data,true);
 				if(inventory_file_generation_completed_check()){
-					console.log("inventory_file_generation_completed_check: ",inventory_file_generation_completed_check())
 					document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
 				}else{
 					document.getElementById("ansible-config-inv-nxt").disabled=true;
@@ -2696,7 +2906,6 @@ function sync_ceph_deploy_state(){
 			//Update the state file stored on server.
 			let update_state_file = ceph_deploy_state_file.replace(ceph_deploy_state_json_str);
 			update_state_file.then(tag => {
-				console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was updated"); 
 				ceph_deploy_state_file.close();
 				localStorage.setItem("ceph_deploy_state",ceph_deploy_state_json_str);
 			});
@@ -2800,7 +3009,6 @@ function get_ceph_deploy_initial_state(){
 				//file does not exist locally
 				let create_state_file = ceph_deploy_state_file.replace(JSON.stringify(g_ceph_deploy_default_state));
 				create_state_file.then(tag => {
-					console.log("/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json was created."); 
 					ceph_deploy_state_file.close();
 					localStorage.setItem("ceph_deploy_state",JSON.stringify(g_ceph_deploy_default_state));
 					localStorage.removeItem("inventory_files");

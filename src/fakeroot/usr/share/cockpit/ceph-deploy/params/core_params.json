@@ -100,6 +100,9 @@
           "haproxy_ssl_ciphers": [],
           "haproxy_ssl_options": [],
           "enable_ssl": false
+      },
+      "nfss":{
+          
       }
   }
 }

@@ -375,6 +375,20 @@ input:checked + .cd-slider:before {
 .cd-field {
 	margin-left: 5px;
 	margin-right: 10px;
+    background-color: var(--container);
+    color: var(--font);
+    border-radius: 4px;
+}
+
+.cd-radio-row > label{
+    padding-right: 15px;
+    padding-left: 2px;
+    color: var(--font);
+}
+
+.cd-field-disabled {
+	margin-left: 5px;
+	margin-right: 10px;
     background-color: var(--container-header);
     color: var(--font);
     border-radius: 4px;
