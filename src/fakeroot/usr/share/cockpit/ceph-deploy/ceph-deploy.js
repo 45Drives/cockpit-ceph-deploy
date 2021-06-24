@@ -180,6 +180,7 @@ let g_option_scheme = {
 							},
 							{
 								"option_name":"ceph_nfs_floating_ip_address",
+								"radio_option_name":"ceph_nfs_floating_ip_address",
 								"option_format":"default",
 								"optional":true,
 								"label":"ceph_nfs_floating_ip_address",
@@ -191,6 +192,7 @@ let g_option_scheme = {
 							},
 							{
 								"option_name":"ceph_nfs_floating_ip_cidr",
+								"radio_option_name":"ceph_nfs_floating_ip_cidr",
 								"option_format":"default",
 								"optional":true,
 								"label":"ceph_nfs_floating_ip_cidr",
@@ -1555,7 +1557,7 @@ function make_radio_options(radio_form,parent_radio,role,groups_json){
 				opt_input.setAttribute("aria-invalid","false");
 				opt_input.id = opt.option_name;
 				opt_input.setAttribute("group",role);
-				opt_input.setAttribute("field",opt.option_name);
+				opt_input.setAttribute("field",opt.radio_option_name);
 				opt_input.setAttribute("optional",opt.optional);
 				opt_input.setAttribute("group-option",true);
 				opt_input.setAttribute("option_format",opt.option_format);
