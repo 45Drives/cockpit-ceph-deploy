@@ -865,6 +865,17 @@ th,td {
     border-radius: 4px;
 }
 
+#nfss-file-content {
+    font-size: small;
+    overflow-y: scroll;
+    max-height: 600px;
+    min-height: 50px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
 #ansible-ping-output {
     font-size: small;
     overflow-y: scroll;
@@ -872,7 +883,7 @@ th,td {
     min-height: 50px;
 }
 
-#terminal-core, #terminal-cephfs, #terminal-device-alias, #terminal-ping, #terminal-radosgw, #terminal-iscsi, #terminal-dashboard {
+#terminal-core, #terminal-cephfs, #terminal-device-alias, #terminal-ping, #terminal-radosgw, #terminal-iscsi, #terminal-dashboard, #terminal-nfs, #terminal-rgwlb{
     height:500px;
     width:100%;
     overflow:auto;

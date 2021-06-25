@@ -650,6 +650,51 @@
               </div>
           
           </div>
+
+                      <!-- NFSS.YML -->
+                      <div class="panel panel-default cd-panel hidden" id="nfss-inv-panel">
+                        <div class="cd-row cd-panel-heading">
+                          <h3 class="panel-title cd-row-child">
+                            Ansible Configuration: Inventory File Generation - nfss.yml
+                          </h3>
+                          <div class="cd-row-right cd-row-child cd-panel-nav">
+                            <i
+                              id="step-2-1-panel-show"
+                              class="fas fa-angle-up cd-panel-vis-toggle"
+                              for="ansible-config-nfss-body"
+                            ></i>
+                          </div>
+                        </div>
+                        <div id="ansible-config-nfss-body" class="cd-panel-body">
+                          <p class="cd-para" id="inv-file-nfss-default">
+                            Click "Generate" to generate the nfss.yml inventory file
+                            (/usr/share/ceph-ansible/group_vars/nfss.yml)
+                          </p>
+          
+                          <div class="cd-row-right cd-row-child">
+                            <button
+                              class="btn active btn-primary"
+                              id="generate-nfss-file-btn"
+                            >
+                              Generate
+                            </button>
+                          </div>
+                          <div class="cd-row-right cd-row-child">
+                            <button
+                              class="btn active btn-primary hidden"
+                              id="show-nfss-file-btn"
+                            >
+                              <i class="fas fa-eye"></i>
+                            </button>
+                          </div>
+          
+                          <pre id="nfss-file-content" class="hidden">
+                      Click "Generate" to create and display the "nfss.yml" file content.
+                      </pre
+                          >
+                        </div>
+                    
+                    </div>
           <div class="cd-step-bottom-nav-group" data-nav-idx="2">
             <button
               type="button"
@@ -1121,6 +1166,76 @@
                 type="button"
                 class="btn btn-primary cd-deploy-step-done-btn"
                 for="step-rgwlb"
+                disabled
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NFS -->
+        <div id="step-nfs" class="hidden" for="deploy-step-nfs">
+          <div class="cd-top-nav-button-group">
+            <div class="cd-progress-bar" id="progress-bar-step-nfs">
+              <div class="progress-bar-main-back" title="main menu">
+                Ceph Deploy
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+              <div class="progress-bar-title">NFS</div>
+              <div
+                class="progress-step progress-current-step"
+                data-progress-bar-idx="0"
+              >
+                Playbook (nfss.yml)
+              </div>
+              <div class="progress-step-divider">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+          </div>
+          <div class="cd-block step-nfs hidden" data-step-content-idx="0">
+            <div class="panel panel-default cd-panel">
+              <div class="cd-row cd-panel-heading">
+                <h3 class="panel-title cd-row-child">
+                  Radosgw-lb: Ansible Playbook -
+                  /usr/share/ceph-ansible/nfs.yml
+                </h3>
+                <div class="cd-row-right cd-row-child cd-panel-nav">
+                  <i
+                    id="step-3-0-panel-show"
+                    class="fas fa-angle-up cd-panel-vis-toggle"
+                    for="nfs-step-1-body"
+                  ></i>
+                </div>
+              </div>
+              <div id="nfs-step-1-body" class="cd-panel-body">
+                <p class="cd-para">
+                  click "run" to perform the nfs.yml playbook
+                </p>
+                <div id="terminal-nfs-iframe"></div>
+                <div class="cd-row-right cd-row-child">
+                  <button class="btn active btn-primary" id="ansible-nfs-btn">
+                    Run
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+              <button
+                type="button"
+                class="btn btn-primary cd-deploy-step-prev-btn"
+                for="step-nfs"
+              >
+                Prev
+              </button>
+              <button
+                id="deploy_nfs"
+                type="button"
+                class="btn btn-primary cd-deploy-step-done-btn"
+                for="step-nfs"
                 disabled
               >
                 Done

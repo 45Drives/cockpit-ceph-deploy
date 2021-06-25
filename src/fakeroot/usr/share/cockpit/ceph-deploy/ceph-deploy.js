@@ -134,7 +134,7 @@ let g_option_scheme = {
 		"group": []
 	},
 	"nfss":{
-		"inventory_file":false,
+		"inventory_file":true,
 		"global": [],
 		"unique": [],
 		"group": [
@@ -860,6 +860,10 @@ function modify_inventory_file_requirement(role,add_requirement){
 		"rgwloadbalancers":{
 			"file_name":"rgwloadbalancers.yml",
 			"div_id":"rgwloadbalancers-inv-panel"
+		},
+		"nfss":{
+			"file_name":"nfss.yml",
+			"div_id":"nfss-inv-panel"
 		}
 	}
 
@@ -2264,6 +2268,18 @@ function show_rgwlb_file(){
 	}
 }
 
+function show_nfss_file(){
+	let nfss_file_content = document.getElementById("nfss-file-content");
+	let show_button = document.getElementById("show-nfss-file-btn");
+	if(nfss_file_content && nfss_file_content.classList.contains("hidden")){
+		nfss_file_content.classList.remove("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+	}else{
+		nfss_file_content.classList.add("hidden");
+		show_button.innerHTML = '<i class="fas fa-eye"></i>';
+	}
+}
+
 /**
  * hides/unhides the host-file-content div, and updates the icon on the show button.
  */
@@ -2381,6 +2397,54 @@ function generate_all_file(){
 		show_snackbar_msg(msg_label,msg_content,msg_color,"snackbar");
 	});
 }
+
+function generate_nfss_file(){
+	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_nfss"];
+	var result_json = null;
+	var generate_nfss_file_proc = cockpit.spawn(spawn_args, {superuser: "require"});
+	generate_nfss_file_proc.done(function(data){
+		let msg_color = "";
+		let msg_label = "";
+		let msg_content = "";
+		try {
+			result_json = JSON.parse(data);
+		} catch (e) {
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		if (result_json.hasOwnProperty("success_msg")){
+			msg_color = "#20a030";
+			msg_label = "Message: ";
+			msg_content = result_json.success_msg;
+			var nfss_file_content_proc = cockpit.spawn(["cat",result_json.path],{superuser:"require"});
+			nfss_file_content_proc.done(function(data){
+				document.getElementById("nfss-file-content").innerText = data;
+				document.getElementById("nfss-file-content").classList.remove("hidden");
+				localStorage.setItem("nfss.yml",data);
+				let show_button = document.getElementById("show-nfss-file-btn");
+				show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+				show_button.classList.remove("hidden");
+				show_button.addEventListener("click",show_nfss_file);
+				document.getElementById("generate-nfss-file-btn").innerHTML = "Generate Again";
+				document.getElementById("inv-file-nfss-default").classList.add("hidden");
+				update_localStorage_inv_file("nfss.yml",data,true);
+				if(inventory_file_generation_completed_check()){
+					document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+				}
+			});
+			nfss_file_content_proc.fail(function(ex,data){
+				console.log("nfss_file_content_proc (FAIL): ",data);
+			});
+		}else{
+			msg_color = "#bd3030";
+			msg_label = "Error:";
+			msg_content = "Unexpected return value.";
+		}
+		show_snackbar_msg(msg_label,msg_content,msg_color,"snackbar");
+	});
+}
+
 
 function generate_rgwloadbalancers_file(){
 	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_rgwloadbalancers"];
@@ -2554,6 +2618,13 @@ function ansible_rgwlb(){
 	let rgwlb_term = document.getElementById("terminal-rgwlb");
 	if(!rgwlb_term){rgwlb_term = makeTerminal("terminal-rgwlb");}
 	document.getElementById("terminal-rgwlb-iframe").appendChild(rgwlb_term);
+}
+
+function ansible_nfs(){
+	localStorage.setItem("terminal-command","ansible_runner -c deploy_nfs\n");
+	let nfs_term = document.getElementById("terminal-nfs");
+	if(!nfs_term){nfs_term = makeTerminal("terminal-nfs");}
+	document.getElementById("terminal-nfs-iframe").appendChild(nfs_term);
 }
 
 
@@ -2788,6 +2859,7 @@ function setup_buttons(){
 	setup_progress_bar("deploy-step-rgw");
 	setup_progress_bar("deploy-step-iscsi");
 	setup_progress_bar("deploy-step-rgwlb");
+	setup_progress_bar("deploy-step-nfs");
 	setup_progress_bar("deploy-step-dashboard");
 
 	document.getElementById("new-host-btn").addEventListener("click",add_host);
@@ -2796,6 +2868,7 @@ function setup_buttons(){
 	document.getElementById("generate-host-file-btn").addEventListener("click",generate_host_file);
 	document.getElementById("generate-all-file-btn").addEventListener("click",generate_all_file);
 	document.getElementById("generate-rgwlb-file-btn").addEventListener("click",generate_rgwloadbalancers_file);
+	document.getElementById("generate-nfss-file-btn").addEventListener("click",generate_nfss_file);
 	document.getElementById("ansible-ping-btn").addEventListener("click",ansible_ping);
 	document.getElementById("ansible-device-alias-btn").addEventListener("click",ansible_device_alias);
 	document.getElementById("ansible-core-btn").addEventListener("click",ansible_core);
@@ -2803,6 +2876,7 @@ function setup_buttons(){
 	document.getElementById("ansible-radosgw-btn").addEventListener("click",ansible_radosgw);
 	document.getElementById("ansible-iscsi-btn").addEventListener("click",ansible_iscsi);
 	document.getElementById("ansible-rgwlb-btn").addEventListener("click",ansible_rgwlb);
+	document.getElementById("ansible-nfs-btn").addEventListener("click",ansible_nfs);
 	document.getElementById("ansible-dashboard-btn").addEventListener("click",ansible_dashboard);
 	document.getElementById("toggle-theme").addEventListener("change",switch_theme);
 }
@@ -2980,13 +3054,35 @@ function sync_ceph_deploy_state(){
 			let rgwlb_file_div_content = document.getElementById("rgwlb-file-content")
 			rgwlb_file_div_content.innerHTML = content;
 			rgwlb_file_div_content.classList.remove("hidden");
-			let show_button = document.getElementById("show-all-file-btn");
+			let show_button = document.getElementById("show-rgwlb-file-btn");
 			show_button.addEventListener("click",show_rgwlb_file);
 			show_button.classList.remove("hidden");
 			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 			document.getElementById("generate-rgwlb-file-btn").innerHTML = "Generate Again";
 			document.getElementById("inv-file-rgwlb-default").classList.add("hidden");
 			update_localStorage_inv_file("rgwloadbalancers.yml",content,true);
+			if(inventory_file_generation_completed_check()){
+				document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
+			}else{
+				document.getElementById("ansible-config-inv-nxt").disabled=true;
+			}
+		}
+	});
+
+	let nfss_content = cockpit.file("/usr/share/ceph-ansible/group_vars/nfss.yml").read();
+	nfss_content.then((content,tag) => {
+		if(content){
+			localStorage.setItem("nfss.yml",content);
+			let nfss_file_div_content = document.getElementById("nfss-file-content")
+			nfss_file_div_content.innerHTML = content;
+			nfss_file_div_content.classList.remove("hidden");
+			let show_button = document.getElementById("show-nfss-file-btn");
+			show_button.addEventListener("click",show_nfss_file);
+			show_button.classList.remove("hidden");
+			show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+			document.getElementById("generate-nfss-file-btn").innerHTML = "Generate Again";
+			document.getElementById("inv-file-nfss-default").classList.add("hidden");
+			update_localStorage_inv_file("nfss.yml",content,true);
 			if(inventory_file_generation_completed_check()){
 				document.getElementById("ansible-config-inv-nxt").removeAttribute("disabled");
 			}else{

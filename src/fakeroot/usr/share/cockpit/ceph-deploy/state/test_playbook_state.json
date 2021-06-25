@@ -1,0 +1,50 @@
+{
+    "ping_all": {
+        "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
+        "cwd": null,
+        "result": 0,
+        "time_stamp": "2021-06-25-17-30"
+    },
+    "device_alias": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts device-alias.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-18-32"
+    },
+    "deploy_core": {
+        "command": "ansible-playbook core.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-18-36"
+    },
+    "deploy_radosgw": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-18-39"
+    },
+    "deploy_rgwlb": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw-lb.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-18-47"
+    },
+    "deploy_dashboard": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-19-02"
+    },
+    "deploy_iscsi": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-19-18"
+    },
+    "deploy_cephfs": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts cephfs.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": 0,
+        "time_stamp": "2021-06-23-19-20"
+    }
+}

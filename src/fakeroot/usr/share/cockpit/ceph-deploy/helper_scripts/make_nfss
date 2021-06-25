@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import subprocess
+import io
+from shutil import copyfile
+from contextlib import redirect_stdout
+import fileinput
+import re
+
+g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
+g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
+g_nfss_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/nfss.yml"
+g_nfss_default_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/nfss-default.yml"
+g_nfss_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
+g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/nfss.yml"
+
+def print_to_string(item):
+	with io.StringIO() as buf, redirect_stdout(buf):
+		print(item)
+		output = buf.getvalue().rstrip("\n")
+		return output
+
+def get_parameters(path):
+	if os.path.exists(path) and os.path.isfile(path):
+		#file exists on disk, load contents and return json object.
+		f = open(path,"r")
+		param_file_content = print_to_string(f.read())
+		f.close()
+		try:
+			parsed_json = json.loads(param_file_content)
+		except ValueError as err:
+			# failed to get json from command line arguments
+			error_string = print_to_string(err)
+			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
+			print(json.dumps(error_msg,indent=4))
+			sys.exit(1)
+		return parsed_json
+	else:
+		error_msg = { "error_msg":"File not found ({p}): ".format(p=path) }
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+def make_nfss_file(nfss_dict,default_path,path,dir,ansible_path):
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	if os.path.exists(path) and os.path.isfile(path):
+		os.remove(path)
+	
+	try:
+		copyfile(default_path,path)
+	except OSError as err:
+		# print json formatted error
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":error_string}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+	nfss_file = open(path,"r")
+	nfss_file_content = nfss_file.readlines()
+	nfss_file.close()
+
+	for option in nfss_dict.keys():
+		if option != "nfs_active_active" and option != "nfs_active_passive":
+			for i in range(len(nfss_file_content)):
+				regex = re.search("^.*{o}:\s+.*$".format(o=option),nfss_file_content[i])
+				if regex != None:
+					comment = ""
+					if isinstance(nfss_dict[option], str):
+						comment = "#" if (len(nfss_dict[option]) == 0) else ""
+						nfss_file_content[i] = "{c}{o}: {ov}\n".format(c=comment,o=option,ov=nfss_dict[option])
+					elif nfss_dict[option] == None:
+						nfss_dict[option] = False
+						nfss_file_content[i] = "{c}{o}: {ov}\n".format(c=comment,o=option,ov=json.dumps(nfss_dict[option]))
+
+	nfss_file = open(path,"w")
+	nfss_file.writelines(nfss_file_content)
+	nfss_file.close()
+
+	# overwrite the hosts file in the ceph-ansible directory
+	try:
+		copyfile(path,ansible_path)
+	except OSError as err:
+		# print json formatted error
+		error_string = print_to_string(err)
+		error_msg = { "error_msg":error_string}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+
+def main():
+	global g_param_file_path
+	global g_param_file_dir
+	global g_nfss_file_path
+	global g_nfss_default_file_path
+	global g_ansible_file_path
+	params = get_parameters(g_param_file_path)
+	if "groups" in params.keys() and "nfss" in params["groups"].keys():
+		make_nfss_file(params["groups"]["nfss"],g_nfss_default_file_path,g_nfss_file_path,g_nfss_file_dir,g_ansible_file_path)
+		success_msg = { "success_msg":"nfss.yml file created successfully","path":g_ansible_file_path}
+		print(json.dumps(success_msg,indent=4))
+		sys.exit(0)
+	else:
+		error_msg = { "error_msg":"unable to make nfss.yml"}
+		print(json.dumps(error_msg,indent=4))
+		sys.exit(1)
+		
+if __name__ == "__main__":
+	main()

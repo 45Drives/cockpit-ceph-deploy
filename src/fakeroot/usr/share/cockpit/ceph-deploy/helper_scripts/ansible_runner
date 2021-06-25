@@ -77,6 +77,12 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None
+    },
+    "deploy_nfs":{
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts nfs.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
     }
 }
 
