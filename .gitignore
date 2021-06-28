@@ -18,3 +18,7 @@ dist
 
 # documentation
 documentation
+
+# vscode
+.vscode/
+*.vscode
