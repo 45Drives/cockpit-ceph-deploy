@@ -1,0 +1,133 @@
+{
+    "hosts": {
+        "ubuntuosd1": {
+            "hostname": "ubuntuosd1",
+            "radosgw_address": "",
+            "monitor_interface": "ens3"
+        },
+        "ubuntuosd2": {
+            "hostname": "ubuntuosd2",
+            "radosgw_address": "",
+            "monitor_interface": "ens3"
+        },
+        "ubuntuosd3": {
+            "hostname": "ubuntuosd3",
+            "radosgw_address": "",
+            "monitor_interface": "ens3"
+        },
+        "ubuntugw1": {
+            "hostname": "ubuntugw1",
+            "radosgw_address": "192.168.13.16",
+            "monitor_interface": ""
+        },
+        "ubuntugw2": {
+            "hostname": "ubuntugw2",
+            "radosgw_address": "192.168.13.17",
+            "monitor_interface": ""
+        }
+    },
+    "roles": {
+        "mons": [
+            "ubuntuosd1",
+            "ubuntuosd3",
+            "ubuntuosd2"
+        ],
+        "mgrs": [
+            "ubuntuosd1",
+            "ubuntuosd3",
+            "ubuntuosd2"
+        ],
+        "osds": [
+            "ubuntuosd1",
+            "ubuntuosd3",
+            "ubuntuosd2"
+        ],
+        "metrics": [
+            "ubuntugw1"
+        ],
+        "mdss": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "smbs": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "nfss": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "iscsigws": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "rgws": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "rgwloadbalancers": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ],
+        "client": [
+            "ubuntugw2",
+            "ubuntugw1"
+        ]
+    },
+    "options": {
+        "monitor_interface": "ens3",
+        "public_network": "192.168.0.0/16",
+        "cluster_network": "",
+        "radosgw_interface": "",
+        "ip_version": "ipv4",
+        "radosgw_civetweb_port": "8080",
+        "radosgw_frontend_type": "beast",
+        "radosgw_civetweb_num_threads": "512",
+        "radosgw_civetweb_options": "num_threads=\\{\\{ radosgw_civetweb_num_threads \\}\\}",
+        "hybrid_cluster": false
+    },
+    "groups": {
+        "rgwloadbalancers": {
+            "haproxy_frontend_port": "80",
+            "virtual_ips": [
+                "192.168.13.55"
+            ],
+            "virtual_ip_netmask": "16",
+            "virtual_ip_interface": "ens3",
+            "haproxy_frontend_ssl_port": "",
+            "haproxy_frontend_ssl_certificate": "",
+            "haproxy_ssl_dh_param": "",
+            "haproxy_ssl_ciphers": [],
+            "haproxy_ssl_options": [],
+            "enable_ssl": false
+        },
+        "nfss": {
+            "nfs_active_active": true,
+            "nfs_active_passive": false,
+            "ceph_nfs_floating_ip_address": "",
+            "ceph_nfs_floating_ip_cidr": "",
+            "ceph_nfs_rados_backend_driver": "rados_cluster"
+        },
+        "smbs": {
+            "smb_active_directory": false,
+            "smb_local_users": true,
+            "samba_server": true,
+            "samba_cluster": true,
+            "domain_member": false,
+            "configure_shares": false,
+            "ctdb_public_addresses": [
+                {
+                    "vip_address": "192.168.13.60",
+                    "vip_interface": "ens3",
+                    "subnet_mask": "16"
+                },
+                {
+                    "vip_address": "192.168.13.61",
+                    "vip_interface": "ens3",
+                    "subnet_mask": "16"
+                }
+            ],
+            "active_directory_info": {}
+        }
+    }
+}

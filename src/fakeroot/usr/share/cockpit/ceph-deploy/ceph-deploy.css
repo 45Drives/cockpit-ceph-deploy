@@ -378,6 +378,7 @@ input:checked + .cd-slider:before {
     background-color: var(--container);
     color: var(--font);
     border-radius: 4px;
+    width: 90%;
 }
 
 .cd-radio-row > label{
@@ -392,6 +393,7 @@ input:checked + .cd-slider:before {
     background-color: var(--container-header);
     color: var(--font);
     border-radius: 4px;
+    width: 90%;
 }
 
 .cd-form-row {
@@ -1170,4 +1172,15 @@ th,td {
 
 .cd-div-button-positive:hover {
 	color: var(--status-font-complete);
+}
+
+.cd-sub-option{
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 10px 5px 5px;
+}
+
+.cd-icon-right{
+    margin-left: auto;
+    padding-right: 10px;
 }
