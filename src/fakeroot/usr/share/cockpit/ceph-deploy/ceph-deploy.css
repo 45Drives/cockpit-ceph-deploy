@@ -47,6 +47,7 @@
 
 body {
     background-color: var(--container);
+    overflow-y:auto !important;
 }
 
 #main-menu-link{
