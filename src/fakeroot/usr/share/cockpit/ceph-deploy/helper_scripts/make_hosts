@@ -7,6 +7,8 @@ import subprocess
 import io
 from shutil import copyfile
 from contextlib import redirect_stdout
+from datetime import datetime
+import copy
 import re
 
 g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
@@ -15,162 +17,203 @@ g_host_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/hosts"
 g_host_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
 g_ansible_file_path = "/usr/share/ceph-ansible/hosts"
 g_ansible_host_inv_file_dir = "/usr/share/ceph-ansible/host_vars"
+g_inventory_file_key = "hosts"
+
 
 def print_to_string(item):
-	with io.StringIO() as buf, redirect_stdout(buf):
-		print(item)
-		output = buf.getvalue().rstrip("\n")
-		return output
+    with io.StringIO() as buf, redirect_stdout(buf):
+        print(item)
+        output = buf.getvalue().rstrip("\n")
+        return output
 
 def get_parameters(path):
-	if os.path.exists(path) and os.path.isfile(path):
-		#file exists on disk, load contents and return json object.
-		f = open(path,"r")
-		param_file_content = print_to_string(f.read())
-		f.close()
-		try:
-			parsed_json = json.loads(param_file_content)
-		except ValueError as err:
-			# failed to get json from command line arguments
-			error_string = print_to_string(err)
-			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
-			print(json.dumps(error_msg,indent=4))
-			sys.exit(1)
-		return parsed_json
-	else:
-		error_msg = { "error_msg":"File not found ({p}): ".format(p=path) }
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
+    if os.path.exists(path) and os.path.isfile(path):
+        #file exists on disk, load contents and return json object.
+        f = open(path,"r")
+        param_file_content = print_to_string(f.read())
+        f.close()
+        try:
+            parsed_json = json.loads(param_file_content)
+        except ValueError as err:
+            # failed to get json from command line arguments
+            error_string = print_to_string(err)
+            error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
+            print(json.dumps(error_msg,indent=4))
+            update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
+            sys.exit(1)
+        return parsed_json
+    else:
+        error_msg = { "error_msg":"File not found ({p}): ".format(p=path) }
+        print(json.dumps(error_msg,indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
+        sys.exit(1)
 
 def make_host_file(roles_dict,path,dir,ansible_path):
-	if not os.path.exists(dir):
-		os.makedirs(dir)
-	if os.path.exists(path) and os.path.isfile(path):
-		os.remove(path)
-	
-	host_file = open(path,"w")
-	for role in roles_dict.keys():
-		comment = "#" if (len(roles_dict[role]) == 0) else "" 
-		host_file.write("{c}[{r}]\n".format(c=comment,r=role))
-		for host in roles_dict[role]:
-			host_file.write(host + "\n")
-		host_file.write("\n")
-	host_file.write("\n")
-	host_file.close()
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    if os.path.exists(path) and os.path.isfile(path):
+        os.remove(path)
+    
+    host_file = open(path,"w")
+    for role in roles_dict.keys():
+        comment = "#" if (len(roles_dict[role]) == 0) else "" 
+        host_file.write("{c}[{r}]\n".format(c=comment,r=role))
+        for host in roles_dict[role]:
+            host_file.write(host + "\n")
+        host_file.write("\n")
+    host_file.write("\n")
+    host_file.close()
 
-	# overwrite the hosts file in the ceph-ansible directory
-	try:
-		copyfile(path,ansible_path)
-	except OSError as err:
-		# print json formatted error
-		error_string = print_to_string(err)
-		error_msg = { "error_msg":error_string}
-		print(json.dumps(error_msg,indent=4))
-		sys.exit(1)
+    # overwrite the hosts file in the ceph-ansible directory
+    try:
+        copyfile(path,ansible_path)
+    except OSError as err:
+        # print json formatted error
+        error_string = print_to_string(err)
+        error_msg = { "error_msg":error_string}
+        print(json.dumps(error_msg,indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
+        sys.exit(1)
 
 
 def make_ansible_host_inventory_files(host_dict,dir,start_tag,end_tag):
-	if not os.path.exists(dir):
-		os.makedirs(dir)
-	
-	for host in host_dict.keys():
-		path = (dir+"/"+host+".yml")
-		if not os.path.exists(path):
-			host_inventory_file = open(path,"w")
-			host_inventory_file.write(start_tag + "\n")
-			host_inventory_file.write(end_tag)
-			host_inventory_file.close()
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    
+    for host in host_dict.keys():
+        path = (dir+"/"+host+".yml")
+        if not os.path.exists(path):
+            host_inventory_file = open(path,"w")
+            host_inventory_file.write(start_tag + "\n")
+            host_inventory_file.write(end_tag)
+            host_inventory_file.close()
 
-	for host in host_dict.keys():
-		path = (dir+"/"+host+".yml")
-		
-		host_inventory_file = open(path,"r")
-		content = host_inventory_file.read()
-		host_inventory_file.close()
+    for host in host_dict.keys():
+        path = (dir+"/"+host+".yml")
+        
+        host_inventory_file = open(path,"r")
+        content = host_inventory_file.read()
+        host_inventory_file.close()
 
-		section_to_replace = content[content.find(start_tag + "\n")+len(start_tag):content.rfind(end_tag)]
-		new_content = "\n"
-		ignore = ["hostname"]
-		for field in host_dict[host].keys():
-			if(host_dict[host][field] and field not in ignore):
-				new_content += field + ": " + host_dict[host][field] + "\n"
-		
-		updated_host_inventory_file = open(path,"w")
-		content = content.replace(section_to_replace,new_content)
-		updated_host_inventory_file.write(content)
-		updated_host_inventory_file.close()
+        section_to_replace = content[content.find(start_tag + "\n")+len(start_tag):content.rfind(end_tag)]
+        new_content = "\n"
+        ignore = ["hostname"]
+        for field in host_dict[host].keys():
+            if(host_dict[host][field] and field not in ignore):
+                new_content += field + ": " + host_dict[host][field] + "\n"
+        
+        updated_host_inventory_file = open(path,"w")
+        content = content.replace(section_to_replace,new_content)
+        updated_host_inventory_file.write(content)
+        updated_host_inventory_file.close()
 
 
 def make_host_inventory_files(host_dict,dir):
-	if not os.path.exists(dir):
-		os.makedirs(dir)
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
-	# remove old host inventory files
-	for host in host_dict.keys():
-		path = (dir+"/"+host+".yml")
-		if os.path.exists(path) and os.path.isfile(path):
-			os.remove(path)
-	
-	for host in host_dict.keys():
-		path = (dir+"/"+host+".yml")
-		host_inventory_file = open(path,"w")
-		ignore = ["hostname"]
-		for field in host_dict[host].keys():
-			if(host_dict[host][field] and field not in ignore):
-				host_inventory_file.write(field + ": " + host_dict[host][field] + "\n")
-		host_inventory_file.close()
+    # remove old host inventory files
+    for host in host_dict.keys():
+        path = (dir+"/"+host+".yml")
+        if os.path.exists(path) and os.path.isfile(path):
+            os.remove(path)
+    
+    for host in host_dict.keys():
+        path = (dir+"/"+host+".yml")
+        host_inventory_file = open(path,"w")
+        ignore = ["hostname"]
+        for field in host_dict[host].keys():
+            if(host_dict[host][field] and field not in ignore):
+                host_inventory_file.write(field + ": " + host_dict[host][field] + "\n")
+        host_inventory_file.close()
 
 
 def check_etc_hosts(host_dict):
-	ip_test = []
-	found = []
-	for host in host_dict.keys():
-		if "ip" in host_dict[host].keys() and host_dict[host]["ip"] != "":
-			ip_test.append((host_dict[host]["ip"],host))
+    ip_test = []
+    found = []
+    for host in host_dict.keys():
+        if "ip" in host_dict[host].keys() and host_dict[host]["ip"] != "":
+            ip_test.append((host_dict[host]["ip"],host))
 
-	if len(ip_test) > 0:
-		if os.path.exists("/etc/hosts") and os.path.isfile("/etc/hosts"):
-			etc_hosts = open("/etc/hosts","r")
-			etc_hosts_content = etc_hosts.readlines()
-			etc_hosts.close()
-			for line in etc_hosts_content:
-				for pair in ip_test:
-					regex = re.search("^\s*({ip})\s+({hn})".format(ip=pair[0],hn=pair[1]),line)
-					if regex != None:
-						found.append((regex.group(1),regex.group(2)))
-			for match in found:
-				if match in ip_test:
-					ip_test.remove(match)
-			if len(ip_test) > 0:
-				etc_hosts = open("/etc/hosts","a+")
-				etc_hosts.write("# added by cockpit ceph-deploy\n")
-				for pair in ip_test:
-					etc_hosts.write("{ip} {hn}\n".format(ip=pair[0],hn=pair[1]))
-				etc_hosts.close()
+    if len(ip_test) > 0:
+        if os.path.exists("/etc/hosts") and os.path.isfile("/etc/hosts"):
+            etc_hosts = open("/etc/hosts","r")
+            etc_hosts_content = etc_hosts.readlines()
+            etc_hosts.close()
+            for line in etc_hosts_content:
+                for pair in ip_test:
+                    regex = re.search("^\s*({ip})\s+({hn})".format(ip=pair[0],hn=pair[1]),line)
+                    if regex != None:
+                        found.append((regex.group(1),regex.group(2)))
+            for match in found:
+                if match in ip_test:
+                    ip_test.remove(match)
+            if len(ip_test) > 0:
+                etc_hosts = open("/etc/hosts","a+")
+                etc_hosts.write("# added by cockpit ceph-deploy\n")
+                for pair in ip_test:
+                    etc_hosts.write("{ip} {hn}\n".format(ip=pair[0],hn=pair[1]))
+                etc_hosts.close()
 
-				
-		
+def update_inventory_state(key,path,failed):
+    inv_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+    inv_state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
 
+    date = datetime.today()
+    time = datetime.now()
+    timestamp =  date.strftime("%Y-%m-%d") + time.strftime("-%H-%M")
 
+    state_dict = {}
+
+    new_state = {
+        "path":path,
+        "failed": failed,
+        "timestamp": timestamp
+    }
+
+    # check to see if file needs to be created.
+    if not os.path.exists(inv_state_file_path):
+        # file doesn't exist
+        if not os.path.exists(inv_state_file_dir):
+            # file directory doesn't exist, make required directories
+            os.makedirs(inv_state_file_dir)
+        #create new inv state file with default parameters
+        state_file = open(inv_state_file_path,"w")
+        state_file.write(json.dumps(state_dict,indent=4))
+        state_file.close()
+
+    else:
+        #file exists on disk, load contents and return json object.
+        state_file = open(inv_state_file_path,"r")
+        state_file_content = print_to_string(state_file.read())
+        state_file.close()
+        state_dict = json.loads(state_file_content)
+    
+    state_dict[key] = copy.deepcopy(new_state)
+    state_file = open(inv_state_file_path,"w")
+    state_file.write(json.dumps(state_dict,indent=4))
+    state_file.close()
 
 def main():
-	global g_param_file_path
-	global g_param_file_dir
-	global g_host_file_path
-	global g_ansible_file_path
-	params = get_parameters(g_param_file_path)
-	make_host_file(params["roles"],g_host_file_path,g_host_file_dir,g_ansible_file_path)
-	make_host_inventory_files(params["hosts"],g_host_file_dir)
-	make_ansible_host_inventory_files(
-		params["hosts"],
-		g_ansible_host_inv_file_dir,
-		"# BEGIN **********  cockpit-ceph-deploy make_hosts output **********",
-		"# END **********  cockpit-ceph-deploy make_hosts output **********"
-		)
-	#check_etc_hosts(params["hosts"])
-	success_msg = { "success_msg":"hosts file created successfully","path":g_ansible_file_path}
-	print(json.dumps(success_msg,indent=4))
-	sys.exit(0)
+    global g_param_file_path
+    global g_param_file_dir
+    global g_host_file_path
+    global g_ansible_file_path
+    global g_inventory_file_key
+    params = get_parameters(g_param_file_path)
+    make_host_file(params["roles"],g_host_file_path,g_host_file_dir,g_ansible_file_path)
+    make_host_inventory_files(params["hosts"],g_host_file_dir)
+    make_ansible_host_inventory_files(
+        params["hosts"],
+        g_ansible_host_inv_file_dir,
+        "# BEGIN **********  cockpit-ceph-deploy make_hosts output **********",
+        "# END **********  cockpit-ceph-deploy make_hosts output **********"
+        )
+    #check_etc_hosts(params["hosts"])
+    success_msg = { "success_msg":"hosts file created successfully","path":g_ansible_file_path}
+    print(json.dumps(success_msg,indent=4))
+    update_inventory_state(g_inventory_file_key,g_ansible_file_path,False)
+    sys.exit(0)
 
 if __name__ == "__main__":
-	main()
+    main()

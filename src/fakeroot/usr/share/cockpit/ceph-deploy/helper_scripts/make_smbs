@@ -7,6 +7,8 @@ import subprocess
 import io
 from shutil import copyfile
 from contextlib import redirect_stdout
+from datetime import datetime
+import copy
 import fileinput
 import re
 
@@ -16,6 +18,8 @@ g_smbs_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs.yml"
 g_smbs_default_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs-default.yml"
 g_smbs_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
 g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/smbs.yml"
+
+g_inventory_file_key = "smbs.yml"
 
 
 def print_to_string(item):
@@ -39,11 +43,13 @@ def get_parameters(path):
             error_msg = {"error_msg": "JSON Parse Error ({p}): ".format(
                 p=g_param_file_path) + error_string}
             print(json.dumps(error_msg, indent=4))
+            update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
             sys.exit(1)
         return parsed_json
     else:
         error_msg = {"error_msg": "File not found ({p}): ".format(p=path)}
         print(json.dumps(error_msg, indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
         sys.exit(1)
 
 
@@ -60,6 +66,7 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
         error_string = print_to_string(err)
         error_msg = {"error_msg": error_string}
         print(json.dumps(error_msg, indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
         sys.exit(1)
 
     smbs_file = open(path, "r")
@@ -106,9 +113,10 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
             section_to_replace, new_content)
 
     start_tag = "##### ceph-deploy:ctdb_public_addresses:START #####"
-    end_tag = "##### ceph-deploy:ctdb_public_addresses:end #####"
+    end_tag = "##### ceph-deploy:ctdb_public_addresses:END #####"
     section_to_replace = smbs_file_content[smbs_file_content.find(
         start_tag + "\n")+len(start_tag):smbs_file_content.rfind(end_tag)]
+
     new_content = "\nctdb_public_addresses:\n"
     for addr_obj in smbs_dict["ctdb_public_addresses"]:
         new_content += "  - "
@@ -132,8 +140,47 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
         error_string = print_to_string(err)
         error_msg = {"error_msg": error_string}
         print(json.dumps(error_msg, indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
         sys.exit(1)
 
+def update_inventory_state(key,path,failed):
+    inv_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+    inv_state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
+
+    date = datetime.today()
+    time = datetime.now()
+    timestamp =  date.strftime("%Y-%m-%d") + time.strftime("-%H-%M")
+
+    state_dict = {}
+
+    new_state = {
+        "path":path,
+        "failed": failed,
+        "timestamp": timestamp
+    }
+
+    # check to see if file needs to be created.
+    if not os.path.exists(inv_state_file_path):
+        # file doesn't exist
+        if not os.path.exists(inv_state_file_dir):
+            # file directory doesn't exist, make required directories
+            os.makedirs(inv_state_file_dir)
+        #create new inv state file with default parameters
+        state_file = open(inv_state_file_path,"w")
+        state_file.write(json.dumps(state_dict,indent=4))
+        state_file.close()
+
+    else:
+        #file exists on disk, load contents and return json object.
+        state_file = open(inv_state_file_path,"r")
+        state_file_content = print_to_string(state_file.read())
+        state_file.close()
+        state_dict = json.loads(state_file_content)
+    
+    state_dict[key] = copy.deepcopy(new_state)
+    state_file = open(inv_state_file_path,"w")
+    state_file.write(json.dumps(state_dict,indent=4))
+    state_file.close()
 
 def main():
     global g_param_file_path
@@ -141,6 +188,7 @@ def main():
     global g_smbs_file_path
     global g_smbs_default_file_path
     global g_ansible_file_path
+    global g_inventory_file_key
     params = get_parameters(g_param_file_path)
     if "groups" in params.keys() and "smbs" in params["groups"].keys():
         make_smbs_file(params["groups"]["smbs"], g_smbs_default_file_path,
@@ -148,10 +196,12 @@ def main():
         success_msg = {
             "success_msg": "smbs.yml file created successfully", "path": g_ansible_file_path}
         print(json.dumps(success_msg, indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,False)
         sys.exit(0)
     else:
         error_msg = {"error_msg": "unable to make smbs.yml"}
         print(json.dumps(error_msg, indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
         sys.exit(1)
 
 

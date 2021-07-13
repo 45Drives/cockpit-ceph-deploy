@@ -1250,7 +1250,7 @@
             <div class="panel panel-default cd-panel">
               <div class="cd-row cd-panel-heading">
                 <h3 class="panel-title cd-row-child">
-                  Radosgw-lb: Ansible Playbook - /usr/share/ceph-ansible/nfs.yml
+                  NFS: Ansible Playbook - /usr/share/ceph-ansible/nfs.yml
                 </h3>
                 <div class="cd-row-right cd-row-child cd-panel-nav">
                   <i
@@ -1292,6 +1292,75 @@
             </div>
           </div>
         </div>
+
+                <!-- SMB -->
+                <div id="step-smb" class="hidden" for="deploy-step-smb">
+                  <div class="cd-top-nav-button-group">
+                    <div class="cd-progress-bar" id="progress-bar-step-smb">
+                      <div class="progress-bar-main-back" title="main menu">
+                        Ceph Deploy
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                      <div class="progress-bar-title">SMB</div>
+                      <div
+                        class="progress-step progress-current-step"
+                        data-progress-bar-idx="0"
+                      >
+                        Playbook (smbs.yml)
+                      </div>
+                      <div class="progress-step-divider">
+                        <i class="fas fa-chevron-right"></i>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cd-block step-smb hidden" data-step-content-idx="0">
+                    <div class="panel panel-default cd-panel">
+                      <div class="cd-row cd-panel-heading">
+                        <h3 class="panel-title cd-row-child">
+                          Samba: Ansible Playbook - /usr/share/ceph-ansible/smbs.yml
+                        </h3>
+                        <div class="cd-row-right cd-row-child cd-panel-nav">
+                          <i
+                            id="step-3-0-panel-show"
+                            class="fas fa-angle-up cd-panel-vis-toggle"
+                            for="smb-step-1-body"
+                          ></i>
+                        </div>
+                      </div>
+                      <div id="smb-step-1-body" class="cd-panel-body">
+                        <p class="cd-para">
+                          click "run" to perform the smbs.yml playbook
+                        </p>
+                        <div id="terminal-smb-iframe"></div>
+                        <div class="cd-row-right cd-row-child">
+                          <button class="btn active btn-primary" id="ansible-smb-btn">
+                            Run
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+                      <button
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-prev-btn"
+                        for="step-smb"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        id="deploy_smb"
+                        type="button"
+                        class="btn btn-primary cd-deploy-step-done-btn"
+                        for="step-smb"
+                        disabled
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
         <!-- CEPH-DASHBOARD -->
         <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">

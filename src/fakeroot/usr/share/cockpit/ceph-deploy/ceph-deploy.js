@@ -22,10 +22,10 @@ let g_inv_default_requirements = {
     content: null,
     completed: false,
   },
-  hosts: {
+  "hosts": {
     content: null,
     completed: false,
-  },
+  }
 };
 let g_option_scheme = {
   mons: {
@@ -3350,7 +3350,6 @@ function generate_host_file() {
       host_file_content_proc.done(function (data) {
         document.getElementById("host-file-content").innerText = data;
         document.getElementById("host-file-content").classList.remove("hidden");
-        localStorage.setItem("hosts", data);
         let show_button = document.getElementById("show-host-file-btn");
         show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
         show_button.classList.remove("hidden");
@@ -3411,7 +3410,6 @@ function generate_all_file() {
       all_file_content_proc.done(function (data) {
         document.getElementById("all-file-content").innerText = data;
         document.getElementById("all-file-content").classList.remove("hidden");
-        localStorage.setItem("all.yml", data);
         let show_button = document.getElementById("show-all-file-btn");
         show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
         show_button.classList.remove("hidden");
@@ -3465,7 +3463,6 @@ function generate_nfss_file() {
       nfss_file_content_proc.done(function (data) {
         document.getElementById("nfss-file-content").innerText = data;
         document.getElementById("nfss-file-content").classList.remove("hidden");
-        localStorage.setItem("nfss.yml", data);
         let show_button = document.getElementById("show-nfss-file-btn");
         show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
         show_button.classList.remove("hidden");
@@ -3521,7 +3518,6 @@ function generate_smbs_file() {
 		smbs_file_content_proc.done(function (data) {
 		  document.getElementById("smbs-file-content").innerText = data;
 		  document.getElementById("smbs-file-content").classList.remove("hidden");
-		  localStorage.setItem("smbs.yml", data);
 		  let show_button = document.getElementById("show-smbs-file-btn");
 		  show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
 		  show_button.classList.remove("hidden");
@@ -3581,7 +3577,6 @@ function generate_rgwloadbalancers_file() {
         document
           .getElementById("rgwlb-file-content")
           .classList.remove("hidden");
-        localStorage.setItem("rgwloadbalancers.yml", data);
         let show_button = document.getElementById("show-rgwlb-file-btn");
         show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
         show_button.classList.remove("hidden");
@@ -3788,6 +3783,15 @@ function ansible_nfs() {
     nfs_term = makeTerminal("terminal-nfs");
   }
   document.getElementById("terminal-nfs-iframe").appendChild(nfs_term);
+}
+
+function ansible_smb() {
+  localStorage.setItem("terminal-command", "ansible_runner -c deploy_smb\n");
+  let smb_term = document.getElementById("terminal-smb");
+  if (!smb_term) {
+    smb_term = makeTerminal("terminal-smb");
+  }
+  document.getElementById("terminal-smb-iframe").appendChild(smb_term);
 }
 
 /**
@@ -4097,6 +4101,7 @@ function setup_buttons() {
   setup_progress_bar("deploy-step-iscsi");
   setup_progress_bar("deploy-step-rgwlb");
   setup_progress_bar("deploy-step-nfs");
+  setup_progress_bar("deploy-step-smb");
   setup_progress_bar("deploy-step-dashboard");
 
   document.getElementById("new-host-btn").addEventListener("click", add_host);
@@ -4145,6 +4150,9 @@ document
   document
     .getElementById("ansible-nfs-btn")
     .addEventListener("click", ansible_nfs);
+  document
+    .getElementById("ansible-smb-btn")
+    .addEventListener("click", ansible_smb);
   document
     .getElementById("ansible-dashboard-btn")
     .addEventListener("click", ansible_dashboard);
@@ -4308,140 +4316,106 @@ function sync_ceph_deploy_state() {
     }
   });
 
-  let hosts_content = cockpit.file("/usr/share/ceph-ansible/hosts").read();
-  hosts_content.then((content, tag) => {
-    if (content) {
-      localStorage.setItem("hosts", content);
-      let host_file_file_div_content =
-        document.getElementById("host-file-content");
-      host_file_file_div_content.classList.remove("hidden");
-      document.getElementById("host-file-content").innerHTML = content;
-      let show_button = document.getElementById("show-host-file-btn");
-      show_button.addEventListener("click", show_host_file);
-      show_button.classList.remove("hidden");
-      show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      document.getElementById("generate-host-file-btn").innerHTML =
-        "Generate Again";
-      document.getElementById("inv-file-hosts-default").classList.add("hidden");
-      update_localStorage_inv_file("hosts", content, true);
-      if (inventory_file_generation_completed_check()) {
-        document
-          .getElementById("ansible-config-inv-nxt")
-          .removeAttribute("disabled");
+  get_inventory_file_state();
+
+}
+
+function get_inventory_file_state(){
+  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+  let inventory_file_vars = {
+    "hosts": {
+      file_content_div_id: "host-file-content",
+      show_button_id: "show-host-file-btn",
+      generate_button_id: "generate-host-file-btn",
+      default_content_div: "inv-file-hosts-default",
+      next_button_id: "ansible-config-inv-nxt",
+      show_listener: show_host_file
+    },
+    "all.yml": {
+      file_content_div_id: "all-file-content",
+      show_button_id: "show-all-file-btn",
+      generate_button_id: "generate-all-file-btn",
+      default_content_div: "inv-file-all-default",
+      next_button_id: "ansible-config-inv-nxt",
+      show_listener: show_all_file
+    },
+    "rgwloadbalancers.yml": {
+      file_content_div_id: "rgwlb-file-content",
+      show_button_id: "show-rgwlb-file-btn",
+      generate_button_id: "generate-rgwlb-file-btn",
+      default_content_div: "inv-file-rgwlb-default",
+      next_button_id: "ansible-config-inv-nxt",
+      show_listener: show_rgwlb_file
+    },
+    "nfss.yml": {
+      file_content_div_id: "nfss-file-content",
+      show_button_id: "show-nfss-file-btn",
+      generate_button_id: "generate-nfss-file-btn",
+      default_content_div: "inv-file-nfss-default",
+      next_button_id: "ansible-config-inv-nxt",
+      show_listener: show_nfss_file
+    },
+    "smbs.yml": {
+      file_content_div_id: "smbs-file-content",
+      show_button_id: "show-smbs-file-btn",
+      generate_button_id: "generate-smbs-file-btn",
+      default_content_div: "inv-file-smbs-default",
+      next_button_id: "ansible-config-inv-nxt",
+      show_listener: show_smbs_file
+    }
+  }
+
+  let inv_state_json = null;
+
+  let inv_state_file_content =  cockpit
+    .file(inventory_state_file_path)
+    .read();
+  inv_state_file_content.then((content,tag) => {
+    if(content){
+      try {
+        inv_state_json = JSON.parse(content);
+      } catch (error) {
+        console.log("get_inventory_state_file(): unable to parse inventory state file");
+        document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-    } else {
+      Object.entries(inventory_file_vars).forEach(([key, obj]) => {
+        if(
+          inv_state_json.hasOwnProperty(key) && 
+          inv_state_json[key].hasOwnProperty("failed") && 
+          !inv_state_json[key]["failed"])
+        {
+          let ansible_inv_file = cockpit
+          .file(inv_state_json[key]["path"])
+          .read()
+          ansible_inv_file.then((ainv_content,tag) =>{
+            if (ainv_content) {
+              localStorage.setItem(key, ainv_content);
+              let file_content_div = document.getElementById(obj["file_content_div_id"]);
+              file_content_div.innerHTML = ainv_content;
+              file_content_div.classList.remove("hidden");
+              let show_button = document.getElementById(obj["show_button_id"]);
+              show_button.addEventListener("click", obj["show_listener"]);
+              show_button.classList.remove("hidden");
+              show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+              document.getElementById(obj["generate_button_id"]).innerHTML =
+                "Generate Again";
+              document.getElementById(obj["default_content_div"]).classList.add("hidden");
+              update_localStorage_inv_file(key, ainv_content, true);
+              if (inventory_file_generation_completed_check()) {
+                document
+                  .getElementById("ansible-config-inv-nxt")
+                  .removeAttribute("disabled");
+              } else {
+                document.getElementById("ansible-config-inv-nxt").disabled = true;
+              }
+            } else {
+              document.getElementById("ansible-config-inv-nxt").disabled = true;
+            }
+          });
+        }
+      });
+    }else{
       document.getElementById("ansible-config-inv-nxt").disabled = true;
-    }
-  });
-
-  let all_content = cockpit
-    .file("/usr/share/ceph-ansible/group_vars/all.yml")
-    .read();
-  all_content.then((content, tag) => {
-    if (content) {
-      localStorage.setItem("all.yml", content);
-      let all_file_div_content = document.getElementById("all-file-content");
-      all_file_div_content.innerHTML = content;
-      all_file_div_content.classList.remove("hidden");
-      let show_button = document.getElementById("show-all-file-btn");
-      show_button.addEventListener("click", show_all_file);
-      show_button.classList.remove("hidden");
-      show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      document.getElementById("generate-all-file-btn").innerHTML =
-        "Generate Again";
-      document.getElementById("inv-file-all-default").classList.add("hidden");
-      update_localStorage_inv_file("all.yml", content, true);
-      if (inventory_file_generation_completed_check()) {
-        document
-          .getElementById("ansible-config-inv-nxt")
-          .removeAttribute("disabled");
-      } else {
-        document.getElementById("ansible-config-inv-nxt").disabled = true;
-      }
-    } else {
-      document.getElementById("ansible-config-inv-nxt").disabled = true;
-    }
-  });
-
-  let rgwlb_content = cockpit
-    .file("/usr/share/ceph-ansible/group_vars/rgwloadbalancers.yml")
-    .read();
-  rgwlb_content.then((content, tag) => {
-    if (content) {
-      localStorage.setItem("rgwloadbalancers.yml", content);
-      let rgwlb_file_div_content =
-        document.getElementById("rgwlb-file-content");
-      rgwlb_file_div_content.innerHTML = content;
-      rgwlb_file_div_content.classList.remove("hidden");
-      let show_button = document.getElementById("show-rgwlb-file-btn");
-      show_button.addEventListener("click", show_rgwlb_file);
-      show_button.classList.remove("hidden");
-      show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      document.getElementById("generate-rgwlb-file-btn").innerHTML =
-        "Generate Again";
-      document.getElementById("inv-file-rgwlb-default").classList.add("hidden");
-      update_localStorage_inv_file("rgwloadbalancers.yml", content, true);
-      if (inventory_file_generation_completed_check()) {
-        document
-          .getElementById("ansible-config-inv-nxt")
-          .removeAttribute("disabled");
-      } else {
-        document.getElementById("ansible-config-inv-nxt").disabled = true;
-      }
-    }
-  });
-
-  let nfss_content = cockpit
-    .file("/usr/share/ceph-ansible/group_vars/nfss.yml")
-    .read();
-  nfss_content.then((content, tag) => {
-    if (content) {
-      localStorage.setItem("nfss.yml", content);
-      let nfss_file_div_content = document.getElementById("nfss-file-content");
-      nfss_file_div_content.innerHTML = content;
-      nfss_file_div_content.classList.remove("hidden");
-      let show_button = document.getElementById("show-nfss-file-btn");
-      show_button.addEventListener("click", show_nfss_file);
-      show_button.classList.remove("hidden");
-      show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      document.getElementById("generate-nfss-file-btn").innerHTML =
-        "Generate Again";
-      document.getElementById("inv-file-nfss-default").classList.add("hidden");
-      update_localStorage_inv_file("nfss.yml", content, true);
-      if (inventory_file_generation_completed_check()) {
-        document
-          .getElementById("ansible-config-inv-nxt")
-          .removeAttribute("disabled");
-      } else {
-        document.getElementById("ansible-config-inv-nxt").disabled = true;
-      }
-    }
-  });
-
-  let smbs_content = cockpit
-    .file("/usr/share/ceph-ansible/group_vars/smbs.yml")
-    .read();
-  smbs_content.then((content, tag) => {
-    if (content) {
-      localStorage.setItem("smbs.yml", content);
-      let smbs_file_div_content = document.getElementById("smbs-file-content");
-      smbs_file_div_content.innerHTML = content;
-      smbs_file_div_content.classList.remove("hidden");
-      let show_button = document.getElementById("show-smbs-file-btn");
-      show_button.addEventListener("click", show_smbs_file);
-      show_button.classList.remove("hidden");
-      show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      document.getElementById("generate-smbs-file-btn").innerHTML =
-        "Generate Again";
-      document.getElementById("inv-file-smbs-default").classList.add("hidden");
-      update_localStorage_inv_file("smbs.yml", content, true);
-      if (inventory_file_generation_completed_check()) {
-        document
-          .getElementById("ansible-config-inv-nxt")
-          .removeAttribute("disabled");
-      } else {
-        document.getElementById("ansible-config-inv-nxt").disabled = true;
-      }
     }
   });
 }

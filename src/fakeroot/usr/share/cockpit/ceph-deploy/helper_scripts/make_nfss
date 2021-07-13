@@ -8,6 +8,8 @@ import io
 from shutil import copyfile
 from contextlib import redirect_stdout
 import fileinput
+from datetime import datetime
+import copy
 import re
 
 g_param_file_path = "/usr/share/cockpit/ceph-deploy/params/core_params.json"
@@ -15,7 +17,8 @@ g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 g_nfss_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/nfss.yml"
 g_nfss_default_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/nfss-default.yml"
 g_nfss_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
-g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/nfss.yml"
+g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/nfss.yml" 
+g_inventory_file_key = "nfss.yml"
 
 def print_to_string(item):
 	with io.StringIO() as buf, redirect_stdout(buf):
@@ -36,11 +39,13 @@ def get_parameters(path):
 			error_string = print_to_string(err)
 			error_msg = { "error_msg":"JSON Parse Error ({p}): ".format(p=g_param_file_path) + error_string }
 			print(json.dumps(error_msg,indent=4))
+			update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
 			sys.exit(1)
 		return parsed_json
 	else:
 		error_msg = { "error_msg":"File not found ({p}): ".format(p=path) }
 		print(json.dumps(error_msg,indent=4))
+		update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
 		sys.exit(1)
 
 def make_nfss_file(nfss_dict,default_path,path,dir,ansible_path):
@@ -56,6 +61,7 @@ def make_nfss_file(nfss_dict,default_path,path,dir,ansible_path):
 		error_string = print_to_string(err)
 		error_msg = { "error_msg":error_string}
 		print(json.dumps(error_msg,indent=4))
+		update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
 		sys.exit(1)
 
 	nfss_file = open(path,"r")
@@ -87,7 +93,47 @@ def make_nfss_file(nfss_dict,default_path,path,dir,ansible_path):
 		error_string = print_to_string(err)
 		error_msg = { "error_msg":error_string}
 		print(json.dumps(error_msg,indent=4))
+		update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
 		sys.exit(1)
+
+def update_inventory_state(key,path,failed):
+    inv_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+    inv_state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
+
+    date = datetime.today()
+    time = datetime.now()
+    timestamp =  date.strftime("%Y-%m-%d") + time.strftime("-%H-%M")
+
+    state_dict = {}
+
+    new_state = {
+        "path":path,
+        "failed": failed,
+        "timestamp": timestamp
+    }
+
+    # check to see if file needs to be created.
+    if not os.path.exists(inv_state_file_path):
+        # file doesn't exist
+        if not os.path.exists(inv_state_file_dir):
+            # file directory doesn't exist, make required directories
+            os.makedirs(inv_state_file_dir)
+        #create new inv state file with default parameters
+        state_file = open(inv_state_file_path,"w")
+        state_file.write(json.dumps(state_dict,indent=4))
+        state_file.close()
+
+    else:
+        #file exists on disk, load contents and return json object.
+        state_file = open(inv_state_file_path,"r")
+        state_file_content = print_to_string(state_file.read())
+        state_file.close()
+        state_dict = json.loads(state_file_content)
+    
+    state_dict[key] = copy.deepcopy(new_state)
+    state_file = open(inv_state_file_path,"w")
+    state_file.write(json.dumps(state_dict,indent=4))
+    state_file.close()
 
 def main():
 	global g_param_file_path
@@ -95,15 +141,18 @@ def main():
 	global g_nfss_file_path
 	global g_nfss_default_file_path
 	global g_ansible_file_path
+	global g_inventory_file_key
 	params = get_parameters(g_param_file_path)
 	if "groups" in params.keys() and "nfss" in params["groups"].keys():
 		make_nfss_file(params["groups"]["nfss"],g_nfss_default_file_path,g_nfss_file_path,g_nfss_file_dir,g_ansible_file_path)
 		success_msg = { "success_msg":"nfss.yml file created successfully","path":g_ansible_file_path}
 		print(json.dumps(success_msg,indent=4))
+		update_inventory_state(g_inventory_file_key,g_ansible_file_path,False)
 		sys.exit(0)
 	else:
 		error_msg = { "error_msg":"unable to make nfss.yml"}
 		print(json.dumps(error_msg,indent=4))
+		update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
 		sys.exit(1)
 		
 if __name__ == "__main__":

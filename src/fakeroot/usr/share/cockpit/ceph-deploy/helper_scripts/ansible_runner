@@ -25,7 +25,7 @@ ansible_commands = {
         "time_stamp": None
     },
     "deploy_core": {
-        "command": "ansible-playbook core.yml",
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts core.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None
@@ -80,6 +80,12 @@ ansible_commands = {
     },
     "deploy_nfs":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts nfs.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None
+    },
+    "deploy_smb":{
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts samba.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None
