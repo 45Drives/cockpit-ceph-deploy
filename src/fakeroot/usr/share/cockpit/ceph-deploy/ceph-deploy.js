@@ -104,7 +104,7 @@ let g_option_scheme = {
       {
         option_name: "hybrid_cluster",
         option_format: "default",
-        optional: false,
+        optional: true,
         label: "hybrid_cluster",
         feedback: false,
         help: "",
@@ -270,7 +270,7 @@ let g_option_scheme = {
                   {
                     option_name: "vip_address",
                     option_format: "default",
-                    optional: true,
+                    optional: false,
                     label: "vip_address",
                     feedback: true,
                     feedback_type: "ip",
@@ -366,7 +366,7 @@ let g_option_scheme = {
                   {
                     option_name: "vip_address",
                     option_format: "default",
-                    optional: true,
+                    optional: false,
                     label: "vip_address",
                     feedback: true,
                     feedback_type: "ip",
@@ -377,7 +377,7 @@ let g_option_scheme = {
                   {
                     option_name: "vip_interface",
                     option_format: "default",
-                    optional: true,
+                    optional: false,
                     label: "vip_interface",
                     feedback: true,
                     feedback_type: "name",
@@ -388,7 +388,7 @@ let g_option_scheme = {
                   {
                     option_name: "subnet_mask",
                     option_format: "default",
-                    optional: true,
+                    optional: false,
                     label: "subnet_mask",
                     feedback: true,
                     feedback_type: "num",
@@ -620,7 +620,7 @@ let g_option_scheme = {
           {
             option_name: "haproxy_frontend_ssl_port",
             option_format: "default",
-            optional: true,
+            optional: false,
             label: "haproxy_frontend_ssl_port",
             feedback: true,
             feedback_type: "num",
@@ -2037,14 +2037,14 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
     if (opt.option_format) {
       if (opt.option_format == "multi-checkbox") {
         //TODO: implement if needed in future
-        console.log(
+        console.error(
           "make_radio_options(): ",
           opt.option_format,
           " not implemented."
         );
       } else if (opt.option_format == "multi-ip") {
         //TODO: implement if needed in future
-        console.log(
+        console.error(
           "make_radio_options(): ",
           opt.option_format,
           " not implemented."
@@ -2080,10 +2080,6 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
           groups_json[role][opt.radio_option_name].length > 0
         ) {
           //we have fields to populate
-          console.log(
-            "groups_json[role][opt.radio_option_name]: ",
-            groups_json[role][opt.radio_option_name]
-          );
           for (
             let i = 0;
             i < groups_json[role][opt.radio_option_name].length;
@@ -2108,7 +2104,6 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
         opt_input.addEventListener("click", () => {
           let object_field_wrapper = generate_object_fields(
             opt,
-            opt_wrapper,
             opt_input,
             {},
             true
@@ -2359,7 +2354,14 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
         opt_input.setAttribute("group-option", true);
         opt_input.setAttribute("option_format", opt.option_format);
         opt_input.setAttribute("field", opt.option_name);
-        if (
+        if(
+          groups_json.hasOwnProperty(role) &&
+          groups_json[role].hasOwnProperty(parent_opt.option_name) &&
+          !groups_json[role][parent_opt.option_name]
+          ){
+            opt_input.checked = opt.default_value;
+          }
+        else if (
           groups_json.hasOwnProperty(role) &&
           groups_json[role].hasOwnProperty(opt.option_name)
         ) {
@@ -2420,7 +2422,14 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
           let box = document.createElement("input");
           box.type = "checkbox";
           box.classList.add("ct-input", "cd-field-checkbox");
-          if (
+          if(
+            groups_json.hasOwnProperty(role) && 
+            groups_json[role].hasOwnProperty(parent_opt.option_name) &&
+            !groups_json[role][parent_opt.option_name]
+          ){
+            box.checked = sub_opt.default_value;
+          }
+          else if (
             groups_json.hasOwnProperty(role) &&
             groups_json[role].hasOwnProperty(opt.option_name)
           ) {
@@ -3051,8 +3060,8 @@ function update_options_request() {
               ) {
                 let multi_obj_list = [
                   ...options_div.querySelectorAll(
-                    `[opt-parent=${radio_sub_opt.id}]`
-                  ),
+                    `[opt-parent="${radio_sub_opt.id}"]`
+                  )
                 ];
 
                 // create a blank array and blank object
@@ -3093,7 +3102,7 @@ function update_options_request() {
         ] = [];
         let multi_ip_list = [
           ...options_div.querySelectorAll(
-            `[opt-parent=${element.id}][type="text"]`
+            `[opt-parent="${element.id}"][type="text"]`
           ),
         ];
         multi_ip_list.forEach((ip_addr) => {
@@ -3108,7 +3117,7 @@ function update_options_request() {
           ] = [];
           let multi_checkbox_child_list = [
             ...options_div.querySelectorAll(
-              `[opt-parent=${element.id}][type="checkbox"]`
+              `[opt-parent="${element.id}"][type="checkbox"]`
             ),
           ];
           multi_checkbox_child_list.forEach((child) => {
@@ -3124,16 +3133,10 @@ function update_options_request() {
           "unknown option_format: ",
           element.getAttribute("option_format")
         );
-        console.log("element with unknwon option_format: ", element);
+        console.error("element with unknwon option_format: ", element);
       }
     }
   });
-
-  console.log("group_request_json: ", group_request_json);
-  console.log(
-    "JSON.stringify(group_request_json): ",
-    JSON.stringify(group_request_json)
-  );
 
   var options_spawn_args = [
     "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
