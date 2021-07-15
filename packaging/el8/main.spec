@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-8
+- makefile was going makefile things
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-7
 - updated deb scripts
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-6

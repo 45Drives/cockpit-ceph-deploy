@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.0-7
+## Cockpit Ceph-Deploy 0.1.0-8
 
-* updated deb scripts
+* makefile was going makefile things
