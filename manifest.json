@@ -1,7 +1,7 @@
 {
     "__version": "45D-R1",
     "name": "cockpit-ceph-deploy",
-    "title": "Cockpit Ceph Deploy",
+    "title": "Cockpit Ceph-Deploy",
     "prerelease": true,
     "version": "0.1.0",
     "buildVersion": "1",
@@ -15,8 +15,8 @@
         "el": "noarch"
     },
     "description": {
-        "long": "A cockpit module for configuring and deploying ceph.",
-        "short": "A cockpit module for configuring and deploying ceph."
+        "long": "A cockpit module for deploying ceph using ansible",
+        "short": "A cockpit module for deploying ceph using ansible"
     },
     "defaults": {
         "urgency": "medium"
@@ -24,15 +24,10 @@
     "dependencies": {
         "deb": [
             "cockpit",
-            "cockpit-ws",
-            "cockpit-bridge",
             "python3"
         ],
         "el": [
             "cockpit",
-            "cockpit-ws",
-            "cockpit-bridge",
-            "ceph-ansible-45d",
             "python3"
         ]
     },
