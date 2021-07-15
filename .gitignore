@@ -24,5 +24,5 @@ documentation
 *.vscode
 
 # state and parameter files
-src/fakeroot/usr/share/cockpit/ceph-deploy/state/
-src/fakeroot/usr/share/cockpit/ceph-deploy/params/
+src/fakeroot/usr/share/cockpit/ceph-deploy/state
+src/fakeroot/usr/share/cockpit/ceph-deploy/params
