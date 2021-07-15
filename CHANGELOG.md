@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.0-6
+## Cockpit Ceph-Deploy 0.1.0-7
 
-* 6th build
+* updated deb scripts

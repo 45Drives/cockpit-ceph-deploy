@@ -1,0 +1,16 @@
+
+if [ "$1" = "upgrade" ]; then
+    STATE_DIR=/usr/share/cockpit/ceph-deploy/state
+    PARAM_DIR=/usr/share/cockpit/ceph-deploy/params
+    TEMP_DIR=/opt/ceph-deploy-tmp
+    if [ -d "$(STATE_DIR)" ]; then \
+   	    mkdir -p $(TEMP_DIR) && \
+	    cp -r $(STATE_DIR) $(TEMP_DIR);\
+    fi
+
+    if [ -d "$(PARAM_DIR)" ]; then \
+	    mkdir -p $(TEMP_DIR) && \
+	    cp -r $(PARAM_DIR) $(TEMP_DIR);\
+    fi
+fi
+
