@@ -24,10 +24,12 @@
     "dependencies": {
         "deb": [
             "cockpit",
+            "ansible",
             "python3"
         ],
         "el": [
             "cockpit",
+            "ansible",
             "python3"
         ]
     },
