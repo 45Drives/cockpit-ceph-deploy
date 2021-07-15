@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.0-10
+## Cockpit Ceph-Deploy 0.1.1-1
 
-* checking to ensure that state files are updating
+* modified debian install scripts

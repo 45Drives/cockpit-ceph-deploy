@@ -4,15 +4,15 @@ TEMP_PARAM_DIR=/opt/ceph-deploy-tmp/params
 STATE_DIR=/usr/share/cockpit/ceph-deploy/state
 PARAM_DIR=/usr/share/cockpit/ceph-deploy/params
 
-if [ -d "$(TEMP_DIR)" ]; then 
-    if [ -d "$(TEMP_PARAM_DIR)" ]; then
-	    mkdir -p $(PARAM_DIR)
-	    cp -r $(TEMP_PARAM_DIR) $(PARAM_DIR)
+if [ -d "$TEMP_DIR" ]; then 
+    if [ -d "$TEMP_PARAM_DIR" ]; then
+	    mkdir -p "$PARAM_DIR"
+	    cp -r "$TEMP_PARAM_DIR" "$PARAM_DIR"
     fi
 
-	if [ -d "$(TEMP_STATE_DIR)" ]; then
+	if [ -d "$TEMP_STATE_DIR" ]; then
 	    mkdir -p $(STATE_DIR)
-	    cp -r $(TEMP_STATE_DIR) $(STATE_DIR)
+	    cp -r "$TEMP_STATE_DIR" "$STATE_DIR"
     fi
-   	rm -rf $(TEMP_DIR)
+   	rm -rf "$TEMP_DIR"
 fi

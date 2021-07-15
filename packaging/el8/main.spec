@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.1-1
+- modified debian install scripts
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-10
 - checking to ensure that state files are updating
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-9
