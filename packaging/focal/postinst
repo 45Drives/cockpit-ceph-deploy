@@ -1,4 +1,4 @@
-TEMP_DIR=/opt/ceph-deploy-tmp
+TEMP_DIR=$(DESTDIR)/opt/ceph-deploy-tmp
 
 if [ -d "$(TEMP_DIR)" ]; then \
    	rm -rf $(TEMP_DIR);\

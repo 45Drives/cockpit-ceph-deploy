@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.0-5
+## Cockpit Ceph-Deploy 0.1.0-6
 
-* 5th build
+* 6th build

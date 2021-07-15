@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-6
+- 6th build
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-5
 - 5th build
 * Thu Jul 15 2021 Mark Hooper <mhooper@45drives.com> 0.1.0-4
