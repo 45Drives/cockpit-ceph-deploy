@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.3-2
+## Cockpit Ceph-Deploy 0.1.3-3
 
-* modified how completed steps can be set back to incomplete
+* added check in ansible_runner script for key

@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-3
+- added check in ansible_runner script for key
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-2
 - modified how completed steps can be set back to incomplete
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-1

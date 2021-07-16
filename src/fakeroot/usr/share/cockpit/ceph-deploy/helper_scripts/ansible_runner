@@ -182,7 +182,8 @@ def remove_ceph_playbook_state_entry(cmd):
         state_file.close()
         state_dict = json.loads(state_file_content)
     
-    del state_dict[cmd]
+    if cmd in state_dict.keys():
+        del state_dict[cmd]
     state_file = open(state_file_path,"w")
     state_file.write(json.dumps(state_dict,indent=4))
     state_file.close()
