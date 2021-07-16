@@ -47,11 +47,11 @@ fi
 make DESTDIR=%{buildroot} install
 
 %post
-NEW_STATE_DIR=/usr/share/cockpit/ceph-deploy/state
-NEW_PARAM_DIR=/usr/share/cockpit/ceph-deploy/params
+NEW_STATE_DIR=/usr/share/cockpit/ceph-deploy
+NEW_PARAM_DIR=/usr/share/cockpit/ceph-deploy
 TEMP_DIR=/opt/ceph-deploy-tmp
-TEMP_STATE_DIR=/opt/ceph-deploy-tmp
-TEMP_PARAM_DIR=/opt/ceph-deploy-tmp
+TEMP_STATE_DIR=/opt/ceph-deploy-tmp/state
+TEMP_PARAM_DIR=/opt/ceph-deploy-tmp/params
 
 if [ $1 == 1 ] || [ $1 == 2 ];then
     echo "----------------------------------"
@@ -59,7 +59,7 @@ if [ $1 == 1 ] || [ $1 == 2 ];then
     if [ -d "$TEMP_STATE_DIR" ];then
    	    echo "Copying state files from temporary directory."
         mkdir -p "$NEW_STATE_DIR"
-	    cp -r "$TEMP_STATE_DIR" "$STATE_DIR"
+	    cp -r "$TEMP_STATE_DIR" "$NEW_STATE_DIR"
     fi
 
     echo "Checking for existing parameter files."
@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-7
+- changed .spec file
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-6
 - third rpm test
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-5
