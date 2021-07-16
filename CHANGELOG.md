@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.1-1
+## Cockpit Ceph-Deploy 0.1.1-2
 
-* modified debian install scripts
+* updated css
