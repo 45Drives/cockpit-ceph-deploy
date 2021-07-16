@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-1
+- updated ansible_runner to remove deploy state entries for purge plays
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-8
 - added postun section to .spec file
 - incremented build number

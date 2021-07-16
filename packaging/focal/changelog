@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (0.1.3-1focal) focal; urgency=medium
+
+  * updated ansible_runner to remove deploy state entries for purge plays
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 16 Jul 2021 11:36:10 -0300
+
 cockpit-ceph-deploy (0.1.2-8focal) focal; urgency=medium
 
   * added postun section to .spec file

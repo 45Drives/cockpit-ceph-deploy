@@ -1,4 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.2-8
+## Cockpit Ceph-Deploy 0.1.3-1
 
-* added postun section to .spec file
-* incremented build number
+* updated ansible_runner to remove deploy state entries for purge plays
