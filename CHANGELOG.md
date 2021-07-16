@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.1-2
+## Cockpit Ceph-Deploy 0.1.1-3
 
-* updated css
+* changed postinst script

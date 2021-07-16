@@ -11,7 +11,7 @@ if [ -d "$TEMP_DIR" ]; then
     fi
 
 	if [ -d "$TEMP_STATE_DIR" ]; then
-	    mkdir -p $(STATE_DIR)
+	    mkdir -p "$STATE_DIR"
 	    cp -r "$TEMP_STATE_DIR" "$STATE_DIR"
     fi
    	rm -rf "$TEMP_DIR"
