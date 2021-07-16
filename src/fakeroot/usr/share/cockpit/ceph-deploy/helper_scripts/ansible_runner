@@ -16,79 +16,92 @@ ansible_commands = {
         "command": "ansible -i /usr/share/ceph-ansible/hosts all -m ping",
         "cwd": None,
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "device_alias": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts device-alias.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_core": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts core.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "remove_core": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-cluster.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":["deploy_core"]
     },
     "remove_vg": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts vg-remove.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "ping_mdss": {
         "command": "ansible -i /usr/share/ceph-ansible/hosts -m ping mdss",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_cephfs": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts cephfs.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_radosgw": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_iscsi": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_dashboard": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_rgwlb":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw-lb.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_nfs":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts nfs.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     },
     "deploy_smb":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts samba.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
-        "time_stamp": None
+        "time_stamp": None,
+        "purge":[]
     }
 }
 
@@ -140,6 +153,39 @@ def run_ansible_command(cmd):
     ansible_commands[cmd]["result"] = command.returncode
     ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
     update_ceph_playbook_state(cmd)
+    if len(ansible_commands[cmd]["purge"]) > 0 and ansible_commands[cmd]["result"] == 0:
+        for affected_playbook in ansible_commands[cmd]["purge"]:
+            if affected_playbook in ansible_commands.keys():
+                remove_ceph_playbook_state_entry(affected_playbook)
+
+
+def remove_ceph_playbook_state_entry(cmd):
+    state_file_path = "/usr/share/cockpit/ceph-deploy/state/playbook_state.json"
+    state_file_dir = "/usr/share/cockpit/ceph-deploy/state"
+    state_dict = {}
+
+    # check to see if file needs to be created.
+    if not os.path.exists(state_file_path):
+        # file doesn't exist
+        if not os.path.exists(state_file_dir):
+            # file directory doesn't exist, make required directories
+            os.makedirs(state_file_dir)
+        #create new parameter file with default parameters
+        state_file = open(state_file_path,"w")
+        state_file.write(json.dumps(state_dict,indent=4))
+        state_file.close()
+
+    else:
+        #file exists on disk, load contents and return json object.
+        state_file = open(state_file_path,"r")
+        state_file_content = print_to_string(state_file.read())
+        state_file.close()
+        state_dict = json.loads(state_file_content)
+    
+    del state_dict[cmd]
+    state_file = open(state_file_path,"w")
+    state_file.write(json.dumps(state_dict,indent=4))
+    state_file.close()
 
 def main():
     cmd_lst_str = "["
