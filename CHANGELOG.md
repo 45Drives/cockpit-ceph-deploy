@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.1-3
+## Cockpit Ceph-Deploy 0.1.2-1
 
 * changed postinst script

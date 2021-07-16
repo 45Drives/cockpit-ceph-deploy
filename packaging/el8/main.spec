@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-1
+- changed postinst script
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.1-3
 - changed postinst script
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.1-2
