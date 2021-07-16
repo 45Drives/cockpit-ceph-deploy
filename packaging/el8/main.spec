@@ -76,6 +76,11 @@ if [ $1 == 1 ] || [ $1 == 2 ];then
     echo "----------------------------------"
 fi
 
+%postun
+if [ $1 == 0 ];then
+    rm -rf /usr/share/cockpit/ceph-deploy
+fi
+
 %files
 %dir /usr/share/cockpit/ceph-deploy
 %defattr(-,root,root,-)
