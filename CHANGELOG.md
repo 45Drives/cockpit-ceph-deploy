@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.2-3
+## Cockpit Ceph-Deploy 0.1.2-4
 
-* modified spec file
+* first rpm build test
