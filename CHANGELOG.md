@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.2-5
+## Cockpit Ceph-Deploy 0.1.2-6
 
-* second rpmbuild test
+* third rpm test

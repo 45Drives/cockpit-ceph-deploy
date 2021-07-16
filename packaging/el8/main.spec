@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-6
+- third rpm test
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-5
 - second rpmbuild test
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-4
