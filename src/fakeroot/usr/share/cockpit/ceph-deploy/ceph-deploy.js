@@ -722,54 +722,63 @@ let g_ceph_deploy_default_state = {
     step_content_id: "step-preconfig",
     progress: "0",
     unlock_requirements: [],
+    playbook_completion_requirements: []
   },
   "deploy-step-ansible-config": {
     lock_state: "locked",
     step_content_id: "step-ansible-config",
     progress: "0",
     unlock_requirements: ["deploy-step-preconfig"],
+    playbook_completion_requirements: ["ping_all"]
   },
   "deploy-step-core": {
     lock_state: "locked",
     step_content_id: "step-core",
     progress: "0",
     unlock_requirements: ["deploy-step-ansible-config"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"]
   },
   "deploy-step-cephfs": {
     lock_state: "locked",
     step_content_id: "step-cephfs",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs"]
   },
   "deploy-step-nfs": {
     lock_state: "locked",
     step_content_id: "step-nfs",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_nfs"]
   },
   "deploy-step-smb": {
     lock_state: "locked",
     step_content_id: "step-smb",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_smb"]
   },
   "deploy-step-rgw": {
     lock_state: "locked",
     step_content_id: "step-rgw",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw"]
   },
   "deploy-step-rgwlb": {
     lock_state: "locked",
     step_content_id: "step-rgwlb",
     progress: "0",
     unlock_requirements: ["deploy-step-rgw"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw","deploy_rgwlb"]
   },
   "deploy-step-iscsi": {
     lock_state: "locked",
     step_content_id: "step-iscsi",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_iscsi"]
   },
   "deploy-step-dashboard": {
     lock_state: "locked",
@@ -781,6 +790,7 @@ let g_ceph_deploy_default_state = {
       "deploy-step-nfs",
       "deploy-step-smb",
     ],
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"]
   },
 };
 
@@ -4184,14 +4194,29 @@ function setup_main_menu() {
     localStorage.getItem("ceph_deploy_state") ??
     JSON.stringify(g_ceph_deploy_default_state);
   deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
+
+  //set complete state based on required playbooks being run
+  let playbook_state_json = localStorage.getItem("playbook_state") ?? "{}";
+  Object.entries(deploy_step_current_states).forEach(
+    ([deploy_step_id, obj]) => {
+      for (let pb_req in obj.playbook_completion_requirements){
+        if(!playbook_state_json.hasOwnProperty(pb_req) || playbook_state_json[pb_req].result != 0){
+          if(obj.lock_state == "complete"){
+            obj.lock_state = "unlocked";
+            obj.progress = "0";
+          }
+        }
+      }
+    }
+  );
+
   // unlock the steps that have their unlock requirements met and update local storage.
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
       if (obj.lock_state == "locked") {
         for (let i = 0; i < obj.unlock_requirements.length; i++) {
           if (
-            deploy_step_current_states[obj.unlock_requirements[i]].lock_state ==
-            "complete"
+            deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
           ) {
             deploy_step_current_states[deploy_step_id].lock_state = "unlocked";
             break;
@@ -4432,6 +4457,12 @@ function get_ceph_deploy_initial_state() {
     initial_state.then((content, tag) => {
       if (content) {
         //defer to the state on the server as it is possible that more than one browser was used.
+        try {
+          let deploy_state_json = JSON.parse(content);
+        } catch (error) {
+          console.log("unable to parse ceph_ceploy_state.json");
+        }
+        console.log("ceph_deploy_state");
         localStorage.setItem("ceph_deploy_state", content);
         ceph_deploy_state_file.close();
         localStorage.removeItem("inventory_files");

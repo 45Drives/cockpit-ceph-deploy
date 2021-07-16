@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.3-1
+## Cockpit Ceph-Deploy 0.1.3-2
 
-* updated ansible_runner to remove deploy state entries for purge plays
+* modified how completed steps can be set back to incomplete

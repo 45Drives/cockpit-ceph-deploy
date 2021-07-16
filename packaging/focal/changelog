@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (0.1.3-2focal) focal; urgency=medium
+
+  * modified how completed steps can be set back to incomplete
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 16 Jul 2021 12:55:17 -0300
+
 cockpit-ceph-deploy (0.1.3-1focal) focal; urgency=medium
 
   * updated ansible_runner to remove deploy state entries for purge plays
