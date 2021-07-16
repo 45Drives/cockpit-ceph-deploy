@@ -1,3 +1,4 @@
-## Cockpit Ceph-Deploy 0.1.2-7
+## Cockpit Ceph-Deploy 0.1.2-8
 
-* changed .spec file
+* added postun section to .spec file
+* incremented build number

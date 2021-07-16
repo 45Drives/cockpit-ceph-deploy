@@ -87,6 +87,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-8
+- added postun section to .spec file
+- incremented build number
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-7
 - changed .spec file
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-6

@@ -4,7 +4,7 @@
     "title": "Cockpit Ceph-Deploy",
     "prerelease": true,
     "version": "0.1.2",
-    "buildVersion": "7",
+    "buildVersion": "8",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-ceph-deploy",
     "category": "utils",
@@ -48,12 +48,10 @@
     "changelog": {
         "urgency": "medium",
         "version": "0.1.2",
-        "buildVersion": "7",
+        "buildVersion": "8",
         "ignore": [],
-        "date": "2021-07-16T13:36:56.886078",
+        "date": null,
         "packager": "Mark Hooper <mhooper@45drives.com>",
-        "changes": [
-            "added postun section to .spec file"
-        ]
+        "changes": []
     }
 }
