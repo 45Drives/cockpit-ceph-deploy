@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.2-2
+## Cockpit Ceph-Deploy 0.1.2-3
 
-* changed postinst state and param path
+* modified spec file

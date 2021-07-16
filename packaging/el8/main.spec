@@ -47,11 +47,11 @@ fi
 make DESTDIR=%{buildroot} install
 
 %post
-NEW_STATE_DIR=%{buildroot}/usr/share/cockpit/ceph-deploy/state
-NEW_PARAM_DIR=%{buildroot}/usr/share/cockpit/ceph-deploy/params
+NEW_STATE_DIR=/usr/share/cockpit/ceph-deploy/state
+NEW_PARAM_DIR=/usr/share/cockpit/ceph-deploy/params
 TEMP_DIR=/opt/ceph-deploy-tmp
-TEMP_STATE_DIR=/opt/ceph-deploy-tmp/state
-TEMP_PARAM_DIR=/opt/ceph-deploy-tmp/params
+TEMP_STATE_DIR=/opt/ceph-deploy-tmp
+TEMP_PARAM_DIR=/opt/ceph-deploy-tmp
 
 if [ $1 == 1 ] || [ $1 == 2 ];then
     echo "----------------------------------"
@@ -82,6 +82,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-3
+- modified spec file
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-2
 - changed postinst state and param path
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.2-1
