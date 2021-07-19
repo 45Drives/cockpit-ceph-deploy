@@ -4201,7 +4201,10 @@ function setup_main_menu() {
     ([deploy_step_id, obj]) => {
       for (let pb_req in obj.playbook_completion_requirements){
         if(!playbook_state_json.hasOwnProperty(pb_req) || playbook_state_json[pb_req].result != 0){
+          console.log("pb_req: ",pb_req);
+          if(playbook_state_json.hasOwnProperty(pb_req)) console.log("playbook_state_json[pb_req]: ",playbook_state_json[pb_req]);
           if(obj.lock_state == "complete"){
+            console.log("obj: ",obj);
             obj.lock_state = "unlocked";
             obj.progress = "0";
           }

@@ -49,11 +49,13 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "0.1.3",
-        "buildVersion": "3",
+        "version": "0.1.4",
+        "buildVersion": "1",
         "ignore": [],
-        "date": null,
+        "date": "2021-07-19T09:39:50.087952",
         "packager": "Mark Hooper <mhooper@45drives.com>",
-        "changes": []
+        "changes": [
+            "state handling"
+        ]
     }
 }
