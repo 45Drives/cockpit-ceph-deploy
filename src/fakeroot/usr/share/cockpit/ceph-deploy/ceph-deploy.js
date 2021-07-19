@@ -4204,7 +4204,7 @@ function setup_main_menu() {
     "deploy-step-rgw",
     "deploy-step-rgwlb",
     "deploy-step-iscsi",
-    "deploy-step-dashboard",
+    "deploy-step-dashboard"
   ];
   deploy_step_current_state_json_str =
     localStorage.getItem("ceph_deploy_state") ??
@@ -4226,11 +4226,7 @@ function setup_main_menu() {
     ([deploy_step_id, obj]) => {
       let tmp_requirements = [];
       for (let pb_req in obj.playbook_completion_requirements){
-        console.log("obj.playbook_completion_requirements: ",obj.playbook_completion_requirements);
         if(!playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) || playbook_state_json[obj.playbook_completion_requirements[pb_req]].result != 0){
-          console.log("pb_req: ",pb_req);
-          console.log("obj.playbook_completion_requirements[pb_req]: ",obj.playbook_completion_requirements[pb_req]);
-          if(playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req])) console.log("playbook_state_json[obj.playbook_completion_requirements[pb_req]]: ",playbook_state_json[obj.playbook_completion_requirements[pb_req]]);
           if(obj.lock_state == "complete"){
             console.log("obj: ",obj);
             obj.lock_state = "unlocked";
@@ -4241,6 +4237,9 @@ function setup_main_menu() {
           tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
           if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements) && obj.lock_state === "unlocked"){
             obj.lock_state = "complete"
+            console.log("tmp_requirements: ", tmp_requirements);
+            console.log("obj.playbook_completion_requirements: ", obj.playbook_completion_requirements);
+
           }
         }
       }
