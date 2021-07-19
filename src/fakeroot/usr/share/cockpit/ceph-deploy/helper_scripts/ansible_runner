@@ -38,14 +38,28 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":["deploy_core","deploy_cephfs"]
+        "purge":["deploy_core","deploy_cephfs","deploy_dashboard"]
     },
     "remove_smb": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-samba.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":["deploy_smb"]
+        "purge":["deploy_smb","deploy_dashboard"]
+    },
+    "remove_iscsi": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-iscsi-gateways.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None,
+        "purge":["deploy_iscsi","deploy_dashboard"]
+    },
+    "remove_nfs": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-nfs.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None,
+        "purge":["deploy_nfs","deploy_dashboard"]
     },
     "remove_vg": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts remove-vg.yml",
@@ -66,21 +80,21 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     },
     "deploy_radosgw": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts radosgw.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     },
     "deploy_iscsi": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts iscsi.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     },
     "deploy_dashboard": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts dashboard.yml",
@@ -94,21 +108,21 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     },
     "deploy_nfs":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts nfs.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     },
     "deploy_smb":{
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts samba.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":[]
+        "purge":["deploy_dashboard"]
     }
 }
 
