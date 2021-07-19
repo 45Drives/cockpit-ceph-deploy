@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.4-4
+## Cockpit Ceph-Deploy 0.1.4-5
 
-* state handling
+* changed ansible_runner entry for remove_vg command

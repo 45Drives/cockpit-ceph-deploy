@@ -41,7 +41,7 @@ ansible_commands = {
         "purge":["deploy_core"]
     },
     "remove_vg": {
-        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts vg-remove.yml",
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts remove-vg.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
