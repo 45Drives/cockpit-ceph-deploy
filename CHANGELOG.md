@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.3-3
+## Cockpit Ceph-Deploy 0.1.4-1
 
-* added check in ansible_runner script for key
+* state handling

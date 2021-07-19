@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Jul 19 2021 Mark Hooper <mhooper@45drives.com> 0.1.4-1
+- state handling
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-3
 - added check in ansible_runner script for key
 * Fri Jul 16 2021 Mark Hooper <mhooper@45drives.com> 0.1.3-2
