@@ -4178,6 +4178,18 @@ document
     .addEventListener("change", switch_theme);
 }
 
+
+const equalsIgnoreOrder = (a, b) => {
+  if (a.length !== b.length) return false;
+  const uniqueValues = new Set([...a, ...b]);
+  for (const v of uniqueValues) {
+    const aCount = a.filter(e => e === v).length;
+    const bCount = b.filter(e => e === v).length;
+    if (aCount !== bCount) return false;
+  }
+  return true;
+}
+
 /**
  * update the state of the main menu according to the deploy states stored in local storage.
  */
@@ -4212,6 +4224,7 @@ function setup_main_menu() {
 
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
+      let tmp_requirements = [];
       for (let pb_req in obj.playbook_completion_requirements){
         console.log("obj.playbook_completion_requirements: ",obj.playbook_completion_requirements);
         if(!playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) || playbook_state_json[obj.playbook_completion_requirements[pb_req]].result != 0){
@@ -4222,6 +4235,12 @@ function setup_main_menu() {
             console.log("obj: ",obj);
             obj.lock_state = "unlocked";
             obj.progress = "0";
+          }
+        }
+        else if(playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) && playbook_state_json[obj.playbook_completion_requirements[pb_req]].result === 0){
+          tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
+          if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements)){
+            obj.lock_state = "complete"
           }
         }
       }
@@ -4292,6 +4311,7 @@ function setup_main_menu() {
     }
   }
 }
+
 
 function inventory_file_generation_completed_check() {
   let inv_file_req_str =
