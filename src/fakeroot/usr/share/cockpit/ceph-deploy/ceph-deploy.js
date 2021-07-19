@@ -2633,6 +2633,9 @@ function get_param_file_content() {
           result_json.old_file_content.options,
           result_json.old_file_content.groups
         );
+        if (result_json.old_file_content.hasOwnProperty("time_stamp")){
+          localStorage.setItem("last_option_update_time",result_json.old_file_content["time_stamp"]);
+        }
       }
     } else {
       msg_color = "#bd3030";
@@ -4202,6 +4205,9 @@ function setup_main_menu() {
   console.log("deploy_step_current_states: ",deploy_step_current_states);
   console.log("playbook_state_json_str: ",playbook_state_json_str);
   console.log("playbook_state_json: ",playbook_state_json);
+
+
+  
 
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {

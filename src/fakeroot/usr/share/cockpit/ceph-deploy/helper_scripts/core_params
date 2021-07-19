@@ -23,6 +23,7 @@ import os
 import json
 import copy
 from typing import List
+from datetime import datetime
 
 #####################################
 # DATA CLASSES
@@ -264,6 +265,7 @@ def get_default_params():
     default_params["options"] = copy.deepcopy(asdict(default_options))
     default_groups = {"rgwloadbalancers": {}, "nfss": {}}
     default_params["groups"] = copy.deepcopy((default_groups))
+    default_params["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
     return default_params.copy()
 
 
@@ -504,6 +506,8 @@ def write_to_parameter_file(new_content):
     global g_param_file_content
     global g_param_file_path
     global g_param_file_dir
+
+    new_content["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
 
     if not os.path.exists(g_param_file_path):
         # file doesn't exist
