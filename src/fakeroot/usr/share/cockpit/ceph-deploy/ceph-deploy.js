@@ -4228,7 +4228,6 @@ function setup_main_menu() {
       for (let pb_req in obj.playbook_completion_requirements){
         if(!playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) || playbook_state_json[obj.playbook_completion_requirements[pb_req]].result != 0){
           if(obj.lock_state == "complete"){
-            console.log("obj: ",obj);
             obj.lock_state = "unlocked";
             obj.progress = "0";
           }
@@ -4239,7 +4238,6 @@ function setup_main_menu() {
             obj.lock_state = "complete"
             console.log("tmp_requirements: ", tmp_requirements);
             console.log("obj.playbook_completion_requirements: ", obj.playbook_completion_requirements);
-
           }
         }
       }
@@ -4249,7 +4247,10 @@ function setup_main_menu() {
   // unlock the steps that have their unlock requirements met and update local storage.
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
-      if (obj.lock_state == "locked") {
+      if (obj.lock_state != "complete") {
+        // objects that are marked complete should be left alone. The playbooks that are 
+        // required to be completed have been verified completed.
+        obj.lock_state = "locked";  // pre-emptively lock the deployment step
         for (let i = 0; i < obj.unlock_requirements.length; i++) {
           if (
             deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
