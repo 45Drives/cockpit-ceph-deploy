@@ -3654,7 +3654,6 @@ function update_playbook_state(content) {
     Object.entries(content).forEach(([playbook, obj]) => {
       let target_button = document.getElementById(playbook);
       if (
-        target_button &&
         content.hasOwnProperty(playbook) &&
         content[playbook].result === 0
       ) {
