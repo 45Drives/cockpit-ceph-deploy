@@ -4005,7 +4005,7 @@ function setup_deploy_step_nav_buttons() {
                 step_content_id
             ) {
               let prog_int = Number(deploy_state[ceph_deploy_step_id].progress);
-              prog_int--;
+              if(prog_int > 0){prog_int--;}else{prog_int = 0;}
               deploy_state[ceph_deploy_step_id].progress = prog_int.toString();
               localStorage.setItem(
                 "ceph_deploy_state",
@@ -4214,14 +4214,6 @@ function setup_main_menu() {
   //set complete state based on required playbooks being run
   let playbook_state_json_str = localStorage.getItem("playbook_state") ?? "{}";
   let playbook_state_json = JSON.parse(playbook_state_json_str);
-  console.log("deploy_step_current_state_json_str: ",deploy_step_current_state_json_str);
-  console.log("deploy_step_current_states: ",deploy_step_current_states);
-  console.log("playbook_state_json_str: ",playbook_state_json_str);
-  console.log("playbook_state_json: ",playbook_state_json);
-
-
-  
-
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
       let tmp_requirements = [];
@@ -4236,8 +4228,6 @@ function setup_main_menu() {
           tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
           if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements) && obj.lock_state === "unlocked"){
             obj.lock_state = "complete"
-            console.log("tmp_requirements: ", tmp_requirements);
-            console.log("obj.playbook_completion_requirements: ", obj.playbook_completion_requirements);
           }
         }
       }
