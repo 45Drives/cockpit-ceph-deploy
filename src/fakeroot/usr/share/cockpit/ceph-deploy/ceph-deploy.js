@@ -2635,6 +2635,7 @@ function get_param_file_content() {
         );
         if (result_json.old_file_content.hasOwnProperty("time_stamp")){
           localStorage.setItem("last_option_update_time",result_json.old_file_content["time_stamp"]);
+          
         }
       }
     } else {
@@ -3657,7 +3658,7 @@ function update_playbook_state(content) {
         content.hasOwnProperty(playbook) &&
         content[playbook].result === 0
       ) {
-        target_button.removeAttribute("disabled");
+        if(target_button){target_button.removeAttribute("disabled");}
         if (
           !prev_state_json.hasOwnProperty(playbook) ||
           (prev_state_json.hasOwnProperty(playbook) &&
@@ -3671,8 +3672,8 @@ function update_playbook_state(content) {
             "snackbar"
           );
         }
-      } else if (target_button && content.hasOwnProperty(playbook)) {
-        target_button.disabled = true;
+      } else if (content.hasOwnProperty(playbook)) {
+        if(target_button){target_button.disabled = true;}
         if (
           !prev_state_json.hasOwnProperty(playbook) ||
           (prev_state_json.hasOwnProperty(playbook) &&
@@ -3689,6 +3690,7 @@ function update_playbook_state(content) {
       }
     });
   }
+  setup_main_menu();
 }
 
 /**

@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.4-6
+## Cockpit Ceph-Deploy 0.1.4-7
 
 * state handling
