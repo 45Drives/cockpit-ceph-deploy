@@ -4,7 +4,7 @@
     "title": "Cockpit Ceph-Deploy",
     "prerelease": true,
     "version": "0.1.4",
-    "buildVersion": "1",
+    "buildVersion": "2",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-ceph-deploy",
     "category": "utils",
@@ -50,7 +50,7 @@
     "changelog": {
         "urgency": "medium",
         "version": "0.1.4",
-        "buildVersion": "1",
+        "buildVersion": "2",
         "ignore": [],
         "date": null,
         "packager": "Mark Hooper <mhooper@45drives.com>",

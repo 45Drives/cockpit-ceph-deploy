@@ -4196,7 +4196,13 @@ function setup_main_menu() {
   deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
 
   //set complete state based on required playbooks being run
-  let playbook_state_json = localStorage.getItem("playbook_state") ?? "{}";
+  let playbook_state_json_str = localStorage.getItem("playbook_state") ?? "{}";
+  let playbook_state_json = JSON.parse(playbook_state_json_str);
+  console.log("deploy_step_current_state_json_str: ",deploy_step_current_state_json_str);
+  console.log("deploy_step_current_states: ",deploy_step_current_states);
+  console.log("playbook_state_json_str: ",playbook_state_json_str);
+  console.log("playbook_state_json: ",playbook_state_json);
+
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
       for (let pb_req in obj.playbook_completion_requirements){
