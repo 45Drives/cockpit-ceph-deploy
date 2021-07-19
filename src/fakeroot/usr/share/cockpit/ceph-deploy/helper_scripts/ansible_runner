@@ -38,7 +38,14 @@ ansible_commands = {
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
-        "purge":["deploy_core"]
+        "purge":["deploy_core","deploy_cephfs"]
+    },
+    "remove_smb": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-samba.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None,
+        "purge":["deploy_smb"]
     },
     "remove_vg": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts remove-vg.yml",
