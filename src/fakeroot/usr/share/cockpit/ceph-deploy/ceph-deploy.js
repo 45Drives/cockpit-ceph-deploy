@@ -788,9 +788,9 @@ let g_ceph_deploy_default_state = {
       "deploy-step-rgw",
       "deploy-step-iscsi",
       "deploy-step-nfs",
-      "deploy-step-smb",
+      "deploy-step-smb"
     ],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_dashboard"]
   },
 };
 
@@ -4239,7 +4239,7 @@ function setup_main_menu() {
         }
         else if(playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) && playbook_state_json[obj.playbook_completion_requirements[pb_req]].result === 0){
           tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
-          if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements)){
+          if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements) && obj.lock_state === "unlocked"){
             obj.lock_state = "complete"
           }
         }
