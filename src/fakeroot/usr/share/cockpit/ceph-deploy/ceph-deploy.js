@@ -4202,13 +4202,16 @@ function setup_main_menu() {
   console.log("deploy_step_current_states: ",deploy_step_current_states);
   console.log("playbook_state_json_str: ",playbook_state_json_str);
   console.log("playbook_state_json: ",playbook_state_json);
+  console.log("obj.playbook_completion_requirements: ",obj.playbook_completion_requirements);
 
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
       for (let pb_req in obj.playbook_completion_requirements){
-        if(!playbook_state_json.hasOwnProperty(pb_req) || playbook_state_json[pb_req].result != 0){
+        console.log("obj.playbook_completion_requirements: ",obj.playbook_completion_requirements);
+        if(!playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) || playbook_state_json[obj.playbook_completion_requirements[pb_req]].result != 0){
           console.log("pb_req: ",pb_req);
-          if(playbook_state_json.hasOwnProperty(pb_req)) console.log("playbook_state_json[pb_req]: ",playbook_state_json[pb_req]);
+          console.log("obj.playbook_completion_requirements[pb_req]: ",obj.playbook_completion_requirements[pb_req]);
+          if(playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req])) console.log("playbook_state_json[obj.playbook_completion_requirements[pb_req]]: ",playbook_state_json[obj.playbook_completion_requirements[pb_req]]);
           if(obj.lock_state == "complete"){
             console.log("obj: ",obj);
             obj.lock_state = "unlocked";
