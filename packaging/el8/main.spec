@@ -87,6 +87,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Tue Jul 20 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-1
+- added purge playbooks to ansible_runner
+- added the ability to force re-generation of inventory files
 * Tue Jul 20 2021 Mark Hooper <mhooper@45drives.com> 0.1.4-29
 - state handling
 * Tue Jul 20 2021 Mark Hooper <mhooper@45drives.com> 0.1.4-28
