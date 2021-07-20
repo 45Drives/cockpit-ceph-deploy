@@ -3299,7 +3299,7 @@ function check_for_parameter_change(param_json_msg){
 
   // see if host parameters were modified
   if(old_params.hasOwnProperty("hosts") && new_params.hasOwnProperty("hosts")){
-    if(old_params["hosts"] != new_params["hosts"]){
+    if(JSON.stringify(old_params["hosts"]) != JSON.stringify(new_params["hosts"])){
       console.log("!!! hosts have been modified !!!");
       console.log("old_params[\"hosts\"]: ",old_params["hosts"]);
       console.log("new_params[\"hosts\"]: ",new_params["hosts"]);
@@ -3308,7 +3308,7 @@ function check_for_parameter_change(param_json_msg){
 
   // see if groups have been modified
   if(old_params.hasOwnProperty("groups") && new_params.hasOwnProperty("groups")){
-    if(old_params["groups"] != new_params["groups"]){
+    if(JSON.stringify(old_params["groups"]) != JSON.stringify(new_params["groups"])){
       console.log("!!! groups have been modified !!!");
       console.log("old_params[\"groups\"]: ",old_params["groups"]);
       console.log("new_params[\"groups\"]: ",new_params["groups"]);
@@ -3317,7 +3317,7 @@ function check_for_parameter_change(param_json_msg){
 
   // see if options have been modified
   if(old_params.hasOwnProperty("options") && new_params.hasOwnProperty("options")){
-    if(old_params["options"] != new_params["options"]){
+    if(JSON.stringify(old_params["options"]) != JSON.stringify(new_params["options"])){
       console.log("!!! options have been modified !!!");
       console.log("old_params[\"options\"]: ",old_params["options"]);
       console.log("new_params[\"options\"]: ",new_params["options"]);
@@ -3326,7 +3326,7 @@ function check_for_parameter_change(param_json_msg){
 
     // see if roles have been modified
     if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
-      if(old_params["roles"] != new_params["roles"]){
+      if(JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])){
         console.log("!!! roles have been modified !!!");
         console.log("old_params[\"roles\"]: ",old_params["roles"]);
         console.log("new_params[\"roles\"]: ",new_params["roles"]);
@@ -4555,7 +4555,6 @@ function get_ceph_deploy_initial_state() {
         } catch (error) {
           console.log("unable to parse ceph_ceploy_state.json");
         }
-        console.log("ceph_deploy_state");
         localStorage.setItem("ceph_deploy_state", content);
         ceph_deploy_state_file.close();
         localStorage.removeItem("inventory_files");
