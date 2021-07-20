@@ -4536,7 +4536,7 @@ function reset_inventory_file_elements(key){
     let default_content_div = document.getElementById(g_inventory_file_vars[key]["default_content_div"]);
     if(file_content_div && show_button && generate_button && default_content_div){
       file_content_div.classList.add("hidden");
-      show_button.removeEventListener("click");
+      show_button.removeEventListener("click",g_inventory_file_vars[key]["show_listener"],false);
       show_button.classList.add("hidden");
       generate_button.innerHTML = "Generate";
       default_content_div.classList.remove("hidden");
