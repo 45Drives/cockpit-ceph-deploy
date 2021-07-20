@@ -27,6 +27,50 @@ let g_inv_default_requirements = {
     completed: false,
   }
 };
+
+let g_inventory_file_vars = {
+  "hosts": {
+    file_content_div_id: "host-file-content",
+    show_button_id: "show-host-file-btn",
+    generate_button_id: "generate-host-file-btn",
+    default_content_div: "inv-file-hosts-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_host_file
+  },
+  "all.yml": {
+    file_content_div_id: "all-file-content",
+    show_button_id: "show-all-file-btn",
+    generate_button_id: "generate-all-file-btn",
+    default_content_div: "inv-file-all-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_all_file
+  },
+  "rgwloadbalancers.yml": {
+    file_content_div_id: "rgwlb-file-content",
+    show_button_id: "show-rgwlb-file-btn",
+    generate_button_id: "generate-rgwlb-file-btn",
+    default_content_div: "inv-file-rgwlb-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_rgwlb_file
+  },
+  "nfss.yml": {
+    file_content_div_id: "nfss-file-content",
+    show_button_id: "show-nfss-file-btn",
+    generate_button_id: "generate-nfss-file-btn",
+    default_content_div: "inv-file-nfss-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_nfss_file
+  },
+  "smbs.yml": {
+    file_content_div_id: "smbs-file-content",
+    show_button_id: "show-smbs-file-btn",
+    generate_button_id: "generate-smbs-file-btn",
+    default_content_div: "inv-file-smbs-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_smbs_file
+  }
+}
+
 let g_option_scheme = {
   mons: {
     inventory_file: false,
@@ -3321,6 +3365,9 @@ function check_for_parameter_change(param_json_msg){
       console.log("!!! options have been modified !!!");
       console.log("old_params[\"options\"]: ",old_params["options"]);
       console.log("new_params[\"options\"]: ",new_params["options"]);
+      // make all.yml again
+      // re-deploy ceph
+      
     }
   }
 
@@ -4441,53 +4488,72 @@ function sync_ceph_deploy_state() {
 
 }
 
-function get_inventory_file_state(){
+function clear_inventory_file_entry(key){
   let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
-  let inventory_file_vars = {
-    "hosts": {
-      file_content_div_id: "host-file-content",
-      show_button_id: "show-host-file-btn",
-      generate_button_id: "generate-host-file-btn",
-      default_content_div: "inv-file-hosts-default",
-      next_button_id: "ansible-config-inv-nxt",
-      show_listener: show_host_file
-    },
-    "all.yml": {
-      file_content_div_id: "all-file-content",
-      show_button_id: "show-all-file-btn",
-      generate_button_id: "generate-all-file-btn",
-      default_content_div: "inv-file-all-default",
-      next_button_id: "ansible-config-inv-nxt",
-      show_listener: show_all_file
-    },
-    "rgwloadbalancers.yml": {
-      file_content_div_id: "rgwlb-file-content",
-      show_button_id: "show-rgwlb-file-btn",
-      generate_button_id: "generate-rgwlb-file-btn",
-      default_content_div: "inv-file-rgwlb-default",
-      next_button_id: "ansible-config-inv-nxt",
-      show_listener: show_rgwlb_file
-    },
-    "nfss.yml": {
-      file_content_div_id: "nfss-file-content",
-      show_button_id: "show-nfss-file-btn",
-      generate_button_id: "generate-nfss-file-btn",
-      default_content_div: "inv-file-nfss-default",
-      next_button_id: "ansible-config-inv-nxt",
-      show_listener: show_nfss_file
-    },
-    "smbs.yml": {
-      file_content_div_id: "smbs-file-content",
-      show_button_id: "show-smbs-file-btn",
-      generate_button_id: "generate-smbs-file-btn",
-      default_content_div: "inv-file-smbs-default",
-      next_button_id: "ansible-config-inv-nxt",
-      show_listener: show_smbs_file
+  let inv_state_json = null;
+  let inv_state_file =  cockpit
+    .file(inventory_state_file_path)
+    .read();
+  inv_state_file.then((content,tag) => {
+    if(content){
+      try {
+        inv_state_json = JSON.parse(content);
+      } catch (error) {
+        console.log("clear_inventory_file_entry(): unable to parse inventory state file");
+        document.getElementById("ansible-config-inv-nxt").disabled = true;
+      }
+      if(inv_state_json.hasOwnProperty(key))
+      {
+        delete inv_state_json.key;
+        let new_inv_state_file = inv_state_file.replace(
+          JSON.stringify(inv_state_json,null,4)
+        );
+        new_inv_state_file.then((tag) => {
+          new_inv_state_file.close();
+          localStorage.setItem(
+            "inventory_files",
+            JSON.stringify(inv_state_json,null,4)
+          );
+          reset_inventory_file_elements(key);
+          get_inventory_file_state();
+        });
+        new_inv_state_file.catch((e) => {
+          new_inv_state_file.close();
+          console.log("clear_inventory_file_entry(): unable to update inventory state file");
+        });
+      }
+    }else{
+      document.getElementById("ansible-config-inv-nxt").disabled = true;
+    }
+  });
+}
+
+function reset_inventory_file_elements(key){
+  if(g_inventory_file_vars.hasOwnProperty(key)){
+    let file_content_div = document.getElementById(g_inventory_file_vars[key]["file_content_div_id"]);
+    let show_button = document.getElementById(g_inventory_file_vars[key]["show_button_id"]);
+    let generate_button = document.getElementById(g_inventory_file_vars[key]["generate_button_id"]);
+    let default_content_div = document.getElementById(g_inventory_file_vars[key]["default_content_div"]);
+    if(file_content_div && show_button && generate_button && default_content_div){
+      file_content_div.classList.add("hidden");
+      show_button.removeEventListener("click");
+      show_button.classList.add("hidden");
+      generate_button.innerHTML = "Generate";
+      default_content_div.classList.remove("hidden");
+      if (inventory_file_generation_completed_check()) {
+        document
+          .getElementById("ansible-config-inv-nxt")
+          .removeAttribute("disabled");
+      } else {
+        document.getElementById("ansible-config-inv-nxt").disabled = true;
+      }
     }
   }
+}
 
+function get_inventory_file_state(){
+  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
   let inv_state_json = null;
-
   let inv_state_file_content =  cockpit
     .file(inventory_state_file_path)
     .read();
@@ -4499,7 +4565,7 @@ function get_inventory_file_state(){
         console.log("get_inventory_state_file(): unable to parse inventory state file");
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-      Object.entries(inventory_file_vars).forEach(([key, obj]) => {
+      Object.entries(g_inventory_file_vars).forEach(([key, obj]) => {
         if(
           inv_state_json.hasOwnProperty(key) && 
           inv_state_json[key].hasOwnProperty("failed") && 
