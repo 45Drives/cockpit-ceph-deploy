@@ -3162,6 +3162,7 @@ function update_options_request() {
     superuser: "require",
   });
   options_proc.done(function (data) {
+    console.log("options_proc: data: ",JSON.stringify(data));
     show_snackbar_msg(
       "Message: ",
       "Global options have been updated",
@@ -3187,6 +3188,7 @@ function update_options_request() {
         msg_label = "Error:";
         msg_content = "Unexpected return value.";
       }
+      console.log("host_proc: data: ",host_result_json);
       if (host_result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
         msg_label = "Add Host: ";
@@ -3219,6 +3221,7 @@ function update_options_request() {
           msg_label = "Error:";
           msg_content = "Unexpected return value.";
         }
+        console.log("group_proc: data: ",group_result_json);
         if (host_result_json.hasOwnProperty("success_msg")) {
           msg_color = "#20a030";
           msg_label = "Group Settings: ";
