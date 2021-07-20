@@ -3366,6 +3366,7 @@ function check_for_parameter_change(param_json_msg){
       console.log("old_params[\"options\"]: ",old_params["options"]);
       console.log("new_params[\"options\"]: ",new_params["options"]);
       // make all.yml again
+      clear_inventory_file_entry("all.yml");
       // re-deploy ceph
       
     }
