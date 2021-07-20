@@ -4509,7 +4509,7 @@ function clear_inventory_file_entry(key){
           JSON.stringify(inv_state_json,null,4)
         );
         new_inv_state_file.then((tag) => {
-          new_inv_state_file.close();
+          inv_state_file.close();
           localStorage.setItem(
             "inventory_files",
             JSON.stringify(inv_state_json,null,4)
@@ -4518,7 +4518,7 @@ function clear_inventory_file_entry(key){
           get_inventory_file_state();
         });
         new_inv_state_file.catch((e) => {
-          new_inv_state_file.close();
+          inv_state_file.close();
           console.log("clear_inventory_file_entry(): unable to update inventory state file");
         });
       }
