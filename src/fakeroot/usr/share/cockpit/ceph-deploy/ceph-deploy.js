@@ -4492,10 +4492,9 @@ function sync_ceph_deploy_state() {
 function clear_inventory_file_entry(key){
   let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
   let inv_state_json = null;
-  let inv_state_file =  cockpit
-    .file(inventory_state_file_path)
-    .read();
-  inv_state_file.then((content,tag) => {
+  let inv_state_file = cockpit.file(inventory_state_file_path);
+  let inv_state_file_content =  inv_state_file.read();
+  inv_state_file_content.then((content,tag) => {
     if(content){
       try {
         inv_state_json = JSON.parse(content);
