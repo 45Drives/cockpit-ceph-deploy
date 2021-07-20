@@ -4502,9 +4502,11 @@ function clear_inventory_file_entry(key){
         console.log("clear_inventory_file_entry(): unable to parse inventory state file");
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
+      console.log("inv_state_json: ",inv_state_json);
       if(inv_state_json.hasOwnProperty(key))
       {
         delete inv_state_json.key;
+        
         let new_inv_state_file = inv_state_file.replace(
           JSON.stringify(inv_state_json,null,4)
         );
@@ -4529,6 +4531,7 @@ function clear_inventory_file_entry(key){
 }
 
 function reset_inventory_file_elements(key){
+  console.log("reset_inventory_file_elements",key);
   if(g_inventory_file_vars.hasOwnProperty(key)){
     let file_content_div = document.getElementById(g_inventory_file_vars[key]["file_content_div_id"]);
     let show_button = document.getElementById(g_inventory_file_vars[key]["show_button_id"]);
