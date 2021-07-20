@@ -4506,7 +4506,7 @@ function clear_inventory_file_entry(key){
       if(inv_state_json.hasOwnProperty(key))
       {
         console.log("inv_state_json: ",inv_state_json);
-        delete inv_state_json.key;
+        delete inv_state_json[key];
         console.log("inv_state_json (after): ",inv_state_json);
         let new_inv_state_file = inv_state_file.replace(
           JSON.stringify(inv_state_json,null,4)
