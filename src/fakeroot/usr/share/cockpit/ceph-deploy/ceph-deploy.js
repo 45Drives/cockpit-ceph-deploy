@@ -3367,6 +3367,7 @@ function check_for_parameter_change(param_json_msg){
       console.log("new_params[\"options\"]: ",new_params["options"]);
       // make all.yml again
       clear_inventory_file_entry("all.yml");
+      clear_playbook_file_entry("ping_all");
       // re-deploy ceph
       
     }
@@ -4489,8 +4490,39 @@ function sync_ceph_deploy_state() {
 
 }
 
+function clear_playbook_file_entry(key){
+  let playbook_state_file_path = "/usr/share/cockpit/ceph-deploy/state/playbook_state.json";
+  let playbook_state_json = null;
+  let playbook_state_file = cockpit.file(playbook_state_file_path);
+  let playbook_state_file_content = playbook_state_file.read();
+  playbook_state_file_content.then((content,tag) =>{
+    if(content){
+      try {
+        playbook_state_json = JSON.parse(content);
+      } catch (error) {
+        console.log("clear_playbook_file_entry(): unable to parse playbook state file");
+      }
+      if(playbook_state_json.hasOwnProperty(key))
+      {
+        delete playbook_state_json[key];
+        let updated_playbook_state_file_content = playbook_state_file.replace(
+          JSON.stringify(playbook_state_json,null,4)
+        );
+        updated_playbook_state_file_content.then((tag)=>{
+          playbook_state_file.close();
+          setup_main_menu();
+        });
+        updated_playbook_state_file_content.catch((e) => {
+          playbook_state_file.close();
+          console.log("clear_playbook_file_entry(): unable to update playbook state file");
+        });
+      }
+    }
+  });
+}
+
 function clear_inventory_file_entry(key){
-  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
   let inv_state_json = null;
   let inv_state_file = cockpit.file(inventory_state_file_path);
   let inv_state_file_content =  inv_state_file.read();
@@ -4502,7 +4534,6 @@ function clear_inventory_file_entry(key){
         console.log("clear_inventory_file_entry(): unable to parse inventory state file");
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-      console.log("inv_state_json: ",inv_state_json);
       if(inv_state_json.hasOwnProperty(key))
       {
         inv_state_json[key]["failed"] = true;
