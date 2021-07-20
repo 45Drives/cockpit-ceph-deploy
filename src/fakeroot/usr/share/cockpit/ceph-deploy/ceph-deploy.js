@@ -3152,6 +3152,7 @@ function update_options_request() {
     }
   });
 
+  // update options with core_params script
   var options_spawn_args = [
     "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
     "-o",
@@ -3161,14 +3162,26 @@ function update_options_request() {
   var options_proc = cockpit.spawn(options_spawn_args, {
     superuser: "require",
   });
+  var options_result_json = null;
   options_proc.done(function (data) {
-    console.log("options_proc: data: ",JSON.parse(data));
+    try {
+      options_result_json = JSON.parse(data);
+    } catch (e) {
+      msg_color = "#bd3030";
+      msg_label = "Error:";
+      msg_content = "Unexpected return value.";
+    }
+    if(options_result_json){
+      check_for_parameter_change(options_result_json);
+    }
     show_snackbar_msg(
       "Message: ",
       "Global options have been updated",
       "#20a030",
       "update-options-snackbar"
     );
+
+    // Now update the host params
     var host_spawn_args = [
       "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
       "-h",
@@ -3188,7 +3201,9 @@ function update_options_request() {
         msg_label = "Error:";
         msg_content = "Unexpected return value.";
       }
-      console.log("host_proc: data: ",host_result_json);
+      if(host_result_json){
+        check_for_parameter_change(host_result_json);
+      }
       if (host_result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
         msg_label = "Add Host: ";
@@ -3221,8 +3236,10 @@ function update_options_request() {
           msg_label = "Error:";
           msg_content = "Unexpected return value.";
         }
-        console.log("group_proc: data: ",group_result_json);
-        if (host_result_json.hasOwnProperty("success_msg")) {
+        if(group_result_json){
+          check_for_parameter_change(group_result_json);
+        }
+        if (group_result_json.hasOwnProperty("success_msg")) {
           msg_color = "#20a030";
           msg_label = "Group Settings: ";
           msg_content = "Group Settings Updated.";
@@ -3271,6 +3288,51 @@ function update_options_request() {
       "update-roles-snackbar"
     );
   });
+}
+
+function check_for_parameter_change(param_json_msg){
+  if(!param_json_msg.hasOwnProperty("old_file_content") || !param_json_msg.hasOwnProperty("new_file_content")){
+    return;
+  }
+  let old_params = param_json_msg["old_file_content"];
+  let new_params = param_json_msg["new_file_content"];
+
+  // see if host parameters were modified
+  if(old_params.hasOwnProperty("hosts") && new_params.hasOwnProperty("hosts")){
+    if(old_params["hosts"] != new_params["hosts"]){
+      console.log("!!! hosts have been modified !!!");
+      console.log("old_params[\"hosts\"]: ",old_params["hosts"]);
+      console.log("new_params[\"hosts\"]: ",new_params["hosts"]);
+    }
+  }
+
+  // see if groups have been modified
+  if(old_params.hasOwnProperty("groups") && new_params.hasOwnProperty("groups")){
+    if(old_params["groups"] != new_params["groups"]){
+      console.log("!!! groups have been modified !!!");
+      console.log("old_params[\"groups\"]: ",old_params["groups"]);
+      console.log("new_params[\"groups\"]: ",new_params["groups"]);
+    }
+  }
+
+  // see if options have been modified
+  if(old_params.hasOwnProperty("options") && new_params.hasOwnProperty("options")){
+    if(old_params["options"] != new_params["options"]){
+      console.log("!!! options have been modified !!!");
+      console.log("old_params[\"options\"]: ",old_params["options"]);
+      console.log("new_params[\"options\"]: ",new_params["options"]);
+    }
+  }
+
+    // see if roles have been modified
+    if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
+      if(old_params["roles"] != new_params["roles"]){
+        console.log("!!! roles have been modified !!!");
+        console.log("old_params[\"roles\"]: ",old_params["roles"]);
+        console.log("new_params[\"roles\"]: ",new_params["roles"]);
+      }
+    }
+
 }
 
 /**
