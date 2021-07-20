@@ -3162,7 +3162,7 @@ function update_options_request() {
     superuser: "require",
   });
   options_proc.done(function (data) {
-    console.log("options_proc: data: ",JSON.stringify(data));
+    console.log("options_proc: data: ",JSON.parse(data));
     show_snackbar_msg(
       "Message: ",
       "Global options have been updated",
