@@ -4505,18 +4505,13 @@ function clear_inventory_file_entry(key){
       console.log("inv_state_json: ",inv_state_json);
       if(inv_state_json.hasOwnProperty(key))
       {
-        console.log("inv_state_json: ",inv_state_json);
-        delete inv_state_json[key];
-        console.log("inv_state_json (after): ",inv_state_json);
+        inv_state_json[key]["failed"] = true;
         let new_inv_state_file = inv_state_file.replace(
           JSON.stringify(inv_state_json,null,4)
         );
         new_inv_state_file.then((tag) => {
           inv_state_file.close();
-          localStorage.setItem(
-            "inventory_files",
-            JSON.stringify(inv_state_json,null,4)
-          );
+          update_localStorage_inv_file(key, "", false);
           reset_inventory_file_elements(key);
           get_inventory_file_state();
         });
@@ -4532,7 +4527,6 @@ function clear_inventory_file_entry(key){
 }
 
 function reset_inventory_file_elements(key){
-  console.log("reset_inventory_file_elements",key);
   if(g_inventory_file_vars.hasOwnProperty(key)){
     let file_content_div = document.getElementById(g_inventory_file_vars[key]["file_content_div_id"]);
     let show_button = document.getElementById(g_inventory_file_vars[key]["show_button_id"]);
