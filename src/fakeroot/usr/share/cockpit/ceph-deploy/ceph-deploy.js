@@ -3538,7 +3538,7 @@ function generate_host_file() {
         document
           .getElementById("inv-file-hosts-default")
           .classList.add("hidden");
-        update_localStorage_inv_file("hosts", data, true);
+        update_localStorage_inv_file_requirements("hosts", data, true);
         if (inventory_file_generation_completed_check()) {
           document
             .getElementById("ansible-config-inv-nxt")
@@ -3596,7 +3596,7 @@ function generate_all_file() {
         document.getElementById("generate-all-file-btn").innerHTML =
           "Generate Again";
         document.getElementById("inv-file-all-default").classList.add("hidden");
-        update_localStorage_inv_file("all.yml", data, true);
+        update_localStorage_inv_file_requirements("all.yml", data, true);
         if (inventory_file_generation_completed_check()) {
           document
             .getElementById("ansible-config-inv-nxt")
@@ -3651,7 +3651,7 @@ function generate_nfss_file() {
         document
           .getElementById("inv-file-nfss-default")
           .classList.add("hidden");
-        update_localStorage_inv_file("nfss.yml", data, true);
+        update_localStorage_inv_file_requirements("nfss.yml", data, true);
         if (inventory_file_generation_completed_check()) {
           document
             .getElementById("ansible-config-inv-nxt")
@@ -3706,7 +3706,7 @@ function generate_smbs_file() {
 		  document
 			.getElementById("inv-file-smbs-default")
 			.classList.add("hidden");
-		  update_localStorage_inv_file("smbs.yml", data, true);
+		  update_localStorage_inv_file_requirements("smbs.yml", data, true);
 		  if (inventory_file_generation_completed_check()) {
 			document
 			  .getElementById("ansible-config-inv-nxt")
@@ -3765,7 +3765,7 @@ function generate_rgwloadbalancers_file() {
         document
           .getElementById("inv-file-rgwlb-default")
           .classList.add("hidden");
-        update_localStorage_inv_file("rgwloadbalancers.yml", data, true);
+        update_localStorage_inv_file_requirements("rgwloadbalancers.yml", data, true);
         if (inventory_file_generation_completed_check()) {
           document
             .getElementById("ansible-config-inv-nxt")
@@ -4494,7 +4494,7 @@ function inventory_file_generation_completed_check() {
   return ret_val;
 }
 
-function update_localStorage_inv_file(key, content, completed_flag) {
+function update_localStorage_inv_file_requirements(key, content, completed_flag) {
   let inv_file_req_str =
     localStorage.getItem("inventory_files") ??
     JSON.stringify(g_inv_default_requirements);
@@ -4599,13 +4599,14 @@ function clear_inventory_file_entry(key){
       }
       if(inv_state_json.hasOwnProperty(key))
       {
-        inv_state_json[key]["failed"] = true;
+        //HERE
+        //inv_state_json[key]["failed"] = true;
         let new_inv_state_file = inv_state_file.replace(
           JSON.stringify(inv_state_json,null,4)
         );
         new_inv_state_file.then((tag) => {
           inv_state_file.close();
-          update_localStorage_inv_file(key, "", false);
+          update_localStorage_inv_file_requirements(key, "", false);
           reset_inventory_file_elements(key);
           get_inventory_file_state();
         });
@@ -4657,6 +4658,7 @@ function get_inventory_file_state(){
         console.log("get_inventory_state_file(): unable to parse inventory state file");
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
+      console.log("inv_state_json:",inv_state_json);
       Object.entries(g_inventory_file_vars).forEach(([key, obj]) => {
         if(
           inv_state_json.hasOwnProperty(key) && 
@@ -4679,7 +4681,7 @@ function get_inventory_file_state(){
               document.getElementById(obj["generate_button_id"]).innerHTML =
                 "Generate Again";
               document.getElementById(obj["default_content_div"]).classList.add("hidden");
-              update_localStorage_inv_file(key, ainv_content, true);
+              update_localStorage_inv_file_requirements(key, ainv_content, true);
               if (inventory_file_generation_completed_check()) {
                 document
                   .getElementById("ansible-config-inv-nxt")
