@@ -4657,9 +4657,10 @@ function get_ceph_deploy_initial_state() {
     initial_state = ceph_deploy_state_file.read();
     initial_state.then((content, tag) => {
       if (content) {
+        let deploy_state_json = null;
         //defer to the state on the server as it is possible that more than one browser was used.
         try {
-          let deploy_state_json = JSON.parse(content);
+          deploy_state_json = JSON.parse(content);
         } catch (error) {
           console.log("unable to parse ceph_ceploy_state.json");
         }
