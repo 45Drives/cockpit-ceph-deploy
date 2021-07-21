@@ -3386,18 +3386,22 @@ function check_for_parameter_change(param_json_msg){
         if(param_group["global"].length > 0){
           //there are variables that pertain to a specific group that may have been modified
           param_group["global"].forEach((global_option) =>{
+            console.log("here 1");
             if(
               old_params["options"].hasOwnProperty(global_option.option_name) && 
               new_params["options"].hasOwnProperty(global_option.option_name) &&
               old_params["options"][global_option.option_name] != new_params["options"][global_option.option_name]
             ){
+              console.log("here 2");
               let deploy_state = localStorage.getItem("ceph_deploy_state");
               let deploy_state_json = JSON.parse(deploy_state);
-              Object.entries(deploy_state_json).forEach((deploy_step_id,state_vars) => {
+              Object.entries(deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
+                console.log("here 3");
                 if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
                   if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
                     deploy_state_json[deploy_step_id]["warning_vars"] = [];
                   }
+                  console.log("here 4");
                   let warning_var = {
                     "var_name": global_option.option_name,
                     "original_value": old_params["options"][global_option.option_name],
