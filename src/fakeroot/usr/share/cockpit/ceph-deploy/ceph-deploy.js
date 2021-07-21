@@ -28,6 +28,20 @@ let g_inv_default_requirements = {
   }
 };
 
+let g_role_to_deploy_step_lut = {
+  "mons":["deploy-step-core","deploy-step-cephfs"],
+  "mgrs":["deploy-step-core","deploy-step-cephfs"],
+  "osds":["deploy-step-core","deploy-step-cephfs"],
+  "metrics":[],
+  "mdss":[],
+  "smbs":[],
+  "nfss":[],
+  "iscsigws":[],
+  "rgws":["deploy-step-rgw"],
+  "rgwloadbalancers":[],
+  "client":[]
+};
+
 let g_inventory_file_vars = {
   "hosts": {
     file_content_div_id: "host-file-content",
@@ -70,6 +84,7 @@ let g_inventory_file_vars = {
     show_listener: show_smbs_file
   }
 }
+
 
 let g_option_scheme = {
   mons: {
@@ -766,63 +781,63 @@ let g_ceph_deploy_default_state = {
     step_content_id: "step-preconfig",
     progress: "0",
     unlock_requirements: [],
-    playbook_completion_requirements: []
+    playbook_completion_requirements: [],
   },
   "deploy-step-ansible-config": {
     lock_state: "locked",
     step_content_id: "step-ansible-config",
     progress: "0",
     unlock_requirements: ["deploy-step-preconfig"],
-    playbook_completion_requirements: ["ping_all"]
+    playbook_completion_requirements: ["ping_all"],
   },
   "deploy-step-core": {
     lock_state: "locked",
     step_content_id: "step-core",
     progress: "0",
     unlock_requirements: ["deploy-step-ansible-config"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"],
   },
   "deploy-step-cephfs": {
     lock_state: "locked",
     step_content_id: "step-cephfs",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs"],
   },
   "deploy-step-nfs": {
     lock_state: "locked",
     step_content_id: "step-nfs",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_nfs"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_nfs"],
   },
   "deploy-step-smb": {
     lock_state: "locked",
     step_content_id: "step-smb",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_smb"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_smb"],
   },
   "deploy-step-rgw": {
     lock_state: "locked",
     step_content_id: "step-rgw",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw"],
   },
   "deploy-step-rgwlb": {
     lock_state: "locked",
     step_content_id: "step-rgwlb",
     progress: "0",
     unlock_requirements: ["deploy-step-rgw"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw","deploy_rgwlb"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw","deploy_rgwlb"],
   },
   "deploy-step-iscsi": {
     lock_state: "locked",
     step_content_id: "step-iscsi",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_iscsi"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_iscsi"],
   },
   "deploy-step-dashboard": {
     lock_state: "locked",
@@ -834,7 +849,7 @@ let g_ceph_deploy_default_state = {
       "deploy-step-nfs",
       "deploy-step-smb"
     ],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_dashboard"]
+    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_dashboard"],
   },
 };
 
@@ -3367,7 +3382,38 @@ function check_for_parameter_change(param_json_msg){
       clear_playbook_file_entry("ping_all");
 
       //TODO: provide a warning to user based on affected roles.
-
+      Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
+        if(param_group["global"].length > 0){
+          //there are variables that pertain to a specific group that may have been modified
+          param_group["global"].forEach((global_option) =>{
+            if(
+              old_params["options"].hasOwnProperty(global_option.option_name) && 
+              new_params["options"].hasOwnProperty(global_option.option_name) &&
+              old_params["options"][global_option.option_name] != new_params["options"][global_option.option_name]
+            ){
+              let deploy_state = localStorage.getItem("ceph_deploy_state");
+              let deploy_state_json = JSON.parse(deploy_state);
+              Object.entries(deploy_state_json).forEach((deploy_step_id,state_vars) => {
+                if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
+                  if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
+                    deploy_state_json[deploy_step_id]["warning_vars"] = [];
+                  }
+                  let warning_var = {
+                    "var_name": global_option.option_name,
+                    "original_value": old_params["options"][global_option.option_name],
+                    "current_value": new_params["options"][global_option.option_name],
+                    "original_time_stamp": old_params["time_stamp"]
+                  };
+                  deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
+                  deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + deploy_step_id + " have been modified. You may need to re-do this step.";
+                  localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
+                  sync_ceph_deploy_state();
+                }
+              });
+            }
+          });
+        }
+      });
     }
   }
 
