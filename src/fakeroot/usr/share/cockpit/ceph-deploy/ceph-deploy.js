@@ -4599,8 +4599,7 @@ function clear_inventory_file_entry(key){
       }
       if(inv_state_json.hasOwnProperty(key))
       {
-        //HERE
-        //inv_state_json[key]["failed"] = true;
+        inv_state_json[key]["failed"] = true;
         let new_inv_state_file = inv_state_file.replace(
           JSON.stringify(inv_state_json,null,4)
         );
@@ -4644,6 +4643,35 @@ function reset_inventory_file_elements(key){
   }
 }
 
+function update_inventory_state_file(new_inv_state_json){
+  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
+  let inv_state_json = null;
+  let inv_state_file = cockpit.file(inventory_state_file_path);
+  let inv_state_file_content =  inv_state_file.read();
+  inv_state_file_content.then((content,tag) => {
+    if(content){
+      try {
+        inv_state_json = JSON.parse(content);
+      } catch (error) {
+        console.log("clear_inventory_file_entry(): unable to parse inventory state file");
+        document.getElementById("ansible-config-inv-nxt").disabled = true;
+      }
+      let new_inv_state_file = inv_state_file.replace(
+        JSON.stringify(new_inv_state_json,null,4)
+      );
+      new_inv_state_file.then((tag) => {
+        inv_state_file.close();
+      });
+        new_inv_state_file.catch((e) => {
+          inv_state_file.close();
+          console.log("clear_inventory_file_entry(): unable to update inventory state file");
+        });
+    }else{
+      document.getElementById("ansible-config-inv-nxt").disabled = true;
+    }
+  });
+}
+
 function get_inventory_file_state(){
   let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
   let inv_state_json = null;
@@ -4658,7 +4686,7 @@ function get_inventory_file_state(){
         console.log("get_inventory_state_file(): unable to parse inventory state file");
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-      console.log("inv_state_json:",inv_state_json);
+      
       Object.entries(g_inventory_file_vars).forEach(([key, obj]) => {
         if(
           inv_state_json.hasOwnProperty(key) && 
@@ -4670,7 +4698,8 @@ function get_inventory_file_state(){
           .read()
           ansible_inv_file.then((ainv_content,tag) =>{
             if (ainv_content) {
-              //localStorage.setItem(key, ainv_content);
+              inv_state_json[key]["content"] = ainv_content;
+              inv_state_json[key]["completed"] = true;
               let file_content_div = document.getElementById(obj["file_content_div_id"]);
               file_content_div.innerHTML = ainv_content;
               file_content_div.classList.remove("hidden");
@@ -4693,12 +4722,23 @@ function get_inventory_file_state(){
               document.getElementById("ansible-config-inv-nxt").disabled = true;
             }
           });
+        }else if(
+          inv_state_json.hasOwnProperty(key) && 
+          inv_state_json[key].hasOwnProperty("failed") && 
+          inv_state_json[key]["failed"]){
+          inv_state_json[key]["content"] = "";
+          inv_state_json[key]["completed"] = false;
         }
       });
     }else{
       document.getElementById("ansible-config-inv-nxt").disabled = true;
     }
   });
+  //update local inventory file with updated content.
+  if(inv_state_json){
+    localStorage.setItem("inventory_state",JSON.stringify(inv_state_json,null,4));
+    update_inventory_state_file(inv_state_json);
+  }
 }
 
 function get_ceph_deploy_initial_state() {
@@ -4719,6 +4759,7 @@ function get_ceph_deploy_initial_state() {
         if(deploy_state_json){localStorage.setItem("ceph_deploy_state", JSON.stringify(deploy_state_json,null,4));}
         ceph_deploy_state_file.close();
         localStorage.removeItem("inventory_files");
+        localStorage.removeItem("inventory_state");
         resolve();
       } else if (!content) {
         //file does not exist locally
@@ -4732,6 +4773,7 @@ function get_ceph_deploy_initial_state() {
             JSON.stringify(g_ceph_deploy_default_state,null,4)
           );
           localStorage.removeItem("inventory_files");
+          localStorage.removeItem("inventory_state");
           resolve();
         });
         create_state_file.catch((e) => {
