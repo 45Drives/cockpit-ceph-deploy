@@ -19,7 +19,9 @@
 	--logo-45: #333;
     --panel: #f8f8f8;
     --bg-complete: #d9e8be;
+    --bg-warning: #e8e4be;
     --border-complete: #658036;
+    --border-warning: #806c36;
     --bg-progress-bar-current: #e3e8ec;
     --cd-box-width: 300px;
     --cd-box-height: 60px;
@@ -45,7 +47,9 @@
 	--logo-45: #fff;
     --panel: #303030;
     --bg-complete: #819164;
+    --bg-warning: #918e64;
     --border-complete: #658036;
+    --border-warning: #806f36;
     --bg-progress-bar-current: #191a1b;
     --ct-form-columns: 2;
 }
@@ -1212,6 +1216,12 @@ th,td {
 .cd-step-complete {
     background-color: var(--bg-complete);
     border: 1px solid var(--border-complete);
+    border-radius: 4px;
+}
+
+.cd-step-warning {
+    background-color: var(--bg-warning);
+    border: 1px solid var(--border-warning);
     border-radius: 4px;
 }
 /*

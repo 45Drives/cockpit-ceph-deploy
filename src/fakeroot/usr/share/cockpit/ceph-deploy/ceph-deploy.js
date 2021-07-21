@@ -3359,17 +3359,15 @@ function check_for_parameter_change(param_json_msg){
     }
   }
 
-  // see if options have been modified
+  // see if global options have been modified
   if(old_params.hasOwnProperty("options") && new_params.hasOwnProperty("options")){
     if(JSON.stringify(old_params["options"]) != JSON.stringify(new_params["options"])){
-      console.log("!!! options have been modified !!!");
-      console.log("old_params[\"options\"]: ",old_params["options"]);
-      console.log("new_params[\"options\"]: ",new_params["options"]);
       // make all.yml again
       clear_inventory_file_entry("all.yml");
       clear_playbook_file_entry("ping_all");
-      // re-deploy ceph
-      
+
+      //TODO: provide a warning to user based on affected roles.
+
     }
   }
 
@@ -4368,7 +4366,7 @@ function setup_main_menu() {
   );
   localStorage.setItem(
     "ceph_deploy_state",
-    JSON.stringify(deploy_step_current_states)
+    JSON.stringify(deploy_step_current_states,null,4)
   );
   sync_ceph_deploy_state();
 
@@ -4384,6 +4382,7 @@ function setup_main_menu() {
         deploy_step_current_states[deploy_step_ids[i]].lock_state == "complete"
       ) {
         deploy_step_element.classList.add("cd-step-complete");
+        deploy_step_element.classList.remove("cd-step-warning");
         if (status_div && start_btn) {
           status_div.innerHTML = '<i class="fas fa-check"></i>';
           status_div.title = "completed";
@@ -4395,21 +4394,35 @@ function setup_main_menu() {
         deploy_step_current_states[deploy_step_ids[i]].lock_state == "unlocked"
       ) {
         deploy_step_element.classList.remove("cd-step-complete");
+        deploy_step_element.classList.remove("cd-step-warning");
         if (status_div && start_btn) {
           status_div.innerHTML = '<i class="fas fa-lock-open"></i>';
           status_div.title = "ready";
           start_btn.classList.remove("hidden");
           start_btn.title = "start";
+          start_btn.innerHTML = '<i class="fas fa-arrow-circle-right"></i>';
         }
       } else if (
         deploy_step_current_states[deploy_step_ids[i]].lock_state == "locked"
       ) {
         deploy_step_element.classList.remove("cd-step-complete");
+        deploy_step_element.classList.remove("cd-step-warning");
         if (status_div && start_btn) {
           status_div.innerHTML = '<i class="fas fa-lock"></i>';
           status_div.title = "locked: complete required steps to unlock.";
           start_btn.classList.add("hidden");
           start_btn.title = "start";
+        }
+      }
+      if(deploy_step_current_states[deploy_step_ids[i]].hasOwnProperty("warning_msg")){
+        deploy_step_element.classList.remove("cd-step-complete");
+        deploy_step_element.classList.add("cd-step-warning");
+        if (status_div && start_btn) {
+          status_div.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+          status_div.title = deploy_step_current_states[deploy_step_ids[i]].warning_msg;
+          start_btn.classList.remove("hidden");
+          start_btn.title = deploy_step_current_states[deploy_step_ids[i]].warning_msg;
+          start_btn.innerHTML = '<i class="fas fa-redo"></i>';
         }
       }
     }
@@ -4450,7 +4463,7 @@ function update_localStorage_inv_file(key, content, completed_flag) {
 function sync_ceph_deploy_state() {
   let ceph_deploy_state_json_str =
     localStorage.getItem("ceph_deploy_state") ??
-    JSON.stringify(g_ceph_deploy_default_state);
+    JSON.stringify(g_ceph_deploy_default_state,null,4);
   let ceph_deploy_state_file = cockpit.file(
     "/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json"
   );
@@ -4605,7 +4618,7 @@ function get_inventory_file_state(){
           .read()
           ansible_inv_file.then((ainv_content,tag) =>{
             if (ainv_content) {
-              localStorage.setItem(key, ainv_content);
+              //localStorage.setItem(key, ainv_content);
               let file_content_div = document.getElementById(obj["file_content_div_id"]);
               file_content_div.innerHTML = ainv_content;
               file_content_div.classList.remove("hidden");
@@ -4650,7 +4663,7 @@ function get_ceph_deploy_initial_state() {
         } catch (error) {
           console.log("unable to parse ceph_ceploy_state.json");
         }
-        localStorage.setItem("ceph_deploy_state", content);
+        if(deploy_state_json){localStorage.setItem("ceph_deploy_state", JSON.stringify(deploy_state_json,null,4));}
         ceph_deploy_state_file.close();
         localStorage.removeItem("inventory_files");
         resolve();
@@ -4663,7 +4676,7 @@ function get_ceph_deploy_initial_state() {
           ceph_deploy_state_file.close();
           localStorage.setItem(
             "ceph_deploy_state",
-            JSON.stringify(g_ceph_deploy_default_state)
+            JSON.stringify(g_ceph_deploy_default_state,null,4)
           );
           localStorage.removeItem("inventory_files");
           resolve();
