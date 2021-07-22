@@ -4726,8 +4726,8 @@ function get_inventory_file_state(){
           inv_state_json.hasOwnProperty(key) && 
           inv_state_json[key].hasOwnProperty("failed") && 
           inv_state_json[key]["failed"]){
-          inv_state_json[key]["content"] = "";
-          inv_state_json[key]["completed"] = false;
+            inv_state_json[key]["content"] = "";
+            inv_state_json[key]["completed"] = false;
         }
       });
     }else{
