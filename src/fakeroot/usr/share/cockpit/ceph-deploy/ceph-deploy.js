@@ -4402,7 +4402,9 @@ function setup_main_menu() {
       if (obj.lock_state != "complete") {
         // objects that are marked complete should be left alone. The playbooks that are 
         // required to be completed have been verified completed.
-        obj.lock_state = "locked";  // pre-emptively lock the deployment step
+        if(obj.unlock_requirements.length > 0){
+          obj.lock_state = "locked";  // pre-emptively lock the deployment step
+        }
         for (let i = 0; i < obj.unlock_requirements.length; i++) {
           if (
             deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
