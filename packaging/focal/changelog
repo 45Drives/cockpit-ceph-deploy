@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (0.1.5-15focal) focal; urgency=medium
+
+  * state handling
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 22 Jul 2021 11:54:05 -0300
+
 cockpit-ceph-deploy (0.1.5-14focal) focal; urgency=medium
 
   * state handling

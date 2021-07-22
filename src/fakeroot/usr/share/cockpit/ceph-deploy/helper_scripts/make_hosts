@@ -104,7 +104,6 @@ def make_per_host_inventory_files(host_dict,ansible_dir,start_tag,end_tag,ceph_d
         for field in host_dict[host].keys():
             if(host_dict[host][field] and field not in ignore and host_dict[host][field] != ""):
                 new_content += field + ": " + host_dict[host][field] + "\n"
-                print("new_content (DURING): ", new_content)
         
         updated_host_inventory_file = open(path,"w")
         content = content.replace(section_to_replace,new_content)
