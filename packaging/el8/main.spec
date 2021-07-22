@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-16
+- fixed text replacement in make_hosts script
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-15
 - state handling
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-14
