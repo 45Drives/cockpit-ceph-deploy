@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-13
+- state handling
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-12
 - state handling
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-11

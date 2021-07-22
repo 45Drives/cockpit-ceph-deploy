@@ -76,21 +76,30 @@ def make_host_file(roles_dict,path,dir,ansible_path):
         sys.exit(1)
 
 
-def make_per_host_inventory_files(host_dict,dir,start_tag,end_tag):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+def make_per_host_inventory_files(host_dict,ansible_dir,start_tag,end_tag,ceph_deploy_local_dir):
+    if not os.path.exists(ansible_dir):
+        os.makedirs(ansible_dir)
+    
+    if not os.path.exists(ceph_deploy_local_dir):
+        os.makedirs(ceph_deploy_local_dir)
     
     for host in host_dict.keys():
-        path = (dir+"/"+host+".yml")
+        path = (ansible_dir+"/"+host+".yml")
+        cd_path = (ceph_deploy_local_dir+"/"+host+".yml")
         if not os.path.exists(path):
             host_inventory_file = open(path,"w")
             host_inventory_file.write(start_tag + "\n")
             host_inventory_file.write(end_tag)
             host_inventory_file.close()
+        if os.path.exists(cd_path) and os.path.isfile(cd_path):
+            os.remove(cd_path)
+
+    error_string = ""
+    error_msg = { "error_msg":error_string }
 
     for host in host_dict.keys():
-        path = (dir+"/"+host+".yml")
-        
+        path = (ansible_dir+"/"+host+".yml")
+        cd_path = (ceph_deploy_local_dir+"/"+host+".yml")
         host_inventory_file = open(path,"r")
         content = host_inventory_file.read()
         host_inventory_file.close()
@@ -106,6 +115,19 @@ def make_per_host_inventory_files(host_dict,dir,start_tag,end_tag):
         content = content.replace(section_to_replace,new_content)
         updated_host_inventory_file.write(content)
         updated_host_inventory_file.close()
+        
+        # overwrite the inventory file in the ceph-ansible directory
+        try:
+            copyfile(path,cd_path)
+        except OSError as err:
+            # print json formatted error
+            error_string += print_to_string(err)
+            error_msg["error_msg"] = error_string
+
+    if error_string != "":
+        print(json.dumps(error_msg,indent=4))
+        update_inventory_state(g_inventory_file_key,g_ansible_file_path,True)
+        sys.exit(1)
 
 
 def make_host_inventory_file(host_dict,dir):
@@ -202,12 +224,13 @@ def main():
     global g_inventory_file_key
     params = get_parameters(g_param_file_path)
     make_host_file(params["roles"],g_host_file_path,g_host_file_dir,g_ansible_file_path)
-    make_host_inventory_file(params["hosts"],g_host_file_dir)
+    #make_host_inventory_file(params["hosts"],g_host_file_dir)
     make_per_host_inventory_files(
         params["hosts"],
         g_ansible_host_inv_file_dir,
         "# BEGIN **********  cockpit-ceph-deploy make_hosts output **********",
-        "# END **********  cockpit-ceph-deploy make_hosts output **********"
+        "# END **********  cockpit-ceph-deploy make_hosts output **********",
+        g_host_file_dir
         )
     #check_etc_hosts(params["hosts"])
     success_msg = { "success_msg":"hosts file created successfully","path":g_ansible_file_path}
