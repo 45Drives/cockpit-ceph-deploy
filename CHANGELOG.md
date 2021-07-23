@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.5-16
+## Cockpit Ceph-Deploy 0.1.5-17
 
-* fixed text replacement in make_hosts script
+* added warning indicators if important parameters are changed

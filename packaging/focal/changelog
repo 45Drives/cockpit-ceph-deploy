@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (0.1.5-17focal) focal; urgency=medium
+
+  * added warning indicators if important parameters are changed
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 23 Jul 2021 07:13:09 -0300
+
 cockpit-ceph-deploy (0.1.5-16focal) focal; urgency=medium
 
   * fixed text replacement in make_hosts script

@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 23 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-17
+- added warning indicators if important parameters are changed
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-16
 - fixed text replacement in make_hosts script
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-15
