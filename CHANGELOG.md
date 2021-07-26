@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.1.5-17
+## Cockpit Ceph-Deploy 0.1.5-18
 
-* added warning indicators if important parameters are changed
+* adding warnadded warning indicators if parameters are changeimportant parameters are changed

@@ -533,6 +533,7 @@ def merge_with_existing(hosts, roles, opts, groups, param_file_content):
     for role_name in roles.keys():
         param_file_content["roles"][role_name] = copy.deepcopy(
             list(set(param_file_content["roles"][role_name] + roles[role_name])))
+        param_file_content["roles"][role_name].sort()
     for opt_name in opts.keys():
         param_file_content["options"][opt_name] = copy.deepcopy(opts[opt_name])
     for group_name in groups.keys():

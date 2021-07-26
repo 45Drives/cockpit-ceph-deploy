@@ -87,6 +87,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Jul 26 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-18
+- adding warnadded warning indicators if parameters are changeimportant parameters
+  are changed
 * Fri Jul 23 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-17
 - added warning indicators if important parameters are changed
 * Thu Jul 22 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-16

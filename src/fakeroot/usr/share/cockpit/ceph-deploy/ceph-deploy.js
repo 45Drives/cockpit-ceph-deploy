@@ -28,18 +28,80 @@ let g_inv_default_requirements = {
   }
 };
 
+let g_deploy_step_id_lut = {
+  "deploy-step-preconfig": {
+    "step_name": "Pre-Configuration",
+    "inventory_files": [],
+    "purge_playbooks":[],
+    "roles":[]
+  },
+  "deploy-step-ansible-config": {
+    "step_name": "Ansible Configuration",
+    "inventory_files": [],
+    "purge_playbooks":[],
+    "roles":[]
+  },
+  "deploy-step-core":  {
+    "step_name": "Ceph Core",
+    "inventory_files": ["hosts","all.yml"],
+    "purge_playbooks":["remove_core"],
+    "roles":["osds","mons","mgrs"]
+  },
+  "deploy-step-cephfs":  {
+    "step_name": "CephFS",
+    "inventory_files": ["hosts","all.yml"],
+    "purge_playbooks":["remove_core"],
+    "roles":["mdss"]
+  },
+  "deploy-step-nfs":  {
+    "step_name": "NFS",
+    "inventory_files": ["hosts","nfss.yml"],
+    "purge_playbooks":["remove_nfss","remove_core"],
+    "roles": ["nfss"]
+  },
+  "deploy-step-smb":  {
+    "step_name": "SMB",
+    "inventory_files": ["hosts","smbs.yml"],
+    "purge_playbooks":["remove_smbs","remove_core"],
+    "roles":["smbs"]
+  },
+  "deploy-step-rgw":  {
+    "inventory_files": ["hosts","all.yml"],
+    "purge_playbooks":["remove_core"],
+    "roles":["rgws"]
+  },
+  "deploy-step-rgwlb":  {
+    "step_name": "Load Balancing",
+    "inventory_files": ["hosts","rgwloadbalancers.yml"],
+    "purge_playbooks":["remove_core"],
+    "roles":["rgwloadbalancers"]
+  },
+  "deploy-step-iscsi":  {
+    "step_name": "ISCSI Service",
+    "inventory_files": ["hosts"],
+    "purge_playbooks":["remove_iscsi","remove_core"],
+    "roles":["iscsigws"]
+  },
+  "deploy-step-dashboard":  {
+    "step_name": "Dashboard",
+    "inventory_files": ["hosts"],
+    "purge_playbooks":["remove_core"],
+    "roles":["metrics"]
+  },
+};
+
 let g_role_to_deploy_step_lut = {
   "mons":["deploy-step-core","deploy-step-cephfs"],
   "mgrs":["deploy-step-core","deploy-step-cephfs"],
   "osds":["deploy-step-core","deploy-step-cephfs"],
-  "metrics":[],
-  "mdss":[],
-  "smbs":[],
-  "nfss":[],
-  "iscsigws":[],
+  "metrics":["deploy-step-dashboard"],
+  "mdss":["deploy-step-cephfs"],
+  "smbs":["deploy-step-smb"],
+  "nfss":["deploy-step-nfs"],
+  "iscsigws":["deploy-step-iscsi"],
   "rgws":["deploy-step-rgw"],
-  "rgwloadbalancers":[],
-  "client":[]
+  "rgwloadbalancers":["deploy-step-rgwlb"],
+  "client":["deploy-step-dashboard"]
 };
 
 let g_inventory_file_vars = {
@@ -2910,6 +2972,7 @@ function update_role_request() {
   });
   remove_role_proc.done(function (data) {
     // removal was successful, now perform the add role request.
+    remove_result_json = JSON.parse(data);
     var add_spawn_args = [
       "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
       "-r",
@@ -2919,6 +2982,12 @@ function update_role_request() {
     var add_result_json = null;
     var add_role_proc = cockpit.spawn(add_spawn_args, { superuser: "require" });
     add_role_proc.done(function (data) {
+      console.log("role_add: ",JSON.parse(data));
+      add_result_json = JSON.parse(data);
+      if(JSON.stringify(remove_result_json["old_file_content"]) != JSON.stringify(add_result_json["new_file_content"])){
+        add_result_json["old_file_content"] = remove_result_json["old_file_content"];
+        check_for_parameter_change(add_result_json);
+      }
       show_snackbar_msg(
         "Message: ",
         "Roles have been updated.",
@@ -3362,6 +3431,7 @@ function check_for_parameter_change(param_json_msg){
       console.log("!!! hosts have been modified !!!");
       console.log("old_params[\"hosts\"]: ",old_params["hosts"]);
       console.log("new_params[\"hosts\"]: ",new_params["hosts"]);
+      
     }
   }
 
@@ -3378,10 +3448,7 @@ function check_for_parameter_change(param_json_msg){
   if(old_params.hasOwnProperty("options") && new_params.hasOwnProperty("options")){
     if(JSON.stringify(old_params["options"]) != JSON.stringify(new_params["options"])){
       // make all.yml again
-      clear_inventory_file_entry("all.yml");
-      clear_playbook_file_entry("ping_all");
 
-      //TODO: provide a warning to user based on affected roles.
       Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
         if(param_group["global"].length > 0){
           //there are variables that pertain to a specific group that may have been modified
@@ -3395,8 +3462,10 @@ function check_for_parameter_change(param_json_msg){
               let deploy_state_json = JSON.parse(deploy_state);
               Object.entries(deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
                 if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
+                  let make_warning_var = false;
                   if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
                     deploy_state_json[deploy_step_id]["warning_vars"] = [];
+                    make_warning_var = true;
                   }
                   else{
                     // we already have a warning vars array.
@@ -3409,28 +3478,44 @@ function check_for_parameter_change(param_json_msg){
                       //value that was used during deployment.
                       if(new_params["options"][global_option.option_name] === existing_warning_var["warning_var"]["original_value"]){
                         // the user changed it back to the proper value, remove the warning variable.
-                        delete deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]];
+                        console.log("user changed warning var back to original value");
+                        deploy_state_json[deploy_step_id]["warning_vars"].splice(existing_warning_var["index"]);
                         if(deploy_state_json[deploy_step_id]["warning_vars"].length == 0){
                           delete deploy_state_json[deploy_step_id]["warning_msg"];
+                          delete deploy_state_json[deploy_step_id]["warning_vars"];
+                        }else{
+                          deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
+                          deploy_step_id + " have been modified.\n" + 
+                          JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
+                          "\nYou may need to re-do this step.";
                         }
                       }
-                    }else{
-                      //warning var was not already found. make a new one
-                      let warning_var = {
-                        "var_name": global_option.option_name,
-                        "original_value": old_params["options"][global_option.option_name],
-                        "current_value": new_params["options"][global_option.option_name],
-                        "original_time_stamp": old_params["time_stamp"]
-                      };
-                      deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
-                      deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
-                                                                          deploy_step_id + " have been modified.\n" + 
-                                                                          JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-                                                                          "\nYou may need to re-do this step.";
-                      localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
-                      sync_ceph_deploy_state();
+                      else{
+                        //the user changed it to something different than the original value.
+                        //update the current value of the warning var.
+                        deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]]["current_value"] = new_params["options"][global_option.option_name];
+                      }
+                    }
+                    else{
+                      make_warning_var = true;
                     }
                   }
+                  if(make_warning_var){
+                    //we need to make a warning variable and a warning message.
+                    let warning_var = {
+                      "var_name": global_option.option_name,
+                      "original_value": old_params["options"][global_option.option_name],
+                      "current_value": new_params["options"][global_option.option_name],
+                      "original_time_stamp": old_params["time_stamp"]
+                    };
+                    deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
+                    deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
+                                                                        deploy_step_id + " have been modified.\n" + 
+                                                                        JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
+                                                                        "\nYou may need to re-do this step.";
+                  }
+                  localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
+                  sync_ceph_deploy_state();
                 }
               });
             }
@@ -3440,15 +3525,85 @@ function check_for_parameter_change(param_json_msg){
     }
   }
 
-    // see if roles have been modified
-    if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
-      if(JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])){
-        console.log("!!! roles have been modified !!!");
-        console.log("old_params[\"roles\"]: ",old_params["roles"]);
-        console.log("new_params[\"roles\"]: ",new_params["roles"]);
-      }
-    }
+  // see if roles have been modified
+  if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
+    if(JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])){
+      //let g_role_to_deploy_step_lut = {
+      //  "mons":["deploy-step-core","deploy-step-cephfs"],
+      //  "mgrs":["deploy-step-core","deploy-step-cephfs"],
+      //  "osds":["deploy-step-core","deploy-step-cephfs"],
+      //  "metrics":["deploy-step-core","deploy-step-dashboard"],
+      //  "mdss":["deploy-step-cephfs"],
+      //  "smbs":["deploy-step-smb"],
+      //  "nfss":["deploy-step-nfs"],
+      //  "iscsigws":["deploy-step-iscsi"],
+      //  "rgws":["deploy-step-rgw"],
+      //  "rgwloadbalancers":["deploy-step-rgwlb"],
+      //  "client":["deploy-step-dashboard"]
+      //};
 
+      let role_deploy_state = localStorage.getItem("ceph_deploy_state");
+      let role_deploy_state_json = JSON.parse(role_deploy_state);
+
+      Object.entries(g_role_to_deploy_step_lut).forEach(([role_name, deploy_step_ids]) => {
+        if(old_params["roles"].hasOwnProperty(role_name) && 
+          new_params["roles"].hasOwnProperty(role_name) && 
+          JSON.stringify(old_params["roles"][role_name]) != JSON.stringify(new_params["roles"][role_name])){
+          console.log("roles have been modified: ",role_name);
+          console.log("old: ", old_params["roles"][role_name]);
+          console.log("new: ", new_params["roles"][role_name]);
+          console.log("deploy_step_ids: ",deploy_step_ids);
+          deploy_step_ids.forEach((deploy_step_id) => {
+            if(role_deploy_state_json[deploy_step_id]["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
+              console.log("deploy_step_id affected: ",deploy_step_id);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  let current_deploy_state = localStorage.getItem("ceph_deploy_state");
+  let current_deploy_state_json = JSON.parse(current_deploy_state);
+  let ansible_config_warning = {
+    deploy_step_warnings: []
+  };
+
+  Object.entries(current_deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
+    if(current_deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars") && current_deploy_state_json[deploy_step_id]["warning_vars"].length > 0){
+      let warning_entry = {};
+      warning_entry["deploy_step_id"] = deploy_step_id;
+      warning_entry["step_name"] = g_deploy_step_id_lut[deploy_step_id]["step_name"];
+      warning_entry["inventory_files"] = g_deploy_step_id_lut[deploy_step_id]["inventory_files"];
+      warning_entry["purge_playbooks"] = g_deploy_step_id_lut[deploy_step_id]["purge_playbooks"];
+      warning_entry["warning_vars"] = current_deploy_state_json[deploy_step_id]["warning_vars"];
+      warning_entry["roles"] = g_deploy_step_id_lut[deploy_step_id]["roles"];
+      ansible_config_warning["deploy_step_warnings"].push(warning_entry);
+    }
+  });
+
+  console.log("ansible_config_warning[\"deploy_step_warnings\"]",ansible_config_warning["deploy_step_warnings"]);
+  if(ansible_config_warning["deploy_step_warnings"].length > 0){
+    let ansible_config_warning_msg = "";
+    ansible_config_warning_msg += "Warning: Ansible Configuration has been modified after deployment steps have been completed\n";
+    ansible_config_warning_msg += "You can fix this by completing one of the following:\n";
+    ansible_config_warning_msg += "    - run the corresponding purge command \"ansible_runner -c <purge_command>\" to undo your progress\n";
+    ansible_config_warning_msg += "    - change the modified variables back to the original value indicated.\n";
+    ansible_config_warning_msg += "    - re-generate the inventory files indicated, and redo the step again. (not recommended)\n";
+    ansible_config_warning["deploy_step_warnings"].forEach((warning_entry) => {
+      ansible_config_warning_msg += warning_entry["step_name"] + ":\n";
+      console.log("warning_entry",warning_entry);
+      ansible_config_warning_msg += ("     purge_command: " + warning_entry["purge_playbooks"].toString() + "\n");
+      ansible_config_warning_msg += ("     Inventory File(s): " + warning_entry["inventory_files"].toString() + "\n");
+      ansible_config_warning_msg += ("     affected roles: " + warning_entry["roles"].toString() + "\n\n");
+    });
+    current_deploy_state_json["deploy-step-ansible-config"]["warning_msg"] = ansible_config_warning_msg;
+  }else if(current_deploy_state_json["deploy-step-ansible-config"].hasOwnProperty("warning_msg")){
+    delete current_deploy_state_json["deploy-step-ansible-config"]["warning_msg"];
+  }
+  localStorage.setItem("ceph_deploy_state",JSON.stringify(current_deploy_state_json,null,4));
+  sync_ceph_deploy_state();
+  setup_main_menu();
 }
 
 function search_jarray_key_value_match(json_array,key,value){
