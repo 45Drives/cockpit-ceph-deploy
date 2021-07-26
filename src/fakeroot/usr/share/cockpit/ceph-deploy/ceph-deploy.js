@@ -67,13 +67,13 @@ let g_deploy_step_id_lut = {
   },
   "deploy-step-rgw":  {
     "inventory_files": ["hosts","all.yml"],
-    "purge_playbooks":["remove_core"],
+    "purge_playbooks":["remove_rgw","remove_core"],
     "roles":["rgws"]
   },
   "deploy-step-rgwlb":  {
     "step_name": "Load Balancing",
     "inventory_files": ["hosts","rgwloadbalancers.yml"],
-    "purge_playbooks":["remove_core"],
+    "purge_playbooks":["remove_rgw","remove_core"],
     "roles":["rgwloadbalancers"]
   },
   "deploy-step-iscsi":  {
@@ -3458,66 +3458,13 @@ function check_for_parameter_change(param_json_msg){
               new_params["options"].hasOwnProperty(global_option.option_name) &&
               old_params["options"][global_option.option_name] != new_params["options"][global_option.option_name]
             ){
-              let deploy_state = localStorage.getItem("ceph_deploy_state");
-              let deploy_state_json = JSON.parse(deploy_state);
-              Object.entries(deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
-                if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
-                  let make_warning_var = false;
-                  if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
-                    deploy_state_json[deploy_step_id]["warning_vars"] = [];
-                    make_warning_var = true;
-                  }
-                  else{
-                    // we already have a warning vars array.
-                    let existing_warning_var = search_jarray_key_value_match(
-                                                  deploy_state_json[deploy_step_id]["warning_vars"],
-                                                  "var_name",
-                                                  global_option.option_name);
-                    if(existing_warning_var){
-                      //warning var was already flagged. check to see if the user changed it back to the
-                      //value that was used during deployment.
-                      if(new_params["options"][global_option.option_name] === existing_warning_var["warning_var"]["original_value"]){
-                        // the user changed it back to the proper value, remove the warning variable.
-                        console.log("user changed warning var back to original value");
-                        deploy_state_json[deploy_step_id]["warning_vars"].splice(existing_warning_var["index"]);
-                        if(deploy_state_json[deploy_step_id]["warning_vars"].length == 0){
-                          delete deploy_state_json[deploy_step_id]["warning_msg"];
-                          delete deploy_state_json[deploy_step_id]["warning_vars"];
-                        }else{
-                          deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
-                          deploy_step_id + " have been modified.\n" + 
-                          JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-                          "\nYou may need to re-do this step.";
-                        }
-                      }
-                      else{
-                        //the user changed it to something different than the original value.
-                        //update the current value of the warning var.
-                        deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]]["current_value"] = new_params["options"][global_option.option_name];
-                      }
-                    }
-                    else{
-                      make_warning_var = true;
-                    }
-                  }
-                  if(make_warning_var){
-                    //we need to make a warning variable and a warning message.
-                    let warning_var = {
-                      "var_name": global_option.option_name,
-                      "original_value": old_params["options"][global_option.option_name],
-                      "current_value": new_params["options"][global_option.option_name],
-                      "original_time_stamp": old_params["time_stamp"]
-                    };
-                    deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
-                    deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
-                                                                        deploy_step_id + " have been modified.\n" + 
-                                                                        JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-                                                                        "\nYou may need to re-do this step.";
-                  }
-                  localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
-                  sync_ceph_deploy_state();
-                }
-              });
+              handle_warning_vars(
+                new_params["options"][global_option.option_name],
+                old_params["options"][global_option.option_name],
+                global_option.option_name,
+                old_params["time_stamp"],
+                role_name
+                );
             }
           });
         }
@@ -3528,36 +3475,17 @@ function check_for_parameter_change(param_json_msg){
   // see if roles have been modified
   if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
     if(JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])){
-      //let g_role_to_deploy_step_lut = {
-      //  "mons":["deploy-step-core","deploy-step-cephfs"],
-      //  "mgrs":["deploy-step-core","deploy-step-cephfs"],
-      //  "osds":["deploy-step-core","deploy-step-cephfs"],
-      //  "metrics":["deploy-step-core","deploy-step-dashboard"],
-      //  "mdss":["deploy-step-cephfs"],
-      //  "smbs":["deploy-step-smb"],
-      //  "nfss":["deploy-step-nfs"],
-      //  "iscsigws":["deploy-step-iscsi"],
-      //  "rgws":["deploy-step-rgw"],
-      //  "rgwloadbalancers":["deploy-step-rgwlb"],
-      //  "client":["deploy-step-dashboard"]
-      //};
-
-      let role_deploy_state = localStorage.getItem("ceph_deploy_state");
-      let role_deploy_state_json = JSON.parse(role_deploy_state);
-
       Object.entries(g_role_to_deploy_step_lut).forEach(([role_name, deploy_step_ids]) => {
         if(old_params["roles"].hasOwnProperty(role_name) && 
           new_params["roles"].hasOwnProperty(role_name) && 
           JSON.stringify(old_params["roles"][role_name]) != JSON.stringify(new_params["roles"][role_name])){
-          console.log("roles have been modified: ",role_name);
-          console.log("old: ", old_params["roles"][role_name]);
-          console.log("new: ", new_params["roles"][role_name]);
-          console.log("deploy_step_ids: ",deploy_step_ids);
-          deploy_step_ids.forEach((deploy_step_id) => {
-            if(role_deploy_state_json[deploy_step_id]["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
-              console.log("deploy_step_id affected: ",deploy_step_id);
-            }
-          });
+            handle_warning_vars(
+              new_params["roles"][role_name].toString(),
+              old_params["roles"][role_name].toString(),
+              "roles-"+role_name,
+              old_params["time_stamp"],
+              role_name
+            );
         }
       });
     }
@@ -3605,6 +3533,70 @@ function check_for_parameter_change(param_json_msg){
   sync_ceph_deploy_state();
   setup_main_menu();
 }
+
+function handle_warning_vars(new_value,old_value,var_name,old_time_stamp,role_name){
+  let deploy_state = localStorage.getItem("ceph_deploy_state");
+  let deploy_state_json = JSON.parse(deploy_state);
+  Object.entries(deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
+    if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
+      let make_warning_var = false;
+      if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
+        deploy_state_json[deploy_step_id]["warning_vars"] = [];
+        make_warning_var = true;
+      }
+      else{
+        // we already have a warning vars array.
+        let existing_warning_var = search_jarray_key_value_match(
+                                      deploy_state_json[deploy_step_id]["warning_vars"],
+                                      "var_name",
+                                      var_name);
+        if(existing_warning_var){
+          //warning var was already flagged. check to see if the user changed it back to the
+          //value that was used during deployment.
+          if(new_value === existing_warning_var["warning_var"]["original_value"]){
+            // the user changed it back to the proper value, remove the warning variable.
+            deploy_state_json[deploy_step_id]["warning_vars"].splice(existing_warning_var["index"]);
+            if(deploy_state_json[deploy_step_id]["warning_vars"].length == 0){
+              delete deploy_state_json[deploy_step_id]["warning_msg"];
+              delete deploy_state_json[deploy_step_id]["warning_vars"];
+            }else{
+              deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
+              deploy_step_id + " have been modified.\n" + 
+              JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
+              "\nYou may need to re-do this step.";
+            }
+          }
+          else{
+            //the user changed it to something different than the original value.
+            //update the current value of the warning var.
+            deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]]["current_value"] = new_value;
+          }
+        }
+        else{
+          make_warning_var = true;
+        }
+      }
+      if(make_warning_var){
+
+        //we need to make a warning variable and a warning message.
+        let warning_var = {
+          "var_name": var_name,
+          "original_value": old_value,
+          "current_value": new_value,
+          "original_time_stamp": old_time_stamp
+        };
+        deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
+        deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
+                                                            deploy_step_id + " have been modified.\n" + 
+                                                            JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
+                                                            "\nYou may need to re-do this step.";
+      }
+      localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
+      sync_ceph_deploy_state();
+    }
+  });
+}
+
 
 function search_jarray_key_value_match(json_array,key,value){
   for (var i=0; i < json_array.length; i++) {

@@ -61,6 +61,13 @@ ansible_commands = {
         "time_stamp": None,
         "purge":["deploy_nfs","deploy_dashboard"]
     },
+    "remove_rgw": {
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-rgw.yml",
+        "cwd": "/usr/share/ceph-ansible",
+        "result": None,
+        "time_stamp": None,
+        "purge":["deploy_rgwlb","deploy_radosgw","deploy_dashboard"]
+    },
     "remove_vg": {
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts remove-vg.yml",
         "cwd": "/usr/share/ceph-ansible",

@@ -50,10 +50,14 @@
     "changelog": {
         "urgency": "medium",
         "version": "0.1.5",
-        "buildVersion": "19",
+        "buildVersion": "20",
         "ignore": [],
-        "date": null,
+        "date": "2021-07-26T16:05:55.468102",
         "packager": "Mark Hooper <mhooper@45drives.com>",
-        "changes": []
+        "changes": [
+            "added handling for modifying assigned roles used in deployment step",
+            "roles are now sorted alphabetically by core_params",
+            "added purge_rgw command to ansible_runner"
+        ]
     }
 }
