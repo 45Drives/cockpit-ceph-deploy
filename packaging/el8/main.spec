@@ -79,14 +79,18 @@ fi
 %postun
 if [ $1 == 0 ];then
     rm -rf /usr/share/cockpit/ceph-deploy
+    rm /usr/bin/ansible_runner
 fi
 
 %files
 %dir /usr/share/cockpit/ceph-deploy
 %defattr(-,root,root,-)
+%{_bindir}/*
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-9
+- changed makefile
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-8
 - changed makefile
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-7

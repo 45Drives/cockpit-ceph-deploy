@@ -1,7 +1,9 @@
 if [ "$1" = "purge" ]; then 
-    rm -rf  /usr/share/cockpit/ceph-deploy ;
+    rm -rf  /usr/share/cockpit/ceph-deploy
+    rm /usr/bin/ansible_runner
 fi
 
 if [ "$1" = "remove" ]; then
-    rm -rf  /usr/share/cockpit/ceph-deploy ;
+    rm -rf  /usr/share/cockpit/ceph-deploy
+    rm /usr/bin/ansible_runner
 fi
