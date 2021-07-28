@@ -87,6 +87,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-2
+- added primitive warning messages when parameters used to deploy are modified
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-1
 - added primitive warning messages when parameters used to deploy are modified
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.1.5-20
