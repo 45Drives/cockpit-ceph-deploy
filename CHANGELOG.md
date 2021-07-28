@@ -1,4 +1,3 @@
-## Cockpit Ceph-Deploy 0.2.0-6
+## Cockpit Ceph-Deploy 0.2.0-7
 
-* changed makefile
 * changed makefile
