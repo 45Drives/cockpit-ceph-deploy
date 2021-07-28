@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.2.0-2
+## Cockpit Ceph-Deploy 0.2.0-3
 
-* added primitive warning messages when parameters used to deploy are modified
+* added python3-dataclasses dependency for el8
