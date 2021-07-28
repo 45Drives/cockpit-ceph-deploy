@@ -321,11 +321,6 @@ input:checked + .cd-slider:before {
 	margin-bottom: 5px;
 }
 
-/*
-.cd-button-right {
-	align-self: flex-end;
-}*/
-
 .cd-row {
 	display: flex;
 	flex-direction: row;
@@ -339,11 +334,6 @@ input:checked + .cd-slider:before {
 	align-items:center;
 	justify-content: flex-end;
 }
-/*
-.cd-col-50 {
-	display: flex;
-	flex-direction: column;
-}*/
 
 .cd-row-child {
 	flex-grow: 1;
@@ -357,15 +347,6 @@ input:checked + .cd-slider:before {
     border-radius: 4px;
 }
 
-/*
-.cd-option-panel {
-    max-width: 90%;
-    background-color: var(--container);
-	border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-left: 15px;
-}
-*/
 .cd-panel-body {
     padding: 15px;
     color: var(--font);
@@ -468,16 +449,6 @@ input:checked + .cd-slider:before {
 	cursor: pointer;
 }
 
-/*
-.cd-host-list-entry-placeholder {
-	display: flex;
-	flex-direction: row;
-	align-items:center;
-	padding: 10px 10px 10px 10px;
-	justify-content: center;
-}
-*/
-
 .cd-top-nav-button-group {
     position: -webkit-sticky;
     position: sticky;
@@ -527,14 +498,6 @@ input:checked + .cd-slider:before {
     border-radius: 4px;
     width: 90%;
 }
-/*
-.cd-form-row {
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	padding: 5px;
-}
-*/
 
 .cd-field-feedback {
 	color: #dc143c;
@@ -1037,22 +1000,6 @@ th,td {
 	padding: 1em;
 }
 
-/*
-.deploy-step-complete {
-    color:limegreen;
-}
-*/
-
-/*
-.deploy-step-incomplete {
-    color:grey;
-}
-*/
-/*
-.deploy-step-failed {
-    color:red;
-}
-*/
 .cd-panel-vis-toggle {
     cursor:pointer;
 }
@@ -1066,15 +1013,6 @@ th,td {
     border-radius: 4px;
     height: 100%;
 }
-/*
-.cd-step-mid {
-    width: 25%;
-}
-*/
-/*
-.cd-step-branch {
-    width: 25%
-}*/
 
 .cd-step-title {
     color: var(--font);
@@ -1085,77 +1023,6 @@ th,td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-/*
-.cd-tree-menu-row {
-    display: flex;
-    justify-content: space-around;
-    background-color: var(--container);
-    padding: 1em 1em 1em 1em;
-}
-
-.cd-tree-menu-col {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--container);
-   
-   
-    gap:10%;
-    width:20%;
-    height: 100%;
-    justify-content: center;
-}
-
-.cd-tree-menu-arrow-col {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--container);
-    gap:10%;
-    width:20%;
-    height: 100%;
-    justify-content: center;
-}
-*/
-
-/*
-.cd-fork {
-    color: var(--font);
-}
-*/
-/*
-.cd-fork-left {
-    color: var(--font);
-    transform: rotate(45deg);
-}
-
-.cd-fork-right {
-    color: var(--font);
-    transform: rotate(-45deg);
-}
-
-.cd-tree-menu-row-3 {
-    display: flex;
-    justify-content: space-evenly;
-    background-color: var(--container);
-    padding: 1em 1em 1em 1em;
-    align-items: center;
-}
-
-.cd-tree-menu-arrow-row {
-    display: flex;
-    justify-content: space-evenly;
-    background-color: var(--container);
-    padding: 0.25em 1em 0.25em 1em;
-    align-items: center;
-}
-
-.cd-tree-menu-branch {
-    display: flex;
-    width: auto;
-    justify-content: space-around;
-    background-color: var(--container);
-    gap:5%;
-}
-*/
 
 .cd-step-status {
     display: flex;
@@ -1169,49 +1036,11 @@ th,td {
     color: var(--font);
 }
 
-/*
-.cd-step-status-text {
-    font-size: small;
-    padding: 5px 5px 5px 5px;
-    background-color: var(--container);
-    height: 50%;
-}*/
-/*
-.cd-step-status-header {
-    padding: 5px 5px 5px 5px;
-    font-size: small;
-    background-color: var(--container-header);
-    height: 50%;
-    color: var(--font);
-}*/
-/*
-.cd-step-status-incomplete {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--status-font-incomplete);
-}
-*/
-/*
-.cd-step-status-complete {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--status-font-complete);
-}
-*/
 .cd-deploy-step-start-btn {
     padding: 0 1em;
     align-self: center;
     cursor: pointer;
 }
-/*
-.cd-arrow-group {
-    width: 62%;
-}
-*/
-/*
-.cd-arrow {
-    height: 50px;
-}*/
 
 .cd-step-complete {
     background-color: var(--bg-complete);
@@ -1224,13 +1053,6 @@ th,td {
     border: 1px solid var(--border-warning);
     border-radius: 4px;
 }
-/*
-.cd-main-menu-header {
-    color: var(--font);
-    font-size: x-large;
-    padding: 1em 1em 1em 1em;
-    font-weight: 700;
-}*/
 
 .progress-bar-main-back {
     color: var(--border);

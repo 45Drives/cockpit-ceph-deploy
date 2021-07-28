@@ -985,11 +985,9 @@ function switch_theme(/*event*/ e) {
  */
 function add_host_request() {
   let hostname = document.getElementById("new-hostname-field").value;
-  //let monitor_interface = document.getElementById("new-interface-field").value;
   if (hostname != null && hostname != "") {
     host_request_json = { [hostname]: { hostname: "" } };
     host_request_json[hostname]["hostname"] = hostname;
-    //host_request_json[hostname]["monitor_interface"] = (monitor_interface != null) ? monitor_interface:"";
     var spawn_args = [
       "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
       "-h",
@@ -1013,6 +1011,7 @@ function add_host_request() {
         msg_color = "#20a030";
         msg_label = "Add Host: ";
         msg_content = "Host Added Succcessfully.";
+        check_for_parameter_change(result_json);
       } else {
         msg_color = "#bd3030";
         msg_label = "Error:";
@@ -1048,9 +1047,7 @@ function add_host() {
   document.getElementById("add-host-modal-title").innerText = "Add New Host";
 
   let hostname_field = document.getElementById("new-hostname-field");
-  let interface_field = document.getElementById("new-interface-field");
   hostname_field.value = "";
-  //interface_field.value = "";
 
   show_modal_dialog("add-host-modal");
   hostname_field.addEventListener("input", function () {
@@ -1125,7 +1122,7 @@ function check_name_field(
 }
 
 /**
- * Checks to see if the text entered in a field is a valid hostname.
+ * Checks to see if the text entered in a field contains an entry in the choice list.
  * @param {string} name_field_id
  * @param {string} feedback_field_id
  * @param {string} button_id
@@ -2806,6 +2803,7 @@ function remove_host(hostname) {
       msg_color = "#20a030";
       msg_label = "Remove Host: ";
       msg_content = result_json.success_msg;
+      check_for_parameter_change(result_json);
     } else {
       msg_color = "#bd3030";
       msg_label = "Error:";
@@ -3428,10 +3426,68 @@ function check_for_parameter_change(param_json_msg){
   // see if host parameters were modified
   if(old_params.hasOwnProperty("hosts") && new_params.hasOwnProperty("hosts")){
     if(JSON.stringify(old_params["hosts"]) != JSON.stringify(new_params["hosts"])){
-      console.log("!!! hosts have been modified !!!");
-      console.log("old_params[\"hosts\"]: ",old_params["hosts"]);
-      console.log("new_params[\"hosts\"]: ",new_params["hosts"]);
-      
+      if(Object.keys(new_params["hosts"]).length < Object.keys(old_params["hosts"]).length){
+        // we removed a host. check the old_params to see if there were any variables that
+        //were removed along with it. 
+        let removed_hosts = Object.keys(old_params["hosts"]).filter((obj)=>{ return Object.keys(new_params["hosts"]).indexOf(obj) == -1;}); 
+        for(let i = 0; i < removed_hosts.length; i++){
+          Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
+            if(param_group["unique"].length > 0){
+              //there are variables that pertain to a specific group that may have been modified
+              param_group["unique"].forEach((unique_option) =>{
+                if(
+                  old_params["hosts"][removed_hosts[i]].hasOwnProperty(unique_option.option_name) &&
+                  old_params["hosts"][removed_hosts[i]][unique_option.option_name] != "" ){
+                    handle_warning_vars(
+                      "",
+                      old_params["hosts"][removed_hosts[i]][unique_option.option_name],
+                      removed_hosts[i]+"-"+unique_option.option_name,
+                      old_params["time_stamp"],
+                      role_name
+                    );
+                }
+              });
+              
+            }
+          });
+        }
+      }
+      else if(Object.keys(new_params["hosts"]).length == Object.keys(old_params["hosts"]).length){
+        // lists are the same length
+        // ensure that the hostnames are 1 to 1 between the lists
+        let unique_old = Object.keys(old_params["hosts"]).filter((obj)=>{ return Object.keys(new_params["hosts"]).indexOf(obj) == -1;}); 
+        let unique_new = Object.keys(new_params["hosts"]).filter((obj)=>{ return Object.keys(old_params["hosts"]).indexOf(obj) == -1;});
+        if(unique_old.length == 0 && unique_new.length == 0){
+          //we have the same keys (i.e. hostnames in old and new.)
+          Object.entries(new_params["hosts"]).forEach(([hostname,host_obj])=>{
+            if(JSON.stringify(old_params["hosts"][hostname]) != JSON.stringify(new_params["hosts"][hostname])){
+              //we've found the modified host
+              //find the modified variable next.
+              Object.entries(host_obj).forEach(([host_var_name,host_var_value])=>{
+                if(new_params["hosts"][hostname][host_var_name] != old_params["hosts"][hostname][host_var_name]){
+                  //we have the modified variable, find which role is associated with it.
+                  Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
+                    if(param_group["unique"].length > 0){
+                      //there are variables that pertain to a specific group that may have been modified
+                      param_group["unique"].forEach((unique_option) =>{
+                        if(unique_option.option_name == host_var_name){
+                          handle_warning_vars(
+                            new_params["hosts"][hostname][unique_option.option_name],
+                            old_params["hosts"][hostname][unique_option.option_name],
+                            hostname+"-"+unique_option.option_name,
+                            old_params["time_stamp"],
+                            role_name
+                          );
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+        } 
+      }
     }
   }
 
@@ -3441,6 +3497,26 @@ function check_for_parameter_change(param_json_msg){
       console.log("!!! groups have been modified !!!");
       console.log("old_params[\"groups\"]: ",old_params["groups"]);
       console.log("new_params[\"groups\"]: ",new_params["groups"]);
+
+      let new_param_group_list = Object.keys(new_params["groups"]);
+      let old_param_group_list = Object.keys(old_params["groups"]);
+      let unique_old = Object.keys(old_params["groups"]).filter((obj)=>{ return Object.keys(new_params["groups"]).indexOf(obj) == -1;}); 
+      let unique_new = Object.keys(new_params["groups"]).filter((obj)=>{ return Object.keys(old_params["groups"]).indexOf(obj) == -1;});
+      if(unique_old.length == 0 && unique_new.length == 0){
+        //we have the same groups in both old and new
+        new_param_group_list.forEach((group_name) => {
+          if(JSON.stringify(new_params["groups"][group_name]) != JSON.stringify(old_params["groups"][group_name])){
+            //This group has been modified.
+            handle_warning_vars(
+              JSON.stringify(new_params["groups"][group_name]),
+              JSON.stringify(old_params["groups"][group_name]),
+              "group-vars-"+group_name,
+              old_params["time_stamp"],
+              group_name
+              );
+          }
+        });
+      }
     }
   }
 
@@ -3510,7 +3586,6 @@ function check_for_parameter_change(param_json_msg){
     }
   });
 
-  console.log("ansible_config_warning[\"deploy_step_warnings\"]",ansible_config_warning["deploy_step_warnings"]);
   if(ansible_config_warning["deploy_step_warnings"].length > 0){
     let ansible_config_warning_msg = "";
     ansible_config_warning_msg += "Warning: Ansible Configuration has been modified after deployment steps have been completed\n";
@@ -3520,7 +3595,6 @@ function check_for_parameter_change(param_json_msg){
     ansible_config_warning_msg += "    - re-generate the inventory files indicated, and redo the step again. (not recommended)\n";
     ansible_config_warning["deploy_step_warnings"].forEach((warning_entry) => {
       ansible_config_warning_msg += warning_entry["step_name"] + ":\n";
-      console.log("warning_entry",warning_entry);
       ansible_config_warning_msg += ("     purge_command: " + warning_entry["purge_playbooks"].toString() + "\n");
       ansible_config_warning_msg += ("     Inventory File(s): " + warning_entry["inventory_files"].toString() + "\n");
       ansible_config_warning_msg += ("     affected roles: " + warning_entry["roles"].toString() + "\n\n");
@@ -3560,16 +3634,14 @@ function handle_warning_vars(new_value,old_value,var_name,old_time_stamp,role_na
               delete deploy_state_json[deploy_step_id]["warning_msg"];
               delete deploy_state_json[deploy_step_id]["warning_vars"];
             }else{
-              deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
-              deploy_step_id + " have been modified.\n" + 
-              JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-              "\nYou may need to re-do this step.";
+              deploy_state_json[deploy_step_id]["warning_msg"] = make_warning_message(deploy_state_json,deploy_step_id);
             }
           }
           else{
             //the user changed it to something different than the original value.
             //update the current value of the warning var.
             deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]]["current_value"] = new_value;
+            make_warning_message(deploy_state_json,deploy_step_id);
           }
         }
         else{
@@ -3586,10 +3658,7 @@ function handle_warning_vars(new_value,old_value,var_name,old_time_stamp,role_na
           "original_time_stamp": old_time_stamp
         };
         deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
-        deploy_state_json[deploy_step_id]["warning_msg"] = "Warning: variables used to complete " + 
-                                                            deploy_step_id + " have been modified.\n" + 
-                                                            JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-                                                            "\nYou may need to re-do this step.";
+        deploy_state_json[deploy_step_id]["warning_msg"] = make_warning_message(deploy_state_json,deploy_step_id);
       }
       localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
       sync_ceph_deploy_state();
@@ -3597,6 +3666,13 @@ function handle_warning_vars(new_value,old_value,var_name,old_time_stamp,role_na
   });
 }
 
+function make_warning_message(deploy_state_json,deploy_step_id){
+  let warning_message = "Warning: variables used to complete " + 
+  deploy_step_id + " have been modified.\n" + 
+  JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
+  "\nYou may need to re-do this step.";
+  return warning_message;
+}
 
 function search_jarray_key_value_match(json_array,key,value){
   for (var i=0; i < json_array.length; i++) {

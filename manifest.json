@@ -3,8 +3,8 @@
     "name": "cockpit-ceph-deploy",
     "title": "Cockpit Ceph-Deploy",
     "prerelease": true,
-    "version": "0.1.5",
-    "buildVersion": "19",
+    "version": "0.2.0",
+    "buildVersion": "1",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-ceph-deploy",
     "category": "utils",
@@ -49,15 +49,11 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "0.1.5",
-        "buildVersion": "20",
+        "version": "0.2.0",
+        "buildVersion": "1",
         "ignore": [],
-        "date": "2021-07-26T16:05:55.468102",
+        "date": null,
         "packager": "Mark Hooper <mhooper@45drives.com>",
-        "changes": [
-            "added handling for modifying assigned roles used in deployment step",
-            "roles are now sorted alphabetically by core_params",
-            "added purge_rgw command to ansible_runner"
-        ]
+        "changes": []
     }
 }
