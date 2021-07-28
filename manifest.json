@@ -51,10 +51,12 @@
     "changelog": {
         "urgency": "medium",
         "version": "0.2.0",
-        "buildVersion": "5",
+        "buildVersion": "6",
         "ignore": [],
-        "date": null,
+        "date": "2021-07-28T14:48:22.928112",
         "packager": "Mark Hooper <mhooper@45drives.com>",
-        "changes": []
+        "changes": [
+            "changed makefile"
+        ]
     }
 }
