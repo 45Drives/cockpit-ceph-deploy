@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.2.0-4
+## Cockpit Ceph-Deploy 0.2.0-5
 
-* added python3-dataclasses dependency for el8
+* added symlink to /usr/bin for rocky in makefile
