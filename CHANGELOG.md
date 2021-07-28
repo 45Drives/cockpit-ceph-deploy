@@ -1,3 +1,4 @@
-## Cockpit Ceph-Deploy 0.2.0-5
+## Cockpit Ceph-Deploy 0.2.0-6
 
-* added symlink to /usr/bin for rocky in makefile
+* changed makefile
+* changed makefile

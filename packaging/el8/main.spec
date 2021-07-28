@@ -87,6 +87,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-6
+- changed makefile
+- changed makefile
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-5
 - added symlink to /usr/bin for rocky in makefile
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-4
