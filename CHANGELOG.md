@@ -1,3 +1,7 @@
-## Cockpit Ceph-Deploy 0.3.0-1
+## Cockpit Ceph-Deploy 1.0.0-1
 
-* test build before stable release
+* added Ctrl+C interrupt to ansible_runner
+* deploy steps remain locked if required roles are not assigned
+* added 45Drives branding to main menu
+* modified the pre-configuration step instructions
+* updated README.md
