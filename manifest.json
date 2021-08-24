@@ -3,8 +3,8 @@
     "name": "cockpit-ceph-deploy",
     "title": "Cockpit Ceph-Deploy",
     "prerelease": true,
-    "version": "0.2.0",
-    "buildVersion": "9",
+    "version": "0.3.0",
+    "buildVersion": "1",
     "author": "Mark Hooper <mhooper@45drives.com>",
     "url": "https://github.com/45Drives/cockpit-ceph-deploy",
     "category": "utils",
@@ -26,13 +26,13 @@
             "cockpit",
             "ansible",
             "python3",
-            "ceph-ansible-45d"
+            "ceph-ansible-45d (>= 5.2.1)"
         ],
         "el": [
             "cockpit",
             "ansible",
             "python3",
-            "ceph-ansible-45d",
+            "ceph-ansible-45d > 5.2.1",
             "python3-dataclasses"
         ]
     },
@@ -50,8 +50,8 @@
     ],
     "changelog": {
         "urgency": "medium",
-        "version": "0.2.0",
-        "buildVersion": "9",
+        "version": "0.3.0",
+        "buildVersion": "1",
         "ignore": [],
         "date": null,
         "packager": "Mark Hooper <mhooper@45drives.com>",

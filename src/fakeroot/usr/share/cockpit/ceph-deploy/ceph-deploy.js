@@ -2753,7 +2753,7 @@ function get_param_file_content() {
         );
         if (result_json.old_file_content.hasOwnProperty("time_stamp")){
           localStorage.setItem("last_option_update_time",result_json.old_file_content["time_stamp"]);
-          
+          localStorage.setItem("current_params",JSON.stringify(result_json.old_file_content));
         }
       }
     } else {
@@ -4651,6 +4651,11 @@ function setup_main_menu() {
     }
   );
 
+
+  //use the current parameters to prevent unlocking a step that 
+  //needs roles assigned.
+  let current_params_str = localStorage.getItem("current_params") ?? "{}"
+  let current_params = JSON.parse(current_params_str);
   // unlock the steps that have their unlock requirements met and update local storage.
   Object.entries(deploy_step_current_states).forEach(
     ([deploy_step_id, obj]) => {
@@ -4664,13 +4669,30 @@ function setup_main_menu() {
           if (
             deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
           ) {
-            deploy_step_current_states[deploy_step_id].lock_state = "unlocked";
-            break;
+            if(current_params.hasOwnProperty("roles") && g_deploy_step_id_lut[deploy_step_id]["roles"].length > 0){
+              console.log("roles")
+              // only unlock them if there is are hosts assigned the required roles.
+              let role_count = 0;
+              let role_target = g_deploy_step_id_lut[deploy_step_id]["roles"].length;
+              g_deploy_step_id_lut[deploy_step_id]["roles"].forEach((required_role) =>{
+                if(current_params["roles"].hasOwnProperty(required_role) && current_params["roles"][required_role].length > 0){
+                  role_count++;
+                }
+              });
+              deploy_step_current_states[deploy_step_id].lock_state = (role_count === role_target) ? "unlocked" : "locked";
+              break;
+            }
+            else{
+              deploy_step_current_states[deploy_step_id].lock_state = "unlocked";
+              break;
+            }
           }
         }
       }
     }
   );
+
+
   localStorage.setItem(
     "ceph_deploy_state",
     JSON.stringify(deploy_step_current_states,null,4)

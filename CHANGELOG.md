@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 0.2.0-9
+## Cockpit Ceph-Deploy 0.3.0-1
 
-* changed makefile
+* test build before stable release

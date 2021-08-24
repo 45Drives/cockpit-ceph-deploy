@@ -1,41 +1,40 @@
-### Last Updated: 2021-07-28
+# cockpit-ceph-deploy
+A cockpit module that deploys Ceph, Samba, NFS, ISCSI and more on 45Drives Hardware using Ansible Playbooks. 
+[![Ceph Deploy Tutorial](http://img.youtube.com/vi/ZsQp1vmn22M/0.jpg)](http://www.youtube.com/watch?v=ZsQp1vmn22M)
 
-# cockpit-ceph-deploy (pre-release v0.2.0 and lower)
-A cockpit module that deploys ceph on 45Drives Hardware using Ansible Playbooks. 
+## Supported Operating Systems
+Rocky Linux
+Ubuntu 20.04.2.0 LTS (Focal Fossa)
 
 # Installation 
 ## Rocky Linux
-Perform all steps as root
-### Enable to 45drives official repository
+### Enable to 45Drives official repository
+https://repo.45drives.com/setup.html
+
+### Install the cockpit-ceph-deploy package on the administrator node  node using dnf
 ```
-curl -LO https://repo.45drives.com/setup
-chmod +x setup
-./setup
+dnf install cockpit-ceph-deploy
 ```
-### Enable the 45drives_testing repo (while cockpit-ceph-deploy is still in pre-release)
+
+### Enable/Start Cockpit
 ```
-sed -i 's/enabled = 0/enabled = 1/g' /etc/yum.repos.d/45drives.repo
-```
-### Install cockpit-ceph-deploy
-```
-yum install cockpit-ceph-deploy
+systemctl enable cockpit.service
+systemctl start --now cockpit.socket
 ```
 
 ## Ubuntu 20.04.2.0 LTS (Focal Fossa)
-Perform all steps as root
-### Enable to 45drives official repository
-```
-wget -q https://repo.45drives.com/setup
-chmod +x setup
-./setup
-```
-### Enable the 45drives_testing repo (while cockpit-ceph-deploy is still in pre-release)
-```
-sed -i 's/Enabled: no/Enabled: yes/g' /etc/apt/sources.list.d/45drives.sources
-```
-### Install cockpit-ceph-deploy
+### Enable to 45Drives official repository
+https://repo.45drives.com/setup.html
+
+### Install the cockpit-ceph-deploy package on the administrator node using apt
 ```
 apt install cockpit-ceph-deploy
+```
+
+### Enable/Start Cockpit
+```
+systemctl enable cockpit.service
+systemctl start --now cockpit.socket
 ```
 
 

@@ -170,14 +170,23 @@ def update_ceph_playbook_state(cmd):
 
 def run_ansible_command(cmd):
     split_command = shlex.split(ansible_commands[cmd]["command"])
-    command = subprocess.run(
-        split_command,
-        cwd=ansible_commands[cmd]["cwd"],
-        stdout=sys.stdout,
-        stderr=sys.stdout,
-        universal_newlines=True,
-        bufsize=1
+    command = None
+    try:
+        command = subprocess.run(
+            split_command,
+            cwd=ansible_commands[cmd]["cwd"],
+            stdout=sys.stdout,
+            stderr=sys.stdout,
+            universal_newlines=True,
+            bufsize=1
         )
+    except KeyboardInterrupt as ki:
+        ansible_commands[cmd]["result"] = 1
+        ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
+        update_ceph_playbook_state(cmd)
+        sys.exit(0)
+        
+
     ansible_commands[cmd]["result"] = command.returncode
     ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
     update_ceph_playbook_state(cmd)

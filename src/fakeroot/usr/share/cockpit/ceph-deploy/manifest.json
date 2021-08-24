@@ -3,7 +3,7 @@
 
     "menu": {
         "ceph-deploy": {
-            "label": "Ceph Deploy",
+            "label": "45Drives Ceph Deploy",
             "path": "ceph-deploy.html",
             "order": 113
         }

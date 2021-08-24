@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Tue Aug 24 2021 Mark Hooper <mhooper@45drives.com> 0.3.0-1
+- test build before stable release
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-9
 - changed makefile
 * Wed Jul 28 2021 Mark Hooper <mhooper@45drives.com> 0.2.0-8

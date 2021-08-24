@@ -27,6 +27,7 @@
     --cd-box-height: 60px;
     --cd-box-gap: calc(var(--cd-box-width)/2);
     --ct-form-columns: 2;
+    --main-menu-icon: url("icons/svg/cd_logo_light.svg");
 }
 [data-theme="dark"] {
 	/* Dark style */
@@ -52,6 +53,7 @@
     --border-warning: #806f36;
     --bg-progress-bar-current: #191a1b;
     --ct-form-columns: 2;
+    --main-menu-icon: url("icons/svg/cd_logo_dark.svg");
 }
 
 body {
@@ -178,6 +180,13 @@ body {
 
 #main-menu-link {
     cursor: pointer;
+    background-image:var(--main-menu-icon);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 43px;
+    width: 236px;
+    padding: 5px 5px 5px 5px;
 }
 
 /* Theme toggle button */
@@ -1061,6 +1070,12 @@ th,td {
     padding: 5px 5px 5px 5px;
     flex-grow: 0;
     cursor: pointer;
+    background-image:var(--main-menu-icon);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 43px;
+    width: 236px;
 }
 
 .cd-progress-bar {
