@@ -1,3 +1,13 @@
+cockpit-ceph-deploy (1.0.1-1focal) focal; urgency=medium
+
+  * first stable release of cockpit-ceph-deploy
+  * added Ctrl+C interrupt to ansible_runner
+  * deploy steps remain locked if required roles are not assigned
+  * added 45Drives branding to main menu
+  * modified the pre-configuration step instructions
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 26 Aug 2021 05:47:23 -0300
+
 cockpit-ceph-deploy (1.0.0-2focal) focal; urgency=medium
 
   * first stable release of cockpit-ceph-deploy

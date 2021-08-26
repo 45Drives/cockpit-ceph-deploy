@@ -89,6 +89,12 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Aug 26 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-1
+- first stable release of cockpit-ceph-deploy
+- added Ctrl+C interrupt to ansible_runner
+- deploy steps remain locked if required roles are not assigned
+- added 45Drives branding to main menu
+- modified the pre-configuration step instructions
 * Thu Aug 26 2021 Mark Hooper <mhooper@45drives.com> 1.0.0-2
 - first stable release of cockpit-ceph-deploy
 - added Ctrl+C interrupt to ansible_runner
