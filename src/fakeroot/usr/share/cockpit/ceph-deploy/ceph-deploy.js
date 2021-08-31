@@ -909,7 +909,8 @@ let g_ceph_deploy_default_state = {
       "deploy-step-rgw",
       "deploy-step-iscsi",
       "deploy-step-nfs",
-      "deploy-step-smb"
+      "deploy-step-smb",
+      "deploy-step-core"
     ],
     playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_dashboard"],
   },
@@ -4670,7 +4671,6 @@ function setup_main_menu() {
             deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
           ) {
             if(current_params.hasOwnProperty("roles") && g_deploy_step_id_lut[deploy_step_id]["roles"].length > 0){
-              console.log("roles")
               // only unlock them if there is are hosts assigned the required roles.
               let role_count = 0;
               let role_target = g_deploy_step_id_lut[deploy_step_id]["roles"].length;
@@ -5035,11 +5035,53 @@ function get_ceph_deploy_initial_state() {
         } catch (error) {
           console.log("unable to parse ceph_ceploy_state.json");
         }
-        if(deploy_state_json){localStorage.setItem("ceph_deploy_state", JSON.stringify(deploy_state_json,null,4));}
-        ceph_deploy_state_file.close();
-        localStorage.removeItem("inventory_files");
-        localStorage.removeItem("inventory_state");
-        resolve();
+        if(deploy_state_json){
+          //we have JSON formatted data in the local file.
+          let update_local_file = false;
+          Object.entries(deploy_state_json).forEach(([key, obj]) => {
+            if (
+              obj.hasOwnProperty("lock_state") &&
+              obj["lock_state"] != "complete" &&
+              g_ceph_deploy_default_state.hasOwnProperty(key) &&
+              JSON.stringify(g_ceph_deploy_default_state[key]) != JSON.stringify(obj)
+            ) {
+              // the default state should be the same as the default state from ceph-deploy.js, update local file.
+              deploy_state_json[key] = g_ceph_deploy_default_state[key];
+              update_local_file = true;
+            }
+          });
+          if(update_local_file){
+            //we can update the locked steps with most up-to-date default state from ceph-deploy.js
+            let update_state_file = ceph_deploy_state_file.replace(
+              JSON.stringify(deploy_state_json)
+            );
+            update_state_file.then((tag) => {
+              ceph_deploy_state_file.close();
+              localStorage.setItem(
+                "ceph_deploy_state",
+                JSON.stringify(deploy_state_json, null, 4)
+              );
+              localStorage.removeItem("inventory_files");
+              localStorage.removeItem("inventory_state");
+              resolve();
+            });
+            update_state_file.catch((e) => {
+              ceph_deploy_state_file.close();
+              reject(
+                "/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be updated."
+              );
+            });
+          }else{
+            localStorage.setItem(
+              "ceph_deploy_state",
+              JSON.stringify(deploy_state_json, null, 4)
+            );
+            ceph_deploy_state_file.close();
+            localStorage.removeItem("inventory_files");
+            localStorage.removeItem("inventory_state");
+            resolve();
+          }
+        }
       } else if (!content) {
         //file does not exist locally
         let create_state_file = ceph_deploy_state_file.replace(

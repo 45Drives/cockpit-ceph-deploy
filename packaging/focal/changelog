@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.1-2focal) focal; urgency=medium
+
+  * modified dashboard step unlock requirements to include ceph core
+
+ -- Mark Hooper <mhooper@45drives.com>  Tue, 31 Aug 2021 13:12:32 -0300
+
 cockpit-ceph-deploy (1.0.1-1focal) focal; urgency=medium
 
   * first stable release of cockpit-ceph-deploy
