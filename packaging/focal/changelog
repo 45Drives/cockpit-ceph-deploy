@@ -1,3 +1,10 @@
+cockpit-ceph-deploy (1.0.1-3focal) focal; urgency=medium
+
+  * fixed inventory file generation bug that caused repeated active directory information
+    to be placed in smbs.yml
+
+ -- Mark Hooper <mhooper@45drives.com>  Tue, 07 Sep 2021 06:04:33 -0300
+
 cockpit-ceph-deploy (1.0.1-2focal) focal; urgency=medium
 
   * modified dashboard step unlock requirements to include ceph core

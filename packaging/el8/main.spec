@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Tue Sep 07 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-3
+- fixed inventory file generation bug that caused repeated active directory information
+  to be placed in smbs.yml
 * Tue Aug 31 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-2
 - modified dashboard step unlock requirements to include ceph core
 * Thu Aug 26 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-1

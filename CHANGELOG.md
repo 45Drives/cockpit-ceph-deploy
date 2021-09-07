@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.1-2
+## Cockpit Ceph-Deploy 1.0.1-3
 
-* modified dashboard step unlock requirements to include ceph core
+* fixed inventory file generation bug that caused repeated active directory information to be placed in smbs.yml

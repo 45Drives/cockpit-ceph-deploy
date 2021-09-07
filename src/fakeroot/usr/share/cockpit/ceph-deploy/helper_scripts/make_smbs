@@ -91,17 +91,17 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
                         smbs_file_content[i] = "{c}{o}: {ov}\n".format(
                             c=comment, o=option, ov=json.dumps(smbs_dict[option]))
 
-    start_tag = "##### ceph-deploy:active_directory_info:START #####"
-    end_tag = "##### ceph-deploy:active_directory_info:END #####"
-    section_to_replace = smbs_file_content[smbs_file_content.find(
-        start_tag + "\n")+len(start_tag):smbs_file_content.rfind(end_tag)]
+    start_tag = "##### ceph-deploy:active_directory_info:START #####\n"
+    end_tag = "##### ceph-deploy:active_directory_info:END #####\n"
+    section_to_replace = smbs_file_content[smbs_file_content.find(start_tag)+len(start_tag):smbs_file_content.rfind(end_tag)]
+    
 
     if smbs_dict["smb_active_directory"] == False:
         # we have to remove any content between our active directory object markers in the file
-        smbs_file_content = smbs_file_content.replace(section_to_replace, "\n")
+        smbs_file_content = smbs_file_content.replace(start_tag + section_to_replace + end_tag, start_tag + "\n" + end_tag)
     else:
         # we need to put the active_directory_info object in .yml syntax
-        new_content = "\nactive_directory_info:\n"
+        new_content = start_tag + "active_directory_info:\n"
         for field in smbs_dict["active_directory_info"].keys():
             if(smbs_dict["active_directory_info"][field] not in ["yes", "no"]):
                 new_content += "  {f}: \"{v}\"\n".format(
@@ -109,24 +109,25 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
             else:
                 new_content += "  {f}: {v}\n".format(
                     f=field, v=smbs_dict["active_directory_info"][field])
-        smbs_file_content = smbs_file_content.replace(
-            section_to_replace, new_content)
+        new_content += end_tag
+        smbs_file_content = smbs_file_content.replace(start_tag +
+            section_to_replace + end_tag, new_content)
 
-    start_tag = "##### ceph-deploy:ctdb_public_addresses:START #####"
-    end_tag = "##### ceph-deploy:ctdb_public_addresses:END #####"
+    start_tag = "##### ceph-deploy:ctdb_public_addresses:START #####\n"
+    end_tag = "##### ceph-deploy:ctdb_public_addresses:END #####\n"
     section_to_replace = smbs_file_content[smbs_file_content.find(
-        start_tag + "\n")+len(start_tag):smbs_file_content.rfind(end_tag)]
+        start_tag)+len(start_tag):smbs_file_content.rfind(end_tag)]
 
-    new_content = "\nctdb_public_addresses:\n"
+    new_content = start_tag + "ctdb_public_addresses:\n"
     for addr_obj in smbs_dict["ctdb_public_addresses"]:
         new_content += "  - "
         for field in addr_obj.keys():
             new_content += "{f}: \"{v}\"\n".format(f=field, v=addr_obj[field])
             new_content += "    "
         new_content = new_content[:-4]
-
+    new_content += end_tag
     smbs_file_content = smbs_file_content.replace(
-        section_to_replace, new_content)
+        start_tag + section_to_replace + end_tag, new_content)
 
     smbs_file = open(path, "w")
     smbs_file.writelines(smbs_file_content)
