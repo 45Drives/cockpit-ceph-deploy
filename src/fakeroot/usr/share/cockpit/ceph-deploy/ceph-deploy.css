@@ -540,7 +540,7 @@ input:checked + .cd-slider:before {
 	bottom: 30px; /* 30px from the bottom */
   }
 
-  #add-host-snackbar, #update-roles-snackbar, #update-options-snackbar {
+  #add-host-snackbar, #update-roles-snackbar, #update-options-snackbar, #general-snackbar{
 	visibility: hidden; /* Hidden by default. Visible on click */
 	min-width: 250px; /* Set a default minimum width */
 	margin-left: -125px; /* Divide value of min-width by 2 */
@@ -555,7 +555,7 @@ input:checked + .cd-slider:before {
 	bottom: 80px; /* 30px from the bottom */
   }
   
-  #snackbar.show, #add-host-snackbar.show , #update-roles-snackbar.show, #update-options-snackbar.show {
+  #snackbar.show, #add-host-snackbar.show , #update-roles-snackbar.show, #update-options-snackbar.show, #general-snackbar.show {
 	visibility: visible; /* Show the snackbar */
 	/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
 	However, delay the fade out process for 5.0 seconds */

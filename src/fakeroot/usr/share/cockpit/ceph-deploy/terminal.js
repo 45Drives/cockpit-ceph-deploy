@@ -14743,10 +14743,6 @@
                 var e = this.props.channel;
                 e && e.valid && (e.addEventListener("message", this.onChannelMessage.bind(this)), e.addEventListener("close", this.onChannelClose.bind(this)))
                 this.props.channel.send(localStorage.getItem("terminal-command"));
-                console.log("this.props.refName",this.props.refName);
-                console.log("this.props.channel: ",this.props.channel);
-                console.log("this.props.parentId: ",this.props.parentId);
-                console.log("this.state.terminal: ",this.state.terminal);
             }
             disconnectChannel(e) {
                 void 0 === e && (e = this.props.channel), e && (e.removeEventListener("message", this.onChannelMessage), e.removeEventListener("close", this.onChannelClose)), e.close()

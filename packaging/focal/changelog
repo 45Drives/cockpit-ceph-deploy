@@ -1,3 +1,13 @@
+cockpit-ceph-deploy (1.0.1-4focal) focal; urgency=medium
+
+  * fixed bug that caused warning messages to persist after a purge playbook was
+    run
+  * modified how main menu locks are handled
+  * made ansible_runner help menu easier to read when using cli
+  * removed unnecessary console.log statements from terminal.js and ceph-deploy.js
+
+ -- Mark Hooper <mhooper@45drives.com>  Wed, 06 Oct 2021 09:09:45 -0300
+
 cockpit-ceph-deploy (1.0.1-3focal) focal; urgency=medium
 
   * fixed inventory file generation bug that caused repeated active directory information

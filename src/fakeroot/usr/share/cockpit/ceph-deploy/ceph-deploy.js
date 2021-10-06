@@ -22,96 +22,96 @@ let g_inv_default_requirements = {
     content: null,
     completed: false,
   },
-  "hosts": {
+  hosts: {
     content: null,
     completed: false,
-  }
+  },
 };
 
 let g_deploy_step_id_lut = {
   "deploy-step-preconfig": {
-    "step_name": "Pre-Configuration",
-    "inventory_files": [],
-    "purge_playbooks":[],
-    "roles":[]
+    step_name: "Pre-Configuration",
+    inventory_files: [],
+    purge_playbooks: [],
+    roles: [],
   },
   "deploy-step-ansible-config": {
-    "step_name": "Ansible Configuration",
-    "inventory_files": [],
-    "purge_playbooks":[],
-    "roles":[]
+    step_name: "Ansible Configuration",
+    inventory_files: [],
+    purge_playbooks: [],
+    roles: [],
   },
-  "deploy-step-core":  {
-    "step_name": "Ceph Core",
-    "inventory_files": ["hosts","all.yml"],
-    "purge_playbooks":["remove_core"],
-    "roles":["osds","mons","mgrs"]
+  "deploy-step-core": {
+    step_name: "Ceph Core",
+    inventory_files: ["hosts", "all.yml"],
+    purge_playbooks: ["remove_core"],
+    roles: ["osds", "mons", "mgrs"],
   },
-  "deploy-step-cephfs":  {
-    "step_name": "CephFS",
-    "inventory_files": ["hosts","all.yml"],
-    "purge_playbooks":["remove_core"],
-    "roles":["mdss"]
+  "deploy-step-cephfs": {
+    step_name: "CephFS",
+    inventory_files: ["hosts", "all.yml"],
+    purge_playbooks: ["remove_core"],
+    roles: ["mdss"],
   },
-  "deploy-step-nfs":  {
-    "step_name": "NFS",
-    "inventory_files": ["hosts","nfss.yml"],
-    "purge_playbooks":["remove_nfss","remove_core"],
-    "roles": ["nfss"]
+  "deploy-step-nfs": {
+    step_name: "NFS",
+    inventory_files: ["hosts", "nfss.yml"],
+    purge_playbooks: ["remove_nfss", "remove_core"],
+    roles: ["nfss"],
   },
-  "deploy-step-smb":  {
-    "step_name": "SMB",
-    "inventory_files": ["hosts","smbs.yml"],
-    "purge_playbooks":["remove_smbs","remove_core"],
-    "roles":["smbs"]
+  "deploy-step-smb": {
+    step_name: "SMB",
+    inventory_files: ["hosts", "smbs.yml"],
+    purge_playbooks: ["remove_smbs", "remove_core"],
+    roles: ["smbs"],
   },
-  "deploy-step-rgw":  {
-    "inventory_files": ["hosts","all.yml"],
-    "purge_playbooks":["remove_rgw","remove_core"],
-    "roles":["rgws"]
+  "deploy-step-rgw": {
+    inventory_files: ["hosts", "all.yml"],
+    purge_playbooks: ["remove_rgw", "remove_core"],
+    roles: ["rgws"],
   },
-  "deploy-step-rgwlb":  {
-    "step_name": "Load Balancing",
-    "inventory_files": ["hosts","rgwloadbalancers.yml"],
-    "purge_playbooks":["remove_rgw","remove_core"],
-    "roles":["rgwloadbalancers"]
+  "deploy-step-rgwlb": {
+    step_name: "Load Balancing",
+    inventory_files: ["hosts", "rgwloadbalancers.yml"],
+    purge_playbooks: ["remove_rgw", "remove_core"],
+    roles: ["rgwloadbalancers"],
   },
-  "deploy-step-iscsi":  {
-    "step_name": "ISCSI Service",
-    "inventory_files": ["hosts"],
-    "purge_playbooks":["remove_iscsi","remove_core"],
-    "roles":["iscsigws"]
+  "deploy-step-iscsi": {
+    step_name: "ISCSI Service",
+    inventory_files: ["hosts"],
+    purge_playbooks: ["remove_iscsi", "remove_core"],
+    roles: ["iscsigws"],
   },
-  "deploy-step-dashboard":  {
-    "step_name": "Dashboard",
-    "inventory_files": ["hosts"],
-    "purge_playbooks":["remove_core"],
-    "roles":["metrics"]
+  "deploy-step-dashboard": {
+    step_name: "Dashboard",
+    inventory_files: ["hosts"],
+    purge_playbooks: ["remove_core"],
+    roles: ["metrics"],
   },
 };
 
 let g_role_to_deploy_step_lut = {
-  "mons":["deploy-step-core","deploy-step-cephfs"],
-  "mgrs":["deploy-step-core","deploy-step-cephfs"],
-  "osds":["deploy-step-core","deploy-step-cephfs"],
-  "metrics":["deploy-step-dashboard"],
-  "mdss":["deploy-step-cephfs"],
-  "smbs":["deploy-step-smb"],
-  "nfss":["deploy-step-nfs"],
-  "iscsigws":["deploy-step-iscsi"],
-  "rgws":["deploy-step-rgw"],
-  "rgwloadbalancers":["deploy-step-rgwlb"],
-  "client":["deploy-step-dashboard"]
+  mons: ["deploy-step-core", "deploy-step-cephfs"],
+  mgrs: ["deploy-step-core", "deploy-step-cephfs"],
+  osds: ["deploy-step-core", "deploy-step-cephfs"],
+  metrics: ["deploy-step-dashboard"],
+  mdss: ["deploy-step-cephfs"],
+  smbs: ["deploy-step-smb"],
+  nfss: ["deploy-step-nfs"],
+  iscsigws: ["deploy-step-iscsi"],
+  rgws: ["deploy-step-rgw"],
+  rgwloadbalancers: ["deploy-step-rgwlb"],
+  client: ["deploy-step-dashboard"],
 };
 
 let g_inventory_file_vars = {
-  "hosts": {
+  hosts: {
     file_content_div_id: "host-file-content",
     show_button_id: "show-host-file-btn",
     generate_button_id: "generate-host-file-btn",
     default_content_div: "inv-file-hosts-default",
     next_button_id: "ansible-config-inv-nxt",
-    show_listener: show_host_file
+    show_listener: show_host_file,
   },
   "all.yml": {
     file_content_div_id: "all-file-content",
@@ -119,7 +119,7 @@ let g_inventory_file_vars = {
     generate_button_id: "generate-all-file-btn",
     default_content_div: "inv-file-all-default",
     next_button_id: "ansible-config-inv-nxt",
-    show_listener: show_all_file
+    show_listener: show_all_file,
   },
   "rgwloadbalancers.yml": {
     file_content_div_id: "rgwlb-file-content",
@@ -127,7 +127,7 @@ let g_inventory_file_vars = {
     generate_button_id: "generate-rgwlb-file-btn",
     default_content_div: "inv-file-rgwlb-default",
     next_button_id: "ansible-config-inv-nxt",
-    show_listener: show_rgwlb_file
+    show_listener: show_rgwlb_file,
   },
   "nfss.yml": {
     file_content_div_id: "nfss-file-content",
@@ -135,7 +135,7 @@ let g_inventory_file_vars = {
     generate_button_id: "generate-nfss-file-btn",
     default_content_div: "inv-file-nfss-default",
     next_button_id: "ansible-config-inv-nxt",
-    show_listener: show_nfss_file
+    show_listener: show_nfss_file,
   },
   "smbs.yml": {
     file_content_div_id: "smbs-file-content",
@@ -143,10 +143,9 @@ let g_inventory_file_vars = {
     generate_button_id: "generate-smbs-file-btn",
     default_content_div: "inv-file-smbs-default",
     next_button_id: "ansible-config-inv-nxt",
-    show_listener: show_smbs_file
-  }
-}
-
+    show_listener: show_smbs_file,
+  },
+};
 
 let g_option_scheme = {
   mons: {
@@ -857,49 +856,86 @@ let g_ceph_deploy_default_state = {
     step_content_id: "step-core",
     progress: "0",
     unlock_requirements: ["deploy-step-ansible-config"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+    ],
   },
   "deploy-step-cephfs": {
     lock_state: "locked",
     step_content_id: "step-cephfs",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_cephfs",
+    ],
   },
   "deploy-step-nfs": {
     lock_state: "locked",
     step_content_id: "step-nfs",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_nfs"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_cephfs",
+      "deploy_nfs",
+    ],
   },
   "deploy-step-smb": {
     lock_state: "locked",
     step_content_id: "step-smb",
     progress: "0",
     unlock_requirements: ["deploy-step-cephfs"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_cephfs","deploy_smb"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_cephfs",
+      "deploy_smb",
+    ],
   },
   "deploy-step-rgw": {
     lock_state: "locked",
     step_content_id: "step-rgw",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_radosgw",
+    ],
   },
   "deploy-step-rgwlb": {
     lock_state: "locked",
     step_content_id: "step-rgwlb",
     progress: "0",
     unlock_requirements: ["deploy-step-rgw"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_radosgw","deploy_rgwlb"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_radosgw",
+      "deploy_rgwlb",
+    ],
   },
   "deploy-step-iscsi": {
     lock_state: "locked",
     step_content_id: "step-iscsi",
     progress: "0",
     unlock_requirements: ["deploy-step-core"],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_iscsi"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_iscsi",
+    ],
   },
   "deploy-step-dashboard": {
     lock_state: "locked",
@@ -910,9 +946,14 @@ let g_ceph_deploy_default_state = {
       "deploy-step-iscsi",
       "deploy-step-nfs",
       "deploy-step-smb",
-      "deploy-step-core"
+      "deploy-step-core",
     ],
-    playbook_completion_requirements: ["ping_all","device_alias","deploy_core","deploy_dashboard"],
+    playbook_completion_requirements: [
+      "ping_all",
+      "device_alias",
+      "deploy_core",
+      "deploy_dashboard",
+    ],
   },
 };
 
@@ -2483,14 +2524,13 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
         opt_input.setAttribute("group-option", true);
         opt_input.setAttribute("option_format", opt.option_format);
         opt_input.setAttribute("field", opt.option_name);
-        if(
+        if (
           groups_json.hasOwnProperty(role) &&
           groups_json[role].hasOwnProperty(parent_opt.option_name) &&
           !groups_json[role][parent_opt.option_name]
-          ){
-            opt_input.checked = opt.default_value;
-          }
-        else if (
+        ) {
+          opt_input.checked = opt.default_value;
+        } else if (
           groups_json.hasOwnProperty(role) &&
           groups_json[role].hasOwnProperty(opt.option_name)
         ) {
@@ -2551,14 +2591,13 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
           let box = document.createElement("input");
           box.type = "checkbox";
           box.classList.add("ct-input", "cd-field-checkbox");
-          if(
-            groups_json.hasOwnProperty(role) && 
+          if (
+            groups_json.hasOwnProperty(role) &&
             groups_json[role].hasOwnProperty(parent_opt.option_name) &&
             !groups_json[role][parent_opt.option_name]
-          ){
+          ) {
             box.checked = sub_opt.default_value;
-          }
-          else if (
+          } else if (
             groups_json.hasOwnProperty(role) &&
             groups_json[role].hasOwnProperty(opt.option_name)
           ) {
@@ -2752,18 +2791,24 @@ function get_param_file_content() {
           result_json.old_file_content.options,
           result_json.old_file_content.groups
         );
-        if (result_json.old_file_content.hasOwnProperty("time_stamp")){
-          localStorage.setItem("last_option_update_time",result_json.old_file_content["time_stamp"]);
-          localStorage.setItem("current_params",JSON.stringify(result_json.old_file_content));
+        if (result_json.old_file_content.hasOwnProperty("time_stamp")) {
+          localStorage.setItem(
+            "last_option_update_time",
+            result_json.old_file_content["time_stamp"]
+          );
+          localStorage.setItem(
+            "current_params",
+            JSON.stringify(result_json.old_file_content)
+          );
         }
       }
     } else {
       msg_color = "#bd3030";
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
+      show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
     }
     hide_modal_dialog("add-host-modal");
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
   });
   proc.fail(function (ex, data) {
     var msg_color = "#bd3030";
@@ -2981,10 +3026,13 @@ function update_role_request() {
     var add_result_json = null;
     var add_role_proc = cockpit.spawn(add_spawn_args, { superuser: "require" });
     add_role_proc.done(function (data) {
-      console.log("role_add: ",JSON.parse(data));
       add_result_json = JSON.parse(data);
-      if(JSON.stringify(remove_result_json["old_file_content"]) != JSON.stringify(add_result_json["new_file_content"])){
-        add_result_json["old_file_content"] = remove_result_json["old_file_content"];
+      if (
+        JSON.stringify(remove_result_json["old_file_content"]) !=
+        JSON.stringify(add_result_json["new_file_content"])
+      ) {
+        add_result_json["old_file_content"] =
+          remove_result_json["old_file_content"];
         check_for_parameter_change(add_result_json);
       }
       show_snackbar_msg(
@@ -3202,7 +3250,7 @@ function update_options_request() {
                 let multi_obj_list = [
                   ...options_div.querySelectorAll(
                     `[opt-parent="${radio_sub_opt.id}"]`
-                  )
+                  ),
                 ];
 
                 // create a blank array and blank object
@@ -3298,15 +3346,23 @@ function update_options_request() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    if(options_result_json){
+    if (options_result_json) {
       check_for_parameter_change(options_result_json);
+      setup_main_menu();
+      if (
+        options_result_json.hasOwnProperty("old_file_content") &&
+        options_result_json.hasOwnProperty("new_file_content") &&
+        JSON.stringify(options_result_json["new_file_content"]["options"]) !=
+          JSON.stringify(options_result_json["old_file_content"]["options"])
+      ) {
+        show_snackbar_msg(
+          "Message: ",
+          "Global options have been updated",
+          "#20a030",
+          "update-options-snackbar"
+        );
+      }
     }
-    show_snackbar_msg(
-      "Message: ",
-      "Global options have been updated",
-      "#20a030",
-      "update-options-snackbar"
-    );
 
     // Now update the host params
     var host_spawn_args = [
@@ -3328,8 +3384,9 @@ function update_options_request() {
         msg_label = "Error:";
         msg_content = "Unexpected return value.";
       }
-      if(host_result_json){
+      if (host_result_json) {
         check_for_parameter_change(host_result_json);
+        setup_main_menu();
       }
       if (host_result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
@@ -3341,7 +3398,19 @@ function update_options_request() {
         msg_content = "Unexpected return value.";
       }
       hide_modal_dialog("add-host-modal");
-      show_snackbar_msg(msg_label, msg_content, msg_color, "add-host-snackbar");
+      if (
+        host_result_json.hasOwnProperty("new_file_content") &&
+        host_result_json.hasOwnProperty("old_file_content") &&
+        JSON.stringify(host_result_json["new_file_content"]) !=
+          JSON.stringify(host_result_json["old_file_content"])
+      ) {
+        show_snackbar_msg(
+          msg_label,
+          msg_content,
+          msg_color,
+          "add-host-snackbar"
+        );
+      }
       var group_spawn_args = [
         "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
         "-g",
@@ -3363,8 +3432,9 @@ function update_options_request() {
           msg_label = "Error:";
           msg_content = "Unexpected return value.";
         }
-        if(group_result_json){
+        if (group_result_json) {
           check_for_parameter_change(group_result_json);
+          setup_main_menu();
         }
         if (group_result_json.hasOwnProperty("success_msg")) {
           msg_color = "#20a030";
@@ -3374,6 +3444,21 @@ function update_options_request() {
           msg_color = "#bd3030";
           msg_label = "Error:";
           msg_content = "Unexpected return value.";
+        }
+        if (
+          group_result_json.hasOwnProperty("old_file_content") &&
+          group_result_json.hasOwnProperty("new_file_content") &&
+          JSON.stringify(group_result_json["new_file_content"]["groups"]) !=
+            JSON.stringify(group_result_json["old_file_content"]["groups"])
+        ) {
+          {
+            show_snackbar_msg(
+              msg_label,
+              msg_content,
+              msg_color,
+              "general-snackbar"
+            );
+          }
         }
         get_param_file_content();
       });
@@ -3405,6 +3490,7 @@ function update_options_request() {
       }
     });
     get_param_file_content();
+    setup_main_menu();
   });
   options_proc.fail(function (ex, data) {
     console.log("options_proc (FAIL): ", data);
@@ -3417,104 +3503,156 @@ function update_options_request() {
   });
 }
 
-function check_for_parameter_change(param_json_msg){
-  if(!param_json_msg.hasOwnProperty("old_file_content") || !param_json_msg.hasOwnProperty("new_file_content")){
+function check_for_parameter_change(param_json_msg) {
+  if (
+    !param_json_msg.hasOwnProperty("old_file_content") ||
+    !param_json_msg.hasOwnProperty("new_file_content")
+  ) {
     return;
   }
   let old_params = param_json_msg["old_file_content"];
   let new_params = param_json_msg["new_file_content"];
 
   // see if host parameters were modified
-  if(old_params.hasOwnProperty("hosts") && new_params.hasOwnProperty("hosts")){
-    if(JSON.stringify(old_params["hosts"]) != JSON.stringify(new_params["hosts"])){
-      if(Object.keys(new_params["hosts"]).length < Object.keys(old_params["hosts"]).length){
+  if (
+    old_params.hasOwnProperty("hosts") &&
+    new_params.hasOwnProperty("hosts")
+  ) {
+    if (
+      JSON.stringify(old_params["hosts"]) != JSON.stringify(new_params["hosts"])
+    ) {
+      if (
+        Object.keys(new_params["hosts"]).length <
+        Object.keys(old_params["hosts"]).length
+      ) {
         // we removed a host. check the old_params to see if there were any variables that
-        //were removed along with it. 
-        let removed_hosts = Object.keys(old_params["hosts"]).filter((obj)=>{ return Object.keys(new_params["hosts"]).indexOf(obj) == -1;}); 
-        for(let i = 0; i < removed_hosts.length; i++){
-          Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
-            if(param_group["unique"].length > 0){
-              //there are variables that pertain to a specific group that may have been modified
-              param_group["unique"].forEach((unique_option) =>{
-                if(
-                  old_params["hosts"][removed_hosts[i]].hasOwnProperty(unique_option.option_name) &&
-                  old_params["hosts"][removed_hosts[i]][unique_option.option_name] != "" ){
+        //were removed along with it.
+        let removed_hosts = Object.keys(old_params["hosts"]).filter((obj) => {
+          return Object.keys(new_params["hosts"]).indexOf(obj) == -1;
+        });
+        for (let i = 0; i < removed_hosts.length; i++) {
+          Object.entries(g_option_scheme).forEach(
+            ([role_name, param_group]) => {
+              if (param_group["unique"].length > 0) {
+                //there are variables that pertain to a specific group that may have been modified
+                param_group["unique"].forEach((unique_option) => {
+                  if (
+                    old_params["hosts"][removed_hosts[i]].hasOwnProperty(
+                      unique_option.option_name
+                    ) &&
+                    old_params["hosts"][removed_hosts[i]][
+                      unique_option.option_name
+                    ] != ""
+                  ) {
                     handle_warning_vars(
                       "",
-                      old_params["hosts"][removed_hosts[i]][unique_option.option_name],
-                      removed_hosts[i]+"-"+unique_option.option_name,
+                      old_params["hosts"][removed_hosts[i]][
+                        unique_option.option_name
+                      ],
+                      removed_hosts[i] + "-" + unique_option.option_name,
                       old_params["time_stamp"],
                       role_name
                     );
-                }
-              });
-              
+                  }
+                });
+              }
             }
-          });
+          );
         }
-      }
-      else if(Object.keys(new_params["hosts"]).length == Object.keys(old_params["hosts"]).length){
+      } else if (
+        Object.keys(new_params["hosts"]).length ==
+        Object.keys(old_params["hosts"]).length
+      ) {
         // lists are the same length
         // ensure that the hostnames are 1 to 1 between the lists
-        let unique_old = Object.keys(old_params["hosts"]).filter((obj)=>{ return Object.keys(new_params["hosts"]).indexOf(obj) == -1;}); 
-        let unique_new = Object.keys(new_params["hosts"]).filter((obj)=>{ return Object.keys(old_params["hosts"]).indexOf(obj) == -1;});
-        if(unique_old.length == 0 && unique_new.length == 0){
+        let unique_old = Object.keys(old_params["hosts"]).filter((obj) => {
+          return Object.keys(new_params["hosts"]).indexOf(obj) == -1;
+        });
+        let unique_new = Object.keys(new_params["hosts"]).filter((obj) => {
+          return Object.keys(old_params["hosts"]).indexOf(obj) == -1;
+        });
+        if (unique_old.length == 0 && unique_new.length == 0) {
           //we have the same keys (i.e. hostnames in old and new.)
-          Object.entries(new_params["hosts"]).forEach(([hostname,host_obj])=>{
-            if(JSON.stringify(old_params["hosts"][hostname]) != JSON.stringify(new_params["hosts"][hostname])){
-              //we've found the modified host
-              //find the modified variable next.
-              Object.entries(host_obj).forEach(([host_var_name,host_var_value])=>{
-                if(new_params["hosts"][hostname][host_var_name] != old_params["hosts"][hostname][host_var_name]){
-                  //we have the modified variable, find which role is associated with it.
-                  Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
-                    if(param_group["unique"].length > 0){
-                      //there are variables that pertain to a specific group that may have been modified
-                      param_group["unique"].forEach((unique_option) =>{
-                        if(unique_option.option_name == host_var_name){
-                          handle_warning_vars(
-                            new_params["hosts"][hostname][unique_option.option_name],
-                            old_params["hosts"][hostname][unique_option.option_name],
-                            hostname+"-"+unique_option.option_name,
-                            old_params["time_stamp"],
-                            role_name
-                          );
+          Object.entries(new_params["hosts"]).forEach(
+            ([hostname, host_obj]) => {
+              if (
+                JSON.stringify(old_params["hosts"][hostname]) !=
+                JSON.stringify(new_params["hosts"][hostname])
+              ) {
+                //we've found the modified host
+                //find the modified variable next.
+                Object.entries(host_obj).forEach(
+                  ([host_var_name, host_var_value]) => {
+                    if (
+                      new_params["hosts"][hostname][host_var_name] !=
+                      old_params["hosts"][hostname][host_var_name]
+                    ) {
+                      //we have the modified variable, find which role is associated with it.
+                      Object.entries(g_option_scheme).forEach(
+                        ([role_name, param_group]) => {
+                          if (param_group["unique"].length > 0) {
+                            //there are variables that pertain to a specific group that may have been modified
+                            param_group["unique"].forEach((unique_option) => {
+                              if (unique_option.option_name == host_var_name) {
+                                handle_warning_vars(
+                                  new_params["hosts"][hostname][
+                                    unique_option.option_name
+                                  ],
+                                  old_params["hosts"][hostname][
+                                    unique_option.option_name
+                                  ],
+                                  hostname + "-" + unique_option.option_name,
+                                  old_params["time_stamp"],
+                                  role_name
+                                );
+                              }
+                            });
+                          }
                         }
-                      });
+                      );
                     }
-                  });
-                }
-              });
+                  }
+                );
+              }
             }
-          });
-        } 
+          );
+        }
       }
     }
   }
 
   // see if groups have been modified
-  if(old_params.hasOwnProperty("groups") && new_params.hasOwnProperty("groups")){
-    if(JSON.stringify(old_params["groups"]) != JSON.stringify(new_params["groups"])){
-      console.log("!!! groups have been modified !!!");
-      console.log("old_params[\"groups\"]: ",old_params["groups"]);
-      console.log("new_params[\"groups\"]: ",new_params["groups"]);
-
+  if (
+    old_params.hasOwnProperty("groups") &&
+    new_params.hasOwnProperty("groups")
+  ) {
+    if (
+      JSON.stringify(old_params["groups"]) !=
+      JSON.stringify(new_params["groups"])
+    ) {
       let new_param_group_list = Object.keys(new_params["groups"]);
       let old_param_group_list = Object.keys(old_params["groups"]);
-      let unique_old = Object.keys(old_params["groups"]).filter((obj)=>{ return Object.keys(new_params["groups"]).indexOf(obj) == -1;}); 
-      let unique_new = Object.keys(new_params["groups"]).filter((obj)=>{ return Object.keys(old_params["groups"]).indexOf(obj) == -1;});
-      if(unique_old.length == 0 && unique_new.length == 0){
+      let unique_old = Object.keys(old_params["groups"]).filter((obj) => {
+        return Object.keys(new_params["groups"]).indexOf(obj) == -1;
+      });
+      let unique_new = Object.keys(new_params["groups"]).filter((obj) => {
+        return Object.keys(old_params["groups"]).indexOf(obj) == -1;
+      });
+      if (unique_old.length == 0 && unique_new.length == 0) {
         //we have the same groups in both old and new
         new_param_group_list.forEach((group_name) => {
-          if(JSON.stringify(new_params["groups"][group_name]) != JSON.stringify(old_params["groups"][group_name])){
+          if (
+            JSON.stringify(new_params["groups"][group_name]) !=
+            JSON.stringify(old_params["groups"][group_name])
+          ) {
             //This group has been modified.
             handle_warning_vars(
               JSON.stringify(new_params["groups"][group_name]),
               JSON.stringify(old_params["groups"][group_name]),
-              "group-vars-"+group_name,
+              "group-vars-" + group_name,
               old_params["time_stamp"],
               group_name
-              );
+            );
           }
         });
       }
@@ -3522,26 +3660,33 @@ function check_for_parameter_change(param_json_msg){
   }
 
   // see if global options have been modified
-  if(old_params.hasOwnProperty("options") && new_params.hasOwnProperty("options")){
-    if(JSON.stringify(old_params["options"]) != JSON.stringify(new_params["options"])){
+  if (
+    old_params.hasOwnProperty("options") &&
+    new_params.hasOwnProperty("options")
+  ) {
+    if (
+      JSON.stringify(old_params["options"]) !=
+      JSON.stringify(new_params["options"])
+    ) {
       // make all.yml again
 
       Object.entries(g_option_scheme).forEach(([role_name, param_group]) => {
-        if(param_group["global"].length > 0){
+        if (param_group["global"].length > 0) {
           //there are variables that pertain to a specific group that may have been modified
-          param_group["global"].forEach((global_option) =>{
-            if(
-              old_params["options"].hasOwnProperty(global_option.option_name) && 
+          param_group["global"].forEach((global_option) => {
+            if (
+              old_params["options"].hasOwnProperty(global_option.option_name) &&
               new_params["options"].hasOwnProperty(global_option.option_name) &&
-              old_params["options"][global_option.option_name] != new_params["options"][global_option.option_name]
-            ){
+              old_params["options"][global_option.option_name] !=
+                new_params["options"][global_option.option_name]
+            ) {
               handle_warning_vars(
                 new_params["options"][global_option.option_name],
                 old_params["options"][global_option.option_name],
                 global_option.option_name,
                 old_params["time_stamp"],
                 role_name
-                );
+              );
             }
           });
         }
@@ -3550,139 +3695,222 @@ function check_for_parameter_change(param_json_msg){
   }
 
   // see if roles have been modified
-  if(old_params.hasOwnProperty("roles") && new_params.hasOwnProperty("roles")){
-    if(JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])){
-      Object.entries(g_role_to_deploy_step_lut).forEach(([role_name, deploy_step_ids]) => {
-        if(old_params["roles"].hasOwnProperty(role_name) && 
-          new_params["roles"].hasOwnProperty(role_name) && 
-          JSON.stringify(old_params["roles"][role_name]) != JSON.stringify(new_params["roles"][role_name])){
+  if (
+    old_params.hasOwnProperty("roles") &&
+    new_params.hasOwnProperty("roles")
+  ) {
+    if (
+      JSON.stringify(old_params["roles"]) != JSON.stringify(new_params["roles"])
+    ) {
+      Object.entries(g_role_to_deploy_step_lut).forEach(
+        ([role_name, deploy_step_ids]) => {
+          if (
+            old_params["roles"].hasOwnProperty(role_name) &&
+            new_params["roles"].hasOwnProperty(role_name) &&
+            JSON.stringify(old_params["roles"][role_name]) !=
+              JSON.stringify(new_params["roles"][role_name])
+          ) {
             handle_warning_vars(
               new_params["roles"][role_name].toString(),
               old_params["roles"][role_name].toString(),
-              "roles-"+role_name,
+              "roles-" + role_name,
               old_params["time_stamp"],
               role_name
             );
+          }
         }
-      });
+      );
     }
   }
-
-  let current_deploy_state = localStorage.getItem("ceph_deploy_state");
-  let current_deploy_state_json = JSON.parse(current_deploy_state);
-  let ansible_config_warning = {
-    deploy_step_warnings: []
-  };
-
-  Object.entries(current_deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
-    if(current_deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars") && current_deploy_state_json[deploy_step_id]["warning_vars"].length > 0){
-      let warning_entry = {};
-      warning_entry["deploy_step_id"] = deploy_step_id;
-      warning_entry["step_name"] = g_deploy_step_id_lut[deploy_step_id]["step_name"];
-      warning_entry["inventory_files"] = g_deploy_step_id_lut[deploy_step_id]["inventory_files"];
-      warning_entry["purge_playbooks"] = g_deploy_step_id_lut[deploy_step_id]["purge_playbooks"];
-      warning_entry["warning_vars"] = current_deploy_state_json[deploy_step_id]["warning_vars"];
-      warning_entry["roles"] = g_deploy_step_id_lut[deploy_step_id]["roles"];
-      ansible_config_warning["deploy_step_warnings"].push(warning_entry);
-    }
-  });
-
-  if(ansible_config_warning["deploy_step_warnings"].length > 0){
-    let ansible_config_warning_msg = "";
-    ansible_config_warning_msg += "Warning: Ansible Configuration has been modified after deployment steps have been completed\n";
-    ansible_config_warning_msg += "You can fix this by completing one of the following:\n";
-    ansible_config_warning_msg += "    - run the corresponding purge command \"ansible_runner -c <purge_command>\" to undo your progress\n";
-    ansible_config_warning_msg += "    - change the modified variables back to the original value indicated.\n";
-    ansible_config_warning_msg += "    - re-generate the inventory files indicated, and redo the step again. (not recommended)\n";
-    ansible_config_warning["deploy_step_warnings"].forEach((warning_entry) => {
-      ansible_config_warning_msg += warning_entry["step_name"] + ":\n";
-      ansible_config_warning_msg += ("     purge_command: " + warning_entry["purge_playbooks"].toString() + "\n");
-      ansible_config_warning_msg += ("     Inventory File(s): " + warning_entry["inventory_files"].toString() + "\n");
-      ansible_config_warning_msg += ("     affected roles: " + warning_entry["roles"].toString() + "\n\n");
-    });
-    current_deploy_state_json["deploy-step-ansible-config"]["warning_msg"] = ansible_config_warning_msg;
-  }else if(current_deploy_state_json["deploy-step-ansible-config"].hasOwnProperty("warning_msg")){
-    delete current_deploy_state_json["deploy-step-ansible-config"]["warning_msg"];
-  }
-  localStorage.setItem("ceph_deploy_state",JSON.stringify(current_deploy_state_json,null,4));
-  sync_ceph_deploy_state();
-  setup_main_menu();
 }
 
-function handle_warning_vars(new_value,old_value,var_name,old_time_stamp,role_name){
+function update_warning_messages(current_deploy_state) {
+  //let current_deploy_state = localStorage.getItem("ceph_deploy_state");
+  let current_deploy_state_json = JSON.parse(current_deploy_state);
+  let ansible_config_warning = {
+    deploy_step_warnings: [],
+  };
+
+  Object.entries(current_deploy_state_json).forEach(
+    ([deploy_step_id, state_vars]) => {
+      if (
+        current_deploy_state_json[deploy_step_id].hasOwnProperty(
+          "warning_vars"
+        ) &&
+        current_deploy_state_json[deploy_step_id]["warning_vars"].length > 0
+      ) {
+        if (
+          current_deploy_state_json[deploy_step_id]["lock_state"] === "complete"
+        ) {
+          let warning_entry = {};
+          warning_entry["deploy_step_id"] = deploy_step_id;
+          warning_entry["step_name"] =
+            g_deploy_step_id_lut[deploy_step_id]["step_name"];
+          warning_entry["inventory_files"] =
+            g_deploy_step_id_lut[deploy_step_id]["inventory_files"];
+          warning_entry["purge_playbooks"] =
+            g_deploy_step_id_lut[deploy_step_id]["purge_playbooks"];
+          warning_entry["warning_vars"] =
+            current_deploy_state_json[deploy_step_id]["warning_vars"];
+          warning_entry["roles"] =
+            g_deploy_step_id_lut[deploy_step_id]["roles"];
+          ansible_config_warning["deploy_step_warnings"].push(warning_entry);
+        } else {
+          delete current_deploy_state_json[deploy_step_id]["warning_msg"];
+          delete current_deploy_state_json[deploy_step_id]["warning_vars"];
+        }
+      }
+    }
+  );
+
+  if (ansible_config_warning["deploy_step_warnings"].length > 0) {
+    let ansible_config_warning_msg = "";
+    ansible_config_warning_msg +=
+      "Warning: Ansible Configuration has been modified after deployment steps have been completed\n";
+    ansible_config_warning_msg +=
+      "You can fix this by completing one of the following:\n";
+    ansible_config_warning_msg +=
+      '    - run the corresponding purge command "ansible_runner -c <purge_command>" to undo your progress\n';
+    ansible_config_warning_msg +=
+      "    - change the modified variables back to the original value indicated.\n";
+    ansible_config_warning_msg +=
+      "    - re-generate the inventory files indicated, and redo the step again. (not recommended)\n";
+    ansible_config_warning["deploy_step_warnings"].forEach((warning_entry) => {
+      ansible_config_warning_msg += warning_entry["step_name"] + ":\n";
+      ansible_config_warning_msg +=
+        "     purge_command: " +
+        warning_entry["purge_playbooks"].toString() +
+        "\n";
+      ansible_config_warning_msg +=
+        "     Inventory File(s): " +
+        warning_entry["inventory_files"].toString() +
+        "\n";
+      ansible_config_warning_msg +=
+        "     affected roles: " + warning_entry["roles"].toString() + "\n\n";
+    });
+    current_deploy_state_json["deploy-step-ansible-config"]["warning_msg"] =
+      ansible_config_warning_msg;
+  } else if (
+    current_deploy_state_json["deploy-step-ansible-config"].hasOwnProperty(
+      "warning_msg"
+    )
+  ) {
+    delete current_deploy_state_json["deploy-step-ansible-config"][
+      "warning_msg"
+    ];
+  }
+  return JSON.stringify(current_deploy_state_json);
+  //localStorage.setItem("ceph_deploy_state",JSON.stringify(current_deploy_state_json,null,4));
+  //sync_ceph_deploy_state();
+}
+
+function handle_warning_vars(
+  new_value,
+  old_value,
+  var_name,
+  old_time_stamp,
+  role_name
+) {
   let deploy_state = localStorage.getItem("ceph_deploy_state");
   let deploy_state_json = JSON.parse(deploy_state);
-  Object.entries(deploy_state_json).forEach(([deploy_step_id,state_vars]) => {
-    if(state_vars["lock_state"] === "complete" && g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)){
+  Object.entries(deploy_state_json).forEach(([deploy_step_id, state_vars]) => {
+    if (
+      state_vars["lock_state"] === "complete" &&
+      g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)
+    ) {
       let make_warning_var = false;
-      if(!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")){
+      if (!deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars")) {
         deploy_state_json[deploy_step_id]["warning_vars"] = [];
         make_warning_var = true;
-      }
-      else{
+      } else {
         // we already have a warning vars array.
         let existing_warning_var = search_jarray_key_value_match(
-                                      deploy_state_json[deploy_step_id]["warning_vars"],
-                                      "var_name",
-                                      var_name);
-        if(existing_warning_var){
+          deploy_state_json[deploy_step_id]["warning_vars"],
+          "var_name",
+          var_name
+        );
+        if (existing_warning_var) {
           //warning var was already flagged. check to see if the user changed it back to the
           //value that was used during deployment.
-          if(new_value === existing_warning_var["warning_var"]["original_value"]){
+          if (
+            new_value === existing_warning_var["warning_var"]["original_value"]
+          ) {
             // the user changed it back to the proper value, remove the warning variable.
-            deploy_state_json[deploy_step_id]["warning_vars"].splice(existing_warning_var["index"]);
-            if(deploy_state_json[deploy_step_id]["warning_vars"].length == 0){
+            deploy_state_json[deploy_step_id]["warning_vars"].splice(
+              existing_warning_var["index"]
+            );
+            if (deploy_state_json[deploy_step_id]["warning_vars"].length == 0) {
               delete deploy_state_json[deploy_step_id]["warning_msg"];
               delete deploy_state_json[deploy_step_id]["warning_vars"];
-            }else{
-              deploy_state_json[deploy_step_id]["warning_msg"] = make_warning_message(deploy_state_json,deploy_step_id);
+            } else {
+              deploy_state_json[deploy_step_id]["warning_msg"] =
+                make_warning_message(deploy_state_json, deploy_step_id);
             }
-          }
-          else{
+          } else {
             //the user changed it to something different than the original value.
             //update the current value of the warning var.
-            deploy_state_json[deploy_step_id]["warning_vars"][existing_warning_var["index"]]["current_value"] = new_value;
-            make_warning_message(deploy_state_json,deploy_step_id);
+            deploy_state_json[deploy_step_id]["warning_vars"][
+              existing_warning_var["index"]
+            ]["current_value"] = new_value;
+            make_warning_message(deploy_state_json, deploy_step_id);
           }
-        }
-        else{
+        } else {
           make_warning_var = true;
         }
       }
-      if(make_warning_var){
-
+      if (make_warning_var) {
         //we need to make a warning variable and a warning message.
         let warning_var = {
-          "var_name": var_name,
-          "original_value": old_value,
-          "current_value": new_value,
-          "original_time_stamp": old_time_stamp
+          var_name: var_name,
+          original_value: old_value,
+          current_value: new_value,
+          original_time_stamp: old_time_stamp,
         };
         deploy_state_json[deploy_step_id]["warning_vars"].push(warning_var);
-        deploy_state_json[deploy_step_id]["warning_msg"] = make_warning_message(deploy_state_json,deploy_step_id);
+        deploy_state_json[deploy_step_id]["warning_msg"] = make_warning_message(
+          deploy_state_json,
+          deploy_step_id
+        );
       }
-      localStorage.setItem("ceph_deploy_state",JSON.stringify(deploy_state_json,null,4));
+      localStorage.setItem(
+        "ceph_deploy_state",
+        JSON.stringify(deploy_state_json, null, 4)
+      );
+      sync_ceph_deploy_state();
+    } else if (
+      deploy_state_json[deploy_step_id].hasOwnProperty("warning_vars") &&
+      state_vars["lock_state"] != "complete" &&
+      g_role_to_deploy_step_lut[role_name].includes(deploy_step_id)
+    ) {
+      delete deploy_state_json[deploy_step_id]["warning_vars"];
+      delete deploy_state_json[deploy_step_id]["warning_msg"];
+      localStorage.setItem(
+        "ceph_deploy_state",
+        JSON.stringify(deploy_state_json, null, 4)
+      );
       sync_ceph_deploy_state();
     }
   });
 }
 
-function make_warning_message(deploy_state_json,deploy_step_id){
-  let warning_message = "Warning: variables used to complete " + 
-  deploy_step_id + " have been modified.\n" + 
-  JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"],null,4) + 
-  "\nYou may need to re-do this step.";
+function make_warning_message(deploy_state_json, deploy_step_id) {
+  let warning_message =
+    "Warning: variables used to complete " +
+    deploy_step_id +
+    " have been modified.\n" +
+    JSON.stringify(deploy_state_json[deploy_step_id]["warning_vars"], null, 4) +
+    "\nYou may need to re-do this step.";
   return warning_message;
 }
 
-function search_jarray_key_value_match(json_array,key,value){
-  for (var i=0; i < json_array.length; i++) {
-      if (json_array[i].hasOwnProperty(key) && json_array[i][key] === value) {
-          return {
-            "warning_var":json_array[i],
-            "index":i
-          };
-      }
+function search_jarray_key_value_match(json_array, key, value) {
+  for (var i = 0; i < json_array.length; i++) {
+    if (json_array[i].hasOwnProperty(key) && json_array[i][key] === value) {
+      return {
+        warning_var: json_array[i],
+        index: i,
+      };
+    }
   }
   return null;
 }
@@ -3927,59 +4155,59 @@ function generate_nfss_file() {
 }
 
 function generate_smbs_file() {
-	var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_smbs"];
-	var result_json = null;
-	var generate_smbs_file_proc = cockpit.spawn(spawn_args, {
-	  superuser: "require",
-	});
-	generate_smbs_file_proc.done(function (data) {
-	  let msg_color = "";
-	  let msg_label = "";
-	  let msg_content = "";
-	  try {
-		result_json = JSON.parse(data);
-	  } catch (e) {
-		msg_color = "#bd3030";
-		msg_label = "Error:";
-		msg_content = "Unexpected return value.";
-	  }
-	  if (result_json.hasOwnProperty("success_msg")) {
-		msg_color = "#20a030";
-		msg_label = "Message: ";
-		msg_content = result_json.success_msg;
-		var smbs_file_content_proc = cockpit.spawn(["cat", result_json.path], {
-		  superuser: "require",
-		});
-		smbs_file_content_proc.done(function (data) {
-		  document.getElementById("smbs-file-content").innerText = data;
-		  document.getElementById("smbs-file-content").classList.remove("hidden");
-		  let show_button = document.getElementById("show-smbs-file-btn");
-		  show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
-		  show_button.classList.remove("hidden");
-		  show_button.addEventListener("click", show_smbs_file);
-		  document.getElementById("generate-smbs-file-btn").innerHTML =
-			"Generate Again";
-		  document
-			.getElementById("inv-file-smbs-default")
-			.classList.add("hidden");
-		  update_localStorage_inv_file_requirements("smbs.yml", data, true);
-		  if (inventory_file_generation_completed_check()) {
-			document
-			  .getElementById("ansible-config-inv-nxt")
-			  .removeAttribute("disabled");
-		  }
-		});
-		smbs_file_content_proc.fail(function (ex, data) {
-		  console.log("smbs_file_content_proc (FAIL): ", data);
-		});
-	  } else {
-		msg_color = "#bd3030";
-		msg_label = "Error:";
-		msg_content = "Unexpected return value.";
-	  }
-	  show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
-	});
-  }
+  var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_smbs"];
+  var result_json = null;
+  var generate_smbs_file_proc = cockpit.spawn(spawn_args, {
+    superuser: "require",
+  });
+  generate_smbs_file_proc.done(function (data) {
+    let msg_color = "";
+    let msg_label = "";
+    let msg_content = "";
+    try {
+      result_json = JSON.parse(data);
+    } catch (e) {
+      msg_color = "#bd3030";
+      msg_label = "Error:";
+      msg_content = "Unexpected return value.";
+    }
+    if (result_json.hasOwnProperty("success_msg")) {
+      msg_color = "#20a030";
+      msg_label = "Message: ";
+      msg_content = result_json.success_msg;
+      var smbs_file_content_proc = cockpit.spawn(["cat", result_json.path], {
+        superuser: "require",
+      });
+      smbs_file_content_proc.done(function (data) {
+        document.getElementById("smbs-file-content").innerText = data;
+        document.getElementById("smbs-file-content").classList.remove("hidden");
+        let show_button = document.getElementById("show-smbs-file-btn");
+        show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        show_button.classList.remove("hidden");
+        show_button.addEventListener("click", show_smbs_file);
+        document.getElementById("generate-smbs-file-btn").innerHTML =
+          "Generate Again";
+        document
+          .getElementById("inv-file-smbs-default")
+          .classList.add("hidden");
+        update_localStorage_inv_file_requirements("smbs.yml", data, true);
+        if (inventory_file_generation_completed_check()) {
+          document
+            .getElementById("ansible-config-inv-nxt")
+            .removeAttribute("disabled");
+        }
+      });
+      smbs_file_content_proc.fail(function (ex, data) {
+        console.log("smbs_file_content_proc (FAIL): ", data);
+      });
+    } else {
+      msg_color = "#bd3030";
+      msg_label = "Error:";
+      msg_content = "Unexpected return value.";
+    }
+    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+  });
+}
 
 function generate_rgwloadbalancers_file() {
   var spawn_args = [
@@ -4021,7 +4249,11 @@ function generate_rgwloadbalancers_file() {
         document
           .getElementById("inv-file-rgwlb-default")
           .classList.add("hidden");
-        update_localStorage_inv_file_requirements("rgwloadbalancers.yml", data, true);
+        update_localStorage_inv_file_requirements(
+          "rgwloadbalancers.yml",
+          data,
+          true
+        );
         if (inventory_file_generation_completed_check()) {
           document
             .getElementById("ansible-config-inv-nxt")
@@ -4071,11 +4303,10 @@ function update_playbook_state(content) {
     localStorage.setItem("playbook_state", JSON.stringify(content));
     Object.entries(content).forEach(([playbook, obj]) => {
       let target_button = document.getElementById(playbook);
-      if (
-        content.hasOwnProperty(playbook) &&
-        content[playbook].result === 0
-      ) {
-        if(target_button){target_button.removeAttribute("disabled");}
+      if (content.hasOwnProperty(playbook) && content[playbook].result === 0) {
+        if (target_button) {
+          target_button.removeAttribute("disabled");
+        }
         if (
           !prev_state_json.hasOwnProperty(playbook) ||
           (prev_state_json.hasOwnProperty(playbook) &&
@@ -4090,7 +4321,9 @@ function update_playbook_state(content) {
           );
         }
       } else if (content.hasOwnProperty(playbook)) {
-        if(target_button){target_button.disabled = true;}
+        if (target_button) {
+          target_button.disabled = true;
+        }
         if (
           !prev_state_json.hasOwnProperty(playbook) ||
           (prev_state_json.hasOwnProperty(playbook) &&
@@ -4423,7 +4656,11 @@ function setup_deploy_step_nav_buttons() {
                 step_content_id
             ) {
               let prog_int = Number(deploy_state[ceph_deploy_step_id].progress);
-              if(prog_int > 0){prog_int--;}else{prog_int = 0;}
+              if (prog_int > 0) {
+                prog_int--;
+              } else {
+                prog_int = 0;
+              }
               deploy_state[ceph_deploy_step_id].progress = prog_int.toString();
               localStorage.setItem(
                 "ceph_deploy_state",
@@ -4558,7 +4795,7 @@ function setup_buttons() {
   document
     .getElementById("generate-nfss-file-btn")
     .addEventListener("click", generate_nfss_file);
-document
+  document
     .getElementById("generate-smbs-file-btn")
     .addEventListener("click", generate_smbs_file);
   document
@@ -4596,16 +4833,138 @@ document
     .addEventListener("change", switch_theme);
 }
 
-
 const equalsIgnoreOrder = (a, b) => {
   if (a.length !== b.length) return false;
   const uniqueValues = new Set([...a, ...b]);
   for (const v of uniqueValues) {
-    const aCount = a.filter(e => e === v).length;
-    const bCount = b.filter(e => e === v).length;
+    const aCount = a.filter((e) => e === v).length;
+    const bCount = b.filter((e) => e === v).length;
     if (aCount !== bCount) return false;
   }
   return true;
+};
+
+function get_converged_main_menu_state() {
+  deploy_step_current_state_json_str =
+    localStorage.getItem("ceph_deploy_state") ??
+    JSON.stringify(g_ceph_deploy_default_state);
+  deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
+
+  let intermediate_deploy_state = JSON.parse(
+    JSON.stringify(deploy_step_current_states)
+  );
+  let state_converged = false;
+  while (!state_converged) {
+    //set complete state based on required playbooks being run
+    let playbook_state_json_str =
+      localStorage.getItem("playbook_state") ?? "{}";
+    let playbook_state_json = JSON.parse(playbook_state_json_str);
+    Object.entries(deploy_step_current_states).forEach(
+      ([deploy_step_id, obj]) => {
+        let tmp_requirements = [];
+        for (let pb_req in obj.playbook_completion_requirements) {
+          if (
+            !playbook_state_json.hasOwnProperty(
+              obj.playbook_completion_requirements[pb_req]
+            ) ||
+            playbook_state_json[obj.playbook_completion_requirements[pb_req]]
+              .result != 0
+          ) {
+            if (obj.lock_state == "complete") {
+              obj.lock_state = "unlocked";
+              obj.progress = "0";
+            }
+          } else if (
+            playbook_state_json.hasOwnProperty(
+              obj.playbook_completion_requirements[pb_req]
+            ) &&
+            playbook_state_json[obj.playbook_completion_requirements[pb_req]]
+              .result === 0
+          ) {
+            tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
+            if (
+              equalsIgnoreOrder(
+                tmp_requirements,
+                obj.playbook_completion_requirements
+              ) &&
+              obj.lock_state === "unlocked"
+            ) {
+              obj.lock_state = "complete";
+            }
+          }
+        }
+      }
+    );
+    //use the current parameters to prevent unlocking a step that
+    //needs roles assigned.
+    let current_params_str = localStorage.getItem("current_params") ?? "{}";
+    let current_params = JSON.parse(current_params_str);
+    // unlock the steps that have their unlock requirements met and update local storage.
+    Object.entries(deploy_step_current_states).forEach(
+      ([deploy_step_id, obj]) => {
+        if (obj.lock_state != "complete") {
+          // objects that are marked complete should be left alone. The playbooks that are
+          // required to be completed have been verified completed.
+          if (obj.unlock_requirements.length > 0) {
+            obj.lock_state = "locked"; // pre-emptively lock the deployment step
+          }
+          for (let i = 0; i < obj.unlock_requirements.length; i++) {
+            if (
+              deploy_step_current_states[obj.unlock_requirements[i]]
+                .lock_state == "complete"
+            ) {
+              if (
+                current_params.hasOwnProperty("roles") &&
+                g_deploy_step_id_lut[deploy_step_id]["roles"].length > 0
+              ) {
+                // only unlock them if there is are hosts assigned the required roles.
+                let role_count = 0;
+                let role_target =
+                  g_deploy_step_id_lut[deploy_step_id]["roles"].length;
+                g_deploy_step_id_lut[deploy_step_id]["roles"].forEach(
+                  (required_role) => {
+                    if (
+                      current_params["roles"].hasOwnProperty(required_role) &&
+                      current_params["roles"][required_role].length > 0
+                    ) {
+                      role_count++;
+                    }
+                  }
+                );
+                deploy_step_current_states[deploy_step_id].lock_state =
+                  role_count === role_target ? "unlocked" : "locked";
+                break;
+              } else {
+                deploy_step_current_states[deploy_step_id].lock_state =
+                  "unlocked";
+                break;
+              }
+            }
+          }
+        }
+      }
+    );
+
+    deploy_step_current_states = JSON.parse(
+      update_warning_messages(JSON.stringify(deploy_step_current_states))
+    );
+
+    //check to see if anything was updated, if not, we have converged, break out of while loop.
+    if (
+      JSON.stringify(intermediate_deploy_state) ===
+      JSON.stringify(deploy_step_current_states)
+    ) {
+      // we have iterated enough times to converge state.
+      state_converged = true;
+    } else {
+      // the two differ, re-assign the intermediate deploy state to the current value of deploy_step_current_states
+      // and do another pass until they converge.
+      intermediate_deploy_state = JSON.parse(
+        JSON.stringify(deploy_step_current_states)
+      );
+    }
+  }
+  return deploy_step_current_states;
 }
 
 /**
@@ -4622,80 +4981,13 @@ function setup_main_menu() {
     "deploy-step-rgw",
     "deploy-step-rgwlb",
     "deploy-step-iscsi",
-    "deploy-step-dashboard"
+    "deploy-step-dashboard",
   ];
-  deploy_step_current_state_json_str =
-    localStorage.getItem("ceph_deploy_state") ??
-    JSON.stringify(g_ceph_deploy_default_state);
-  deploy_step_current_states = JSON.parse(deploy_step_current_state_json_str);
-
-  //set complete state based on required playbooks being run
-  let playbook_state_json_str = localStorage.getItem("playbook_state") ?? "{}";
-  let playbook_state_json = JSON.parse(playbook_state_json_str);
-  Object.entries(deploy_step_current_states).forEach(
-    ([deploy_step_id, obj]) => {
-      let tmp_requirements = [];
-      for (let pb_req in obj.playbook_completion_requirements){
-        if(!playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) || playbook_state_json[obj.playbook_completion_requirements[pb_req]].result != 0){
-          if(obj.lock_state == "complete"){
-            obj.lock_state = "unlocked";
-            obj.progress = "0";
-          }
-        }
-        else if(playbook_state_json.hasOwnProperty(obj.playbook_completion_requirements[pb_req]) && playbook_state_json[obj.playbook_completion_requirements[pb_req]].result === 0){
-          tmp_requirements.push(obj.playbook_completion_requirements[pb_req]);
-          if(equalsIgnoreOrder(tmp_requirements,obj.playbook_completion_requirements) && obj.lock_state === "unlocked"){
-            obj.lock_state = "complete"
-          }
-        }
-      }
-    }
-  );
-
-
-  //use the current parameters to prevent unlocking a step that 
-  //needs roles assigned.
-  let current_params_str = localStorage.getItem("current_params") ?? "{}"
-  let current_params = JSON.parse(current_params_str);
-  // unlock the steps that have their unlock requirements met and update local storage.
-  Object.entries(deploy_step_current_states).forEach(
-    ([deploy_step_id, obj]) => {
-      if (obj.lock_state != "complete") {
-        // objects that are marked complete should be left alone. The playbooks that are 
-        // required to be completed have been verified completed.
-        if(obj.unlock_requirements.length > 0){
-          obj.lock_state = "locked";  // pre-emptively lock the deployment step
-        }
-        for (let i = 0; i < obj.unlock_requirements.length; i++) {
-          if (
-            deploy_step_current_states[obj.unlock_requirements[i]].lock_state == "complete"
-          ) {
-            if(current_params.hasOwnProperty("roles") && g_deploy_step_id_lut[deploy_step_id]["roles"].length > 0){
-              // only unlock them if there is are hosts assigned the required roles.
-              let role_count = 0;
-              let role_target = g_deploy_step_id_lut[deploy_step_id]["roles"].length;
-              g_deploy_step_id_lut[deploy_step_id]["roles"].forEach((required_role) =>{
-                if(current_params["roles"].hasOwnProperty(required_role) && current_params["roles"][required_role].length > 0){
-                  role_count++;
-                }
-              });
-              deploy_step_current_states[deploy_step_id].lock_state = (role_count === role_target) ? "unlocked" : "locked";
-              break;
-            }
-            else{
-              deploy_step_current_states[deploy_step_id].lock_state = "unlocked";
-              break;
-            }
-          }
-        }
-      }
-    }
-  );
-
+  let deploy_step_current_states = get_converged_main_menu_state();
 
   localStorage.setItem(
     "ceph_deploy_state",
-    JSON.stringify(deploy_step_current_states,null,4)
+    JSON.stringify(deploy_step_current_states, null, 4)
   );
   sync_ceph_deploy_state();
 
@@ -4743,21 +5035,26 @@ function setup_main_menu() {
           start_btn.title = "start";
         }
       }
-      if(deploy_step_current_states[deploy_step_ids[i]].hasOwnProperty("warning_msg")){
+      if (
+        deploy_step_current_states[deploy_step_ids[i]].hasOwnProperty(
+          "warning_msg"
+        )
+      ) {
         deploy_step_element.classList.remove("cd-step-complete");
         deploy_step_element.classList.add("cd-step-warning");
         if (status_div && start_btn) {
           status_div.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-          status_div.title = deploy_step_current_states[deploy_step_ids[i]].warning_msg;
+          status_div.title =
+            deploy_step_current_states[deploy_step_ids[i]].warning_msg;
           start_btn.classList.remove("hidden");
-          start_btn.title = deploy_step_current_states[deploy_step_ids[i]].warning_msg;
+          start_btn.title =
+            deploy_step_current_states[deploy_step_ids[i]].warning_msg;
           start_btn.innerHTML = '<i class="fas fa-redo"></i>';
         }
       }
     }
   }
 }
-
 
 function inventory_file_generation_completed_check() {
   let inv_file_req_str =
@@ -4773,7 +5070,11 @@ function inventory_file_generation_completed_check() {
   return ret_val;
 }
 
-function update_localStorage_inv_file_requirements(key, content, completed_flag) {
+function update_localStorage_inv_file_requirements(
+  key,
+  content,
+  completed_flag
+) {
   let inv_file_req_str =
     localStorage.getItem("inventory_files") ??
     JSON.stringify(g_inv_default_requirements);
@@ -4792,7 +5093,7 @@ function update_localStorage_inv_file_requirements(key, content, completed_flag)
 function sync_ceph_deploy_state() {
   let ceph_deploy_state_json_str =
     localStorage.getItem("ceph_deploy_state") ??
-    JSON.stringify(g_ceph_deploy_default_state,null,4);
+    JSON.stringify(g_ceph_deploy_default_state, null, 4);
   let ceph_deploy_state_file = cockpit.file(
     "/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json"
   );
@@ -4829,58 +5130,63 @@ function sync_ceph_deploy_state() {
   });
 
   get_inventory_file_state();
-
 }
 
-function clear_playbook_file_entry(key){
-  let playbook_state_file_path = "/usr/share/cockpit/ceph-deploy/state/playbook_state.json";
+function clear_playbook_file_entry(key) {
+  let playbook_state_file_path =
+    "/usr/share/cockpit/ceph-deploy/state/playbook_state.json";
   let playbook_state_json = null;
   let playbook_state_file = cockpit.file(playbook_state_file_path);
   let playbook_state_file_content = playbook_state_file.read();
-  playbook_state_file_content.then((content,tag) =>{
-    if(content){
+  playbook_state_file_content.then((content, tag) => {
+    if (content) {
       try {
         playbook_state_json = JSON.parse(content);
       } catch (error) {
-        console.log("clear_playbook_file_entry(): unable to parse playbook state file");
+        console.log(
+          "clear_playbook_file_entry(): unable to parse playbook state file"
+        );
       }
-      if(playbook_state_json.hasOwnProperty(key))
-      {
+      if (playbook_state_json.hasOwnProperty(key)) {
         delete playbook_state_json[key];
         let updated_playbook_state_file_content = playbook_state_file.replace(
-          JSON.stringify(playbook_state_json,null,4)
+          JSON.stringify(playbook_state_json, null, 4)
         );
-        updated_playbook_state_file_content.then((tag)=>{
+        updated_playbook_state_file_content.then((tag) => {
           playbook_state_file.close();
           setup_main_menu();
         });
         updated_playbook_state_file_content.catch((e) => {
           playbook_state_file.close();
-          console.log("clear_playbook_file_entry(): unable to update playbook state file");
+          console.log(
+            "clear_playbook_file_entry(): unable to update playbook state file"
+          );
         });
       }
     }
   });
 }
 
-function clear_inventory_file_entry(key){
-  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
+function clear_inventory_file_entry(key) {
+  let inventory_state_file_path =
+    "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
   let inv_state_json = null;
   let inv_state_file = cockpit.file(inventory_state_file_path);
-  let inv_state_file_content =  inv_state_file.read();
-  inv_state_file_content.then((content,tag) => {
-    if(content){
+  let inv_state_file_content = inv_state_file.read();
+  inv_state_file_content.then((content, tag) => {
+    if (content) {
       try {
         inv_state_json = JSON.parse(content);
       } catch (error) {
-        console.log("clear_inventory_file_entry(): unable to parse inventory state file");
+        console.log(
+          "clear_inventory_file_entry(): unable to parse inventory state file"
+        );
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-      if(inv_state_json.hasOwnProperty(key))
-      {
+      if (inv_state_json.hasOwnProperty(key)) {
         inv_state_json[key]["failed"] = true;
         let new_inv_state_file = inv_state_file.replace(
-          JSON.stringify(inv_state_json,null,4)
+          JSON.stringify(inv_state_json, null, 4)
         );
         new_inv_state_file.then((tag) => {
           inv_state_file.close();
@@ -4890,24 +5196,43 @@ function clear_inventory_file_entry(key){
         });
         new_inv_state_file.catch((e) => {
           inv_state_file.close();
-          console.log("clear_inventory_file_entry(): unable to update inventory state file");
+          console.log(
+            "clear_inventory_file_entry(): unable to update inventory state file"
+          );
         });
       }
-    }else{
+    } else {
       document.getElementById("ansible-config-inv-nxt").disabled = true;
     }
   });
 }
 
-function reset_inventory_file_elements(key){
-  if(g_inventory_file_vars.hasOwnProperty(key)){
-    let file_content_div = document.getElementById(g_inventory_file_vars[key]["file_content_div_id"]);
-    let show_button = document.getElementById(g_inventory_file_vars[key]["show_button_id"]);
-    let generate_button = document.getElementById(g_inventory_file_vars[key]["generate_button_id"]);
-    let default_content_div = document.getElementById(g_inventory_file_vars[key]["default_content_div"]);
-    if(file_content_div && show_button && generate_button && default_content_div){
+function reset_inventory_file_elements(key) {
+  if (g_inventory_file_vars.hasOwnProperty(key)) {
+    let file_content_div = document.getElementById(
+      g_inventory_file_vars[key]["file_content_div_id"]
+    );
+    let show_button = document.getElementById(
+      g_inventory_file_vars[key]["show_button_id"]
+    );
+    let generate_button = document.getElementById(
+      g_inventory_file_vars[key]["generate_button_id"]
+    );
+    let default_content_div = document.getElementById(
+      g_inventory_file_vars[key]["default_content_div"]
+    );
+    if (
+      file_content_div &&
+      show_button &&
+      generate_button &&
+      default_content_div
+    ) {
       file_content_div.classList.add("hidden");
-      show_button.removeEventListener("click",g_inventory_file_vars[key]["show_listener"],false);
+      show_button.removeEventListener(
+        "click",
+        g_inventory_file_vars[key]["show_listener"],
+        false
+      );
       show_button.classList.add("hidden");
       generate_button.innerHTML = "Generate";
       default_content_div.classList.remove("hidden");
@@ -4922,64 +5247,72 @@ function reset_inventory_file_elements(key){
   }
 }
 
-function update_inventory_state_file(new_inv_state_json){
-  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
+function update_inventory_state_file(new_inv_state_json) {
+  let inventory_state_file_path =
+    "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
   let inv_state_json = null;
   let inv_state_file = cockpit.file(inventory_state_file_path);
-  let inv_state_file_content =  inv_state_file.read();
-  inv_state_file_content.then((content,tag) => {
-    if(content){
+  let inv_state_file_content = inv_state_file.read();
+  inv_state_file_content.then((content, tag) => {
+    if (content) {
       try {
         inv_state_json = JSON.parse(content);
       } catch (error) {
-        console.log("clear_inventory_file_entry(): unable to parse inventory state file");
+        console.log(
+          "clear_inventory_file_entry(): unable to parse inventory state file"
+        );
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
       let new_inv_state_file = inv_state_file.replace(
-        JSON.stringify(new_inv_state_json,null,4)
+        JSON.stringify(new_inv_state_json, null, 4)
       );
       new_inv_state_file.then((tag) => {
         inv_state_file.close();
       });
-        new_inv_state_file.catch((e) => {
-          inv_state_file.close();
-          console.log("clear_inventory_file_entry(): unable to update inventory state file");
-        });
-    }else{
+      new_inv_state_file.catch((e) => {
+        inv_state_file.close();
+        console.log(
+          "clear_inventory_file_entry(): unable to update inventory state file"
+        );
+      });
+    } else {
       document.getElementById("ansible-config-inv-nxt").disabled = true;
     }
   });
 }
 
-function get_inventory_file_state(){
-  let inventory_state_file_path = "/usr/share/cockpit/ceph-deploy/state/inventory_state.json"
+function get_inventory_file_state() {
+  let inventory_state_file_path =
+    "/usr/share/cockpit/ceph-deploy/state/inventory_state.json";
   let inv_state_json = null;
-  let inv_state_file_content =  cockpit
-    .file(inventory_state_file_path)
-    .read();
-  inv_state_file_content.then((content,tag) => {
-    if(content){
+  let inv_state_file_content = cockpit.file(inventory_state_file_path).read();
+  inv_state_file_content.then((content, tag) => {
+    if (content) {
       try {
         inv_state_json = JSON.parse(content);
       } catch (error) {
-        console.log("get_inventory_state_file(): unable to parse inventory state file");
+        console.log(
+          "get_inventory_state_file(): unable to parse inventory state file"
+        );
         document.getElementById("ansible-config-inv-nxt").disabled = true;
       }
-      
+
       Object.entries(g_inventory_file_vars).forEach(([key, obj]) => {
-        if(
-          inv_state_json.hasOwnProperty(key) && 
-          inv_state_json[key].hasOwnProperty("failed") && 
-          !inv_state_json[key]["failed"])
-        {
+        if (
+          inv_state_json.hasOwnProperty(key) &&
+          inv_state_json[key].hasOwnProperty("failed") &&
+          !inv_state_json[key]["failed"]
+        ) {
           let ansible_inv_file = cockpit
-          .file(inv_state_json[key]["path"])
-          .read()
-          ansible_inv_file.then((ainv_content,tag) =>{
+            .file(inv_state_json[key]["path"])
+            .read();
+          ansible_inv_file.then((ainv_content, tag) => {
             if (ainv_content) {
               inv_state_json[key]["content"] = ainv_content;
               inv_state_json[key]["completed"] = true;
-              let file_content_div = document.getElementById(obj["file_content_div_id"]);
+              let file_content_div = document.getElementById(
+                obj["file_content_div_id"]
+              );
               file_content_div.innerHTML = ainv_content;
               file_content_div.classList.remove("hidden");
               let show_button = document.getElementById(obj["show_button_id"]);
@@ -4988,34 +5321,46 @@ function get_inventory_file_state(){
               show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
               document.getElementById(obj["generate_button_id"]).innerHTML =
                 "Generate Again";
-              document.getElementById(obj["default_content_div"]).classList.add("hidden");
-              update_localStorage_inv_file_requirements(key, ainv_content, true);
+              document
+                .getElementById(obj["default_content_div"])
+                .classList.add("hidden");
+              update_localStorage_inv_file_requirements(
+                key,
+                ainv_content,
+                true
+              );
               if (inventory_file_generation_completed_check()) {
                 document
                   .getElementById("ansible-config-inv-nxt")
                   .removeAttribute("disabled");
               } else {
-                document.getElementById("ansible-config-inv-nxt").disabled = true;
+                document.getElementById(
+                  "ansible-config-inv-nxt"
+                ).disabled = true;
               }
             } else {
               document.getElementById("ansible-config-inv-nxt").disabled = true;
             }
           });
-        }else if(
-          inv_state_json.hasOwnProperty(key) && 
-          inv_state_json[key].hasOwnProperty("failed") && 
-          inv_state_json[key]["failed"]){
-            inv_state_json[key]["content"] = "";
-            inv_state_json[key]["completed"] = false;
+        } else if (
+          inv_state_json.hasOwnProperty(key) &&
+          inv_state_json[key].hasOwnProperty("failed") &&
+          inv_state_json[key]["failed"]
+        ) {
+          inv_state_json[key]["content"] = "";
+          inv_state_json[key]["completed"] = false;
         }
       });
-    }else{
+    } else {
       document.getElementById("ansible-config-inv-nxt").disabled = true;
     }
   });
   //update local inventory file with updated content.
-  if(inv_state_json){
-    localStorage.setItem("inventory_state",JSON.stringify(inv_state_json,null,4));
+  if (inv_state_json) {
+    localStorage.setItem(
+      "inventory_state",
+      JSON.stringify(inv_state_json, null, 4)
+    );
     update_inventory_state_file(inv_state_json);
   }
 }
@@ -5035,7 +5380,7 @@ function get_ceph_deploy_initial_state() {
         } catch (error) {
           console.log("unable to parse ceph_ceploy_state.json");
         }
-        if(deploy_state_json){
+        if (deploy_state_json) {
           //we have JSON formatted data in the local file.
           let update_local_file = false;
           Object.entries(deploy_state_json).forEach(([key, obj]) => {
@@ -5043,14 +5388,15 @@ function get_ceph_deploy_initial_state() {
               obj.hasOwnProperty("lock_state") &&
               obj["lock_state"] != "complete" &&
               g_ceph_deploy_default_state.hasOwnProperty(key) &&
-              JSON.stringify(g_ceph_deploy_default_state[key]) != JSON.stringify(obj)
+              JSON.stringify(g_ceph_deploy_default_state[key]) !=
+                JSON.stringify(obj)
             ) {
               // the default state should be the same as the default state from ceph-deploy.js, update local file.
               deploy_state_json[key] = g_ceph_deploy_default_state[key];
               update_local_file = true;
             }
           });
-          if(update_local_file){
+          if (update_local_file) {
             //we can update the locked steps with most up-to-date default state from ceph-deploy.js
             let update_state_file = ceph_deploy_state_file.replace(
               JSON.stringify(deploy_state_json)
@@ -5071,7 +5417,7 @@ function get_ceph_deploy_initial_state() {
                 "/usr/share/cockpit/ceph-deploy/state/ceph_deploy_state.json could not be updated."
               );
             });
-          }else{
+          } else {
             localStorage.setItem(
               "ceph_deploy_state",
               JSON.stringify(deploy_state_json, null, 4)
@@ -5091,7 +5437,7 @@ function get_ceph_deploy_initial_state() {
           ceph_deploy_state_file.close();
           localStorage.setItem(
             "ceph_deploy_state",
-            JSON.stringify(g_ceph_deploy_default_state,null,4)
+            JSON.stringify(g_ceph_deploy_default_state, null, 4)
           );
           localStorage.removeItem("inventory_files");
           localStorage.removeItem("inventory_state");
@@ -5108,9 +5454,70 @@ function get_ceph_deploy_initial_state() {
   });
 }
 
+function get_playbook_initial_state() {
+  return new Promise((resolve, reject) => {
+    let playbook_state_file = cockpit.file(
+      "/usr/share/cockpit/ceph-deploy/state/playbook_state.json"
+    );
+    initial_state = playbook_state_file.read();
+    initial_state.then((content, tag) => {
+      if (content) {
+        let playbook_state_json = null;
+        //defer to the state on the server as it is possible that more than one browser was used.
+        try {
+          playbook_state_json = JSON.parse(content);
+        } catch (error) {
+          console.log("unable to parse playbook_state.json");
+        }
+        if (playbook_state_json) {
+          localStorage.setItem(
+            "playbook_state",
+            JSON.stringify(playbook_state_json, null, 4)
+          );
+          playbook_state_file.close();
+          resolve();
+        } else {
+          let create_state_file = playbook_state_file.replace("{}");
+          create_state_file.then((tag) => {
+            playbook_state_file.close();
+            localStorage.setItem("playbook_state", "{}");
+            resolve();
+          });
+          create_state_file.catch((e) => {
+            playbook_state_file.close();
+            reject(
+              "/usr/share/cockpit/ceph-deploy/state/playbook_state.json could not be created."
+            );
+          });
+        }
+      } else if (!content) {
+        //file does not exist locally
+        let create_state_file = playbook_state_file.replace("{}");
+        create_state_file.then((tag) => {
+          playbook_state_file.close();
+          localStorage.setItem("playbook_state", "{}");
+          resolve();
+        });
+        create_state_file.catch((e) => {
+          playbook_state_file.close();
+          reject(
+            "/usr/share/cockpit/ceph-deploy/state/playbook_state.json could not be created."
+          );
+        });
+      }
+    });
+  });
+}
+
 async function start_ceph_deploy() {
   try {
     await get_ceph_deploy_initial_state();
+  } catch (e) {
+    alert(e);
+    console.error(e);
+  }
+  try {
+    await get_playbook_initial_state();
   } catch (e) {
     alert(e);
     console.error(e);

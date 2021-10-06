@@ -226,13 +226,13 @@ def remove_ceph_playbook_state_entry(cmd):
     state_file.close()
 
 def main():
-    cmd_lst_str = "["
+    cmd_lst_str = "[\n"
     for key in ansible_commands.keys():
-        cmd_lst_str += key + ","
-    cmd_lst_str = cmd_lst_str[:-1] + "]"
+        cmd_lst_str += key + ",\n"
+    cmd_lst_str = cmd_lst_str[:-2] + "\n]"
 
     parser = OptionParser()
-    parser.add_option("-c","--command",action="store",dest="command",default=None, help="The ansible command to run. {c}".format(c=cmd_lst_str))
+    parser.add_option("-c","--command",action="store",dest="command",default=None, help="The ansible command to run. \nvalid commands:\n{c}".format(c=cmd_lst_str))
     (options, args) = parser.parse_args()
 
     if options.command != None and options.command in ansible_commands.keys():
