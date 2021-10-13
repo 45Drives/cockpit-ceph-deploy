@@ -3089,7 +3089,7 @@ function update_options_request() {
     ...options_div.querySelectorAll(':scope input[host-option="true"]'),
   ];
 
-  host_request_json = {};
+  let host_request_json = {};
 
   per_host_list.forEach((element) => {
     if (!host_request_json.hasOwnProperty(element.hostname)) {
@@ -3108,7 +3108,7 @@ function update_options_request() {
     }
   });
 
-  group_request_json = {};
+  let group_request_json = {};
   let group_list = [...options_div.querySelectorAll('[group-option="true"]')];
   group_list.forEach((element) => {
     if (!element.getAttribute("opt-parent")) {
@@ -3327,7 +3327,7 @@ function update_options_request() {
     }
   });
 
-  // update options with core_params script
+  // update options, hosts, and group parameters (in that order).
   var options_spawn_args = [
     "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
     "-o",
@@ -3364,7 +3364,7 @@ function update_options_request() {
       }
     }
 
-    // Now update the host params
+    // update the host params, and then update group options upon success.
     var host_spawn_args = [
       "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
       "-h",
@@ -3411,67 +3411,70 @@ function update_options_request() {
           "add-host-snackbar"
         );
       }
-      var group_spawn_args = [
-        "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
-        "-g",
-        JSON.stringify(group_request_json),
-        "-w",
-      ];
-      var group_proc = cockpit.spawn(group_spawn_args, {
-        superuser: "require",
-      });
-      var group_result_json = null;
-      group_proc.done(function (data) {
-        var msg_label = "";
-        var msg_content = "";
-        var msg_color = "";
-        try {
-          group_result_json = JSON.parse(data);
-        } catch (e) {
-          msg_color = "#bd3030";
-          msg_label = "Error:";
-          msg_content = "Unexpected return value.";
-        }
-        if (group_result_json) {
-          check_for_parameter_change(group_result_json);
-          setup_main_menu();
-        }
-        if (group_result_json.hasOwnProperty("success_msg")) {
-          msg_color = "#20a030";
-          msg_label = "Group Settings: ";
-          msg_content = "Group Settings Updated.";
-        } else {
-          msg_color = "#bd3030";
-          msg_label = "Error:";
-          msg_content = "Unexpected return value.";
-        }
-        if (
-          group_result_json.hasOwnProperty("old_file_content") &&
-          group_result_json.hasOwnProperty("new_file_content") &&
-          JSON.stringify(group_result_json["new_file_content"]["groups"]) !=
-            JSON.stringify(group_result_json["old_file_content"]["groups"])
-        ) {
-          {
-            show_snackbar_msg(
-              msg_label,
-              msg_content,
-              msg_color,
-              "general-snackbar"
-            );
+      if(JSON.stringify(group_request_json) != "{}"){
+        //update group options if there are options to update
+        var group_spawn_args = [
+          "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
+          "-g",
+          JSON.stringify(group_request_json),
+          "-w",
+        ];
+        var group_proc = cockpit.spawn(group_spawn_args, {
+          superuser: "require",
+        });
+        var group_result_json = null;
+        group_proc.done(function (data) {
+          var msg_label = "";
+          var msg_content = "";
+          var msg_color = "";
+          try {
+            group_result_json = JSON.parse(data);
+          } catch (e) {
+            msg_color = "#bd3030";
+            msg_label = "Error:";
+            msg_content = "Unexpected return value.";
           }
-        }
-        get_param_file_content();
-      });
-      group_proc.fail(function (ex, data) {
-        console.log("group_proc (FAIL): ", data);
-        show_snackbar_msg(
-          "Error: ",
-          "Failed to modify global options",
-          "#bd3030",
-          "update-roles-snackbar"
-        );
-        console.log("group_proc (FAIL): ", ex);
-      });
+          if (group_result_json) {
+            check_for_parameter_change(group_result_json);
+            setup_main_menu();
+          }
+          if (group_result_json.hasOwnProperty("success_msg")) {
+            msg_color = "#20a030";
+            msg_label = "Group Settings: ";
+            msg_content = "Group Settings Updated.";
+          } else {
+            msg_color = "#bd3030";
+            msg_label = "Error:";
+            msg_content = "Unexpected return value.";
+          }
+          if (
+            group_result_json.hasOwnProperty("old_file_content") &&
+            group_result_json.hasOwnProperty("new_file_content") &&
+            JSON.stringify(group_result_json["new_file_content"]["groups"]) !=
+              JSON.stringify(group_result_json["old_file_content"]["groups"])
+          ) {
+            {
+              show_snackbar_msg(
+                msg_label,
+                msg_content,
+                msg_color,
+                "general-snackbar"
+              );
+            }
+          }
+          get_param_file_content();
+        });
+        group_proc.fail(function (ex, data) {
+          console.log("group_proc (FAIL): ", data);
+          show_snackbar_msg(
+            "Error: ",
+            "Failed to modify global options",
+            "#bd3030",
+            "update-roles-snackbar"
+          );
+          console.log("group_proc (FAIL): ", ex);
+        });
+      }
     });
     host_proc.fail(function (ex, data) {
       document.getElementById("add-host-result-msg").style.display = "block";
@@ -3725,7 +3728,6 @@ function check_for_parameter_change(param_json_msg) {
 }
 
 function update_warning_messages(current_deploy_state) {
-  //let current_deploy_state = localStorage.getItem("ceph_deploy_state");
   let current_deploy_state_json = JSON.parse(current_deploy_state);
   let ansible_config_warning = {
     deploy_step_warnings: [],

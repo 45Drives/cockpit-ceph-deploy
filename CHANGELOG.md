@@ -1,6 +1,4 @@
-## Cockpit Ceph-Deploy 1.0.1-4
+## Cockpit Ceph-Deploy 1.0.1-5
 
-* fixed bug that caused warning messages to persist after a purge playbook was run
-* modified how main menu locks are handled
-* made ansible_runner help menu easier to read when using cli
-* removed unnecessary console.log statements from terminal.js and ceph-deploy.js
+* added option to show default parameters to core_params script
+* fixed bug that sent empty group options resulting in unecessary error messages when updating options in ansible configuration step

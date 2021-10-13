@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Oct 13 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-5
+- added option to show default parameters to core_params script
+- fixed bug that sent empty group options resulting in unecessary error messages
+  when updating options in ansible configuration step
 * Wed Oct 06 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-4
 - fixed bug that caused warning messages to persist after a purge playbook was run
 - modified how main menu locks are handled
