@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Oct 21 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-6
+- added an offline_install option in ansible configuration step for use with 45Drives
+  offline repos
 * Wed Oct 13 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-5
 - added option to show default parameters to core_params script
 - fixed bug that sent empty group options resulting in unecessary error messages

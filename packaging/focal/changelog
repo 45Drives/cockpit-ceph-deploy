@@ -1,3 +1,10 @@
+cockpit-ceph-deploy (1.0.1-6focal) focal; urgency=medium
+
+  * added an offline_install option in ansible configuration step for use with 45Drives
+    offline repos
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 21 Oct 2021 07:58:01 -0300
+
 cockpit-ceph-deploy (1.0.1-5focal) focal; urgency=medium
 
   * added option to show default parameters to core_params script

@@ -1,4 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.1-5
+## Cockpit Ceph-Deploy 1.0.1-6
 
-* added option to show default parameters to core_params script
-* fixed bug that sent empty group options resulting in unecessary error messages when updating options in ansible configuration step
+* added an offline_install option in ansible configuration step for use with 45Drives offline repos
