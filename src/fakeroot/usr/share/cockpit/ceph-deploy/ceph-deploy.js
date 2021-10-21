@@ -231,6 +231,16 @@ let g_option_scheme = {
         input_type: "checkbox",
         default_value: false,
       },
+      {
+        option_name: "offline_install",
+        option_format: "default",
+        optional: true,
+        label: "offline_install",
+        feedback: false,
+        help: "",
+        input_type: "checkbox",
+        default_value: false,
+      }
     ],
     unique: [],
     group: [],

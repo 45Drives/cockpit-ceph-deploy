@@ -79,6 +79,8 @@ def make_all_file(options_dict,default_path,path,dir,ansible_path):
 				elif options_dict[option] == None:
 					options_dict[option] = False
 					all_file_content[i] = "{c}{o}: {ov}\n".format(c=comment,o=option,ov=json.dumps(options_dict[option]))
+				elif isinstance(options_dict[option],bool):
+					all_file_content[i] = "{c}{o}: {ov}\n".format(c=comment,o=option,ov=json.dumps(options_dict[option]))
 
 	all_file = open(path,"w")
 	all_file.writelines(all_file_content)

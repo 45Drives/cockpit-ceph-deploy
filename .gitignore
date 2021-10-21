@@ -23,6 +23,10 @@ documentation
 .vscode/
 *.vscode
 
+# sync scripts
+sync_scripts/
+*sync_scripts
+
 # state and parameter files
 src/fakeroot/usr/share/cockpit/ceph-deploy/state
 src/fakeroot/usr/share/cockpit/ceph-deploy/params
