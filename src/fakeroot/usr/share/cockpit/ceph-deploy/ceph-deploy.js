@@ -1153,15 +1153,15 @@ function check_name_field(
     return false;
   } else if (
     field_text.length > 0 &&
-    !field_text.match(/^[a-z_][a-z0-9_-]*[$]?$/)
+    !field_text.match(/^[a-z_][a-z0-9_.-]*[$]?$/)
   ) {
     button.disabled = true;
     var invalid_chars = [];
     if (field_text[0].match(/[^a-z_]/))
       invalid_chars.push("'" + field_text[0] + "'");
     for (let char of field_text.slice(1, -1))
-      if (char.match(/[^a-z0-9_-]/)) invalid_chars.push("'" + char + "'");
-    if (field_text[field_text.length - 1].match(/[^a-z0-9_\-$]/))
+      if (char.match(/[^a-z0-9_.-]/)) invalid_chars.push("'" + char + "'");
+    if (field_text[field_text.length - 1].match(/[^a-z0-9_.\-$]/))
       invalid_chars.push("'" + field_text[field_text.length - 1] + "'");
     info_message.innerText =
       label_name +
