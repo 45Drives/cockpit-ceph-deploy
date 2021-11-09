@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Tue Nov 09 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-7
+- updated the check_name_field to allow names that contain period characters.
 * Thu Oct 21 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-6
 - added an offline_install option in ansible configuration step for use with 45Drives
   offline repos

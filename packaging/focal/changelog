@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.1-7focal) focal; urgency=medium
+
+  * updated the check_name_field to allow names that contain period characters.
+
+ -- Mark Hooper <mhooper@45drives.com>  Tue, 09 Nov 2021 08:36:21 -0400
+
 cockpit-ceph-deploy (1.0.1-6focal) focal; urgency=medium
 
   * added an offline_install option in ansible configuration step for use with 45Drives
