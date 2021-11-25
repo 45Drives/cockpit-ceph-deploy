@@ -319,10 +319,10 @@ let g_option_scheme = {
                     default_value: "",
                   },
                   {
-                    option_name: "id_map_range",
+                    option_name: "idmap_range",
                     option_format: "default",
                     optional: true,
-                    label: "id_map_range",
+                    label: "idmap_range",
                     feedback: true,
                     feedback_type: "fixed",
                     feedback_choice_options: ["100000 - 999999"],

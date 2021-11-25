@@ -72,25 +72,8 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
     smbs_file = open(path, "r")
     smbs_file_content = smbs_file.read()
     smbs_file.close()
-    special_keys = ["smb_active_directory", "smb_local_users",
-                    "ctdb_public_addresses", "active_directory_info"]
 
-    for option in smbs_dict.keys():
-        if option not in special_keys:
-            for i in range(len(smbs_file_content)):
-                regex = re.search(
-                    "^.*{o}:\s+.*$".format(o=option), smbs_file_content[i])
-                if regex != None:
-                    comment = ""
-                    if isinstance(smbs_dict[option], str):
-                        comment = "#" if (len(smbs_dict[option]) == 0) else ""
-                        smbs_file_content[i] = "{c}{o}: {ov}\n".format(
-                            c=comment, o=option, ov=smbs_dict[option])
-                    elif smbs_dict[option] == None:
-                        smbs_dict[option] = False
-                        smbs_file_content[i] = "{c}{o}: {ov}\n".format(
-                            c=comment, o=option, ov=json.dumps(smbs_dict[option]))
-
+    # populate the active_directory_info data structure
     start_tag = "##### ceph-deploy:active_directory_info:START #####\n"
     end_tag = "##### ceph-deploy:active_directory_info:END #####\n"
     section_to_replace = smbs_file_content[smbs_file_content.find(start_tag)+len(start_tag):smbs_file_content.rfind(end_tag)]
@@ -113,6 +96,7 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
         smbs_file_content = smbs_file_content.replace(start_tag +
             section_to_replace + end_tag, new_content)
 
+    # populate the ctdb_public_addresses data structure
     start_tag = "##### ceph-deploy:ctdb_public_addresses:START #####\n"
     end_tag = "##### ceph-deploy:ctdb_public_addresses:END #####\n"
     section_to_replace = smbs_file_content[smbs_file_content.find(
@@ -129,6 +113,32 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
     smbs_file_content = smbs_file_content.replace(
         start_tag + section_to_replace + end_tag, new_content)
 
+    # finally search each line for simple single variables
+    smbs_file_lines = smbs_file_content.split("\n")
+    special_keys = ["smb_active_directory", "smb_local_users",
+                    "ctdb_public_addresses", "active_directory_info"]
+
+    for option in smbs_dict.keys():
+        if option not in special_keys:
+            for i in range(len(smbs_file_lines)):
+                regex = re.search(
+                    "^.*{o}:\s+.*$".format(o=option), smbs_file_lines[i])
+                if regex != None:
+                    comment = ""
+                    if isinstance(smbs_dict[option], str):
+                        comment = "#" if (len(smbs_dict[option]) == 0) else ""
+                        smbs_file_lines[i] = "{c}{o}: {ov}".format(
+                            c=comment, o=option, ov=smbs_dict[option])
+                    elif smbs_dict[option] == None:
+                        smbs_dict[option] = False
+                        smbs_file_lines[i] = "{c}{o}: {ov}".format(
+                            c=comment, o=option, ov=json.dumps(smbs_dict[option]))
+                    elif isinstance(smbs_dict[option], bool):
+                        smbs_file_lines[i] = "{c}{o}: {ov}".format(
+                            c=comment, o=option, ov=json.dumps(smbs_dict[option]))
+    
+
+    smbs_file_content = "\n".join(smbs_file_lines)
     smbs_file = open(path, "w")
     smbs_file.writelines(smbs_file_content)
     smbs_file.close()

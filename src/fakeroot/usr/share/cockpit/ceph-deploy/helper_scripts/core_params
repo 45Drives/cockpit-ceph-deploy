@@ -33,7 +33,7 @@ from datetime import datetime
 @dataclass()
 class AdInfo:
     workgroup: str = ""
-    id_map_range: str = "100000 - 999999"
+    idmap_range: str = "100000 - 999999"
     realm: str = ""
     winbind_enum_groups: str = "no"
     winbind_enum_users: str = "no"
