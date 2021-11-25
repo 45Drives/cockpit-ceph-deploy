@@ -1,3 +1,10 @@
+cockpit-ceph-deploy (1.0.1-8focal) focal; urgency=medium
+
+  * fixed bug that missed single variable entries in smbs.yml during inventory file
+    generation
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 25 Nov 2021 09:09:11 -0400
+
 cockpit-ceph-deploy (1.0.1-7focal) focal; urgency=medium
 
   * updated the check_name_field to allow names that contain period characters.

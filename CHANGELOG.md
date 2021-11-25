@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.1-7
+## Cockpit Ceph-Deploy 1.0.1-8
 
-* updated the check_name_field to allow names that contain period characters.
+* fixed bug that missed single variable entries in smbs.yml during inventory file generation

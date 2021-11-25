@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Nov 25 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-8
+- fixed bug that missed single variable entries in smbs.yml during inventory file
+  generation
 * Tue Nov 09 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-7
 - updated the check_name_field to allow names that contain period characters.
 * Thu Oct 21 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-6
