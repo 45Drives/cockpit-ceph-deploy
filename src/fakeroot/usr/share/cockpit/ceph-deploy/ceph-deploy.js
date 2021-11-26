@@ -147,6 +147,27 @@ let g_inventory_file_vars = {
   },
 };
 
+
+let g_all_option_scheme = {
+  all: {
+    inventory_file: false,
+  global: [
+    {
+      option_name: "offline_install",
+      option_format: "default",
+      optional: true,
+      label: "offline_install",
+      feedback: false,
+      help: "",
+      input_type: "checkbox",
+      default_value: false,
+    }
+  ],
+  unique: [],
+  group: [],
+  }
+}
+
 let g_option_scheme = {
   mons: {
     inventory_file: false,
@@ -232,14 +253,15 @@ let g_option_scheme = {
         default_value: false,
       },
       {
-        option_name: "offline_install",
+        option_name: "block_db_size",
         option_format: "default",
         optional: true,
-        label: "offline_install",
-        feedback: false,
+        label: "block_db_size",
+        feedback: true,
+        feedback_type: "num_unlim",
         help: "",
-        input_type: "checkbox",
-        default_value: false,
+        input_type: "text",
+        default_value: "-1",
       }
     ],
     unique: [],
@@ -1259,6 +1281,46 @@ function check_num_field(
 }
 
 /**
+ * Checks to see if the text entered in a field contains only numeric characters or -1 for unlimited
+ * @param {string} name_field_id
+ * @param {string} feedback_field_id
+ * @param {string} button_id
+ * @param {string} label_name
+ * @param {boolean} required_flag
+ * @returns {boolean}
+ */
+ function check_num_unlim_field(
+  name_field_id,
+  feedback_field_id,
+  button_id,
+  label_name,
+  required_flag
+) {
+  var field_text = document.getElementById(name_field_id).value;
+  var button = document.getElementById(button_id);
+  var info_message = document.getElementById(feedback_field_id);
+  info_message.innerText = " ";
+  if (field_text.length === 0 && required_flag) {
+    button.disabled = true;
+    info_message.innerText = label_name + " cannot be empty.";
+    return false;
+  } else if (field_text.length > 0 && !/^[0-9]*[$]?$/.test(field_text) && field_text != "-1") {
+    button.disabled = true;
+    var invalid_chars = [];
+    for (let char of field_text)
+      if (/[^0-9]/.test(char)) invalid_chars.push("'" + char + "'");
+    info_message.innerText =
+      label_name +
+      " contains non-numeric characters: \n" +
+      invalid_chars.join(", ");
+    return false;
+  }
+  button.disabled = false;
+  return true;
+}
+
+
+/**
  * provides feedback on whether a given field contains a valid IP address.
  * @param {string} field_id
  * @param {string} feedback_field_id
@@ -1484,6 +1546,39 @@ function update_options_info(
   let options_div = document.getElementById("ansible-config-options");
   if (options_div) {
     options_div.innerHTML = ""; //erase everything within the options div.
+            //create a box to house all global and per-host options
+            let all_option_div = document.createElement("div");
+            all_option_div.classList.add(
+              "panel",
+              "panel-default",
+              "cd-option-panel"
+            );
+    
+            let all_section_header = document.createElement("div");
+            all_section_header.classList.add("cd-row", "cd-panel-heading");
+    
+            let all_section_header_text = document.createElement("h3");
+            all_section_header_text.classList.add("panel-title", "cd-row-child");
+            all_section_header_text.innerText = "Global Options";
+            all_section_header.appendChild(all_section_header_text);
+    
+            let all_section_body = document.createElement("div");
+            all_section_body.classList.add("cd-panel-body");
+            if (g_all_option_scheme["all"].global.length > 0) {
+              let all_form = document.createElement("div");
+              all_form.classList.add("ct-form");
+              all_form.id = "all";
+              make_global_options(
+                all_section_body,
+                all_form,
+                g_all_option_scheme["all"].global,
+                options_json
+              );
+              all_option_div.appendChild(all_section_header);
+              all_option_div.appendChild(all_section_body);
+              options_div.appendChild(all_option_div);
+            }
+
     //create global and per-host options for each role type
     Object.entries(roles_json).forEach(([role, host_list]) => {
       //loop through each role in the roles_json
@@ -2183,6 +2278,16 @@ function generate_option_feedback(opt, opt_input, id) {
         !opt.optional
       );
     });
+  } else if (opt.feedback_type === "num_unlim") {
+    opt_input.addEventListener("input", function () {
+      check_num_unlim_field(
+        opt_input.id,
+        feedback.id,
+        "global-options-btn",
+        opt.option_name,
+        !opt.optional
+      );
+    });
   } else if (opt.feedback_type === "choice") {
     opt_input.addEventListener("input", function () {
       check_choice_field(
@@ -2821,6 +2926,7 @@ function get_param_file_content() {
     hide_modal_dialog("add-host-modal");
   });
   proc.fail(function (ex, data) {
+    console.log(data);
     var msg_color = "#bd3030";
     var msg_label = "Error:";
     var msg_content = "Unable to load parameter file.";

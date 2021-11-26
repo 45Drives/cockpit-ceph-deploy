@@ -257,7 +257,7 @@ ceph_nfs_grace_namespace: "ganesha-grace"
 #non_hci_safety_factor: 0.7
 osd_memory_target: 2147483648
 #journal_size: 5120 # OSD journal size in MB
-block_db_size: 32212254720 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.
+block_db_size: -1 # block db size in bytes for the ceph-volume lvm batch. -1 means use the default of 'as big as possible'.
 public_network: 192.168.0.0/16
 #cluster_network: 10.0.0.0/24
 #osd_mkfs_type: xfs
