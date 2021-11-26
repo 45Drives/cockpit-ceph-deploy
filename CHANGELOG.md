@@ -1,3 +1,4 @@
-## Cockpit Ceph-Deploy 1.0.1-8
+## Cockpit Ceph-Deploy 1.0.1-9
 
-* fixed bug that missed single variable entries in smbs.yml during inventory file generation
+* added block_db_size in osd configuration options
+* moved the offline_install checkbox to a role-independent section of page

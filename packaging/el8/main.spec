@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Nov 26 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-9
+- added block_db_size in osd configuration options
+- moved the offline_install checkbox to a role-independent section of page
 * Thu Nov 25 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-8
 - fixed bug that missed single variable entries in smbs.yml during inventory file
   generation
