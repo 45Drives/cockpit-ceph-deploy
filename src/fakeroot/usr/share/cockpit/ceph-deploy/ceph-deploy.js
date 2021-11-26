@@ -147,26 +147,25 @@ let g_inventory_file_vars = {
   },
 };
 
-
 let g_all_option_scheme = {
   all: {
     inventory_file: false,
-  global: [
-    {
-      option_name: "offline_install",
-      option_format: "default",
-      optional: true,
-      label: "offline_install",
-      feedback: false,
-      help: "",
-      input_type: "checkbox",
-      default_value: false,
-    }
-  ],
-  unique: [],
-  group: [],
-  }
-}
+    global: [
+      {
+        option_name: "offline_install",
+        option_format: "default",
+        optional: true,
+        label: "offline_install",
+        feedback: false,
+        help: "",
+        input_type: "checkbox",
+        default_value: false,
+      },
+    ],
+    unique: [],
+    group: [],
+  },
+};
 
 let g_option_scheme = {
   mons: {
@@ -262,7 +261,7 @@ let g_option_scheme = {
         help: "",
         input_type: "text",
         default_value: "-1",
-      }
+      },
     ],
     unique: [],
     group: [],
@@ -1289,7 +1288,7 @@ function check_num_field(
  * @param {boolean} required_flag
  * @returns {boolean}
  */
- function check_num_unlim_field(
+function check_num_unlim_field(
   name_field_id,
   feedback_field_id,
   button_id,
@@ -1304,7 +1303,11 @@ function check_num_field(
     button.disabled = true;
     info_message.innerText = label_name + " cannot be empty.";
     return false;
-  } else if (field_text.length > 0 && !/^[0-9]*[$]?$/.test(field_text) && field_text != "-1") {
+  } else if (
+    field_text.length > 0 &&
+    !/^[0-9]*[$]?$/.test(field_text) &&
+    field_text != "-1"
+  ) {
     button.disabled = true;
     var invalid_chars = [];
     for (let char of field_text)
@@ -1318,7 +1321,6 @@ function check_num_field(
   button.disabled = false;
   return true;
 }
-
 
 /**
  * provides feedback on whether a given field contains a valid IP address.
@@ -1546,38 +1548,34 @@ function update_options_info(
   let options_div = document.getElementById("ansible-config-options");
   if (options_div) {
     options_div.innerHTML = ""; //erase everything within the options div.
-            //create a box to house all global and per-host options
-            let all_option_div = document.createElement("div");
-            all_option_div.classList.add(
-              "panel",
-              "panel-default",
-              "cd-option-panel"
-            );
-    
-            let all_section_header = document.createElement("div");
-            all_section_header.classList.add("cd-row", "cd-panel-heading");
-    
-            let all_section_header_text = document.createElement("h3");
-            all_section_header_text.classList.add("panel-title", "cd-row-child");
-            all_section_header_text.innerText = "Global Options";
-            all_section_header.appendChild(all_section_header_text);
-    
-            let all_section_body = document.createElement("div");
-            all_section_body.classList.add("cd-panel-body");
-            if (g_all_option_scheme["all"].global.length > 0) {
-              let all_form = document.createElement("div");
-              all_form.classList.add("ct-form");
-              all_form.id = "all";
-              make_global_options(
-                all_section_body,
-                all_form,
-                g_all_option_scheme["all"].global,
-                options_json
-              );
-              all_option_div.appendChild(all_section_header);
-              all_option_div.appendChild(all_section_body);
-              options_div.appendChild(all_option_div);
-            }
+    //create a box to house all global and per-host options
+    let all_option_div = document.createElement("div");
+    all_option_div.classList.add("panel", "panel-default", "cd-option-panel");
+
+    let all_section_header = document.createElement("div");
+    all_section_header.classList.add("cd-row", "cd-panel-heading");
+
+    let all_section_header_text = document.createElement("h3");
+    all_section_header_text.classList.add("panel-title", "cd-row-child");
+    all_section_header_text.innerText = "Global Options";
+    all_section_header.appendChild(all_section_header_text);
+
+    let all_section_body = document.createElement("div");
+    all_section_body.classList.add("cd-panel-body");
+    if (g_all_option_scheme["all"].global.length > 0) {
+      let all_form = document.createElement("div");
+      all_form.classList.add("ct-form");
+      all_form.id = "all";
+      make_global_options(
+        all_section_body,
+        all_form,
+        g_all_option_scheme["all"].global,
+        options_json
+      );
+      all_option_div.appendChild(all_section_header);
+      all_option_div.appendChild(all_section_body);
+      options_div.appendChild(all_option_div);
+    }
 
     //create global and per-host options for each role type
     Object.entries(roles_json).forEach(([role, host_list]) => {
@@ -3527,7 +3525,7 @@ function update_options_request() {
           "add-host-snackbar"
         );
       }
-      if(JSON.stringify(group_request_json) != "{}"){
+      if (JSON.stringify(group_request_json) != "{}") {
         //update group options if there are options to update
         var group_spawn_args = [
           "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
