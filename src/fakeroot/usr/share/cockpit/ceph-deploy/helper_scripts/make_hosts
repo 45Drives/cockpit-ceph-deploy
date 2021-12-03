@@ -87,6 +87,17 @@ def make_per_host_inventory_files(host_dict,ansible_dir,start_tag,end_tag,ceph_d
             host_inventory_file.write(start_tag)
             host_inventory_file.write(end_tag)
             host_inventory_file.close()
+        else:
+            host_inventory_file = open(path,"r")
+            content = host_inventory_file.read()
+            host_inventory_file.close()
+            if (content.find(start_tag) == -1):
+                # we cannot find the tag, file must have been created by another program
+                # put the required tags in at the end of the file
+                host_inventory_file = open(path,"a")
+                host_inventory_file.write(f"\n{start_tag}{end_tag}")
+                host_inventory_file.close()
+
 
     for host in host_dict.keys():
         path = (ansible_dir+"/"+host+".yml")
@@ -99,8 +110,13 @@ def make_per_host_inventory_files(host_dict,ansible_dir,start_tag,end_tag,ceph_d
         new_content = start_tag
         ignore = ["hostname"]
         for field in host_dict[host].keys():
-            if(host_dict[host][field] and field not in ignore and host_dict[host][field] != ""):
-                new_content += field + ": " + host_dict[host][field] + "\n"
+            if isinstance(host_dict[host][field], str):
+                if(host_dict[host][field] and field not in ignore and host_dict[host][field] != ""):
+                    new_content += field + ": " + host_dict[host][field] + "\n"
+            elif isinstance(host_dict[host][field],list) and len(host_dict[host][field]) != 0:
+                new_content += f"{field}:\n"
+                for item in host_dict[host][field]:
+                    new_content += f"   - {item}\n"
         new_content += end_tag
         updated_host_inventory_file = open(path,"w")
         content = content.replace(start_tag+section_to_replace+end_tag,new_content)

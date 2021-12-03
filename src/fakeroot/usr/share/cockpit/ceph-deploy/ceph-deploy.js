@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with Cockpit Ceph Deploy.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 let g_core_params = null;
 let g_deploy_file = null;
 let g_inv_default_requirements = {
@@ -275,7 +274,7 @@ let g_option_scheme = {
             help: "",
             input_type: "button",
             default_value: "+",
-            default_path: "/dev/disk/by-vdev/"
+            default_path: "/dev/disk/by-vdev/",
           },
         ],
         optional: true,
@@ -1226,7 +1225,7 @@ function check_name_field(
  * @param {boolean} required_flag
  * @returns {boolean}
  */
- function check_device_path_field(
+function check_device_path_field(
   path_field_id,
   feedback_field_id,
   button_id,
@@ -1771,7 +1770,7 @@ function make_global_options(
     target_form.appendChild(opt_label);
 
     let opt_input = document.createElement("input");
-    if (opt.option_format === "default"){
+    if (opt.option_format === "default") {
       if (opt.input_type === "text") {
         // make a text field
         opt_input.type = opt.input_type;
@@ -1798,9 +1797,9 @@ function make_global_options(
       opt_input.id = opt.option_name;
       opt_input.setAttribute("global-option", true);
       opt_input.setAttribute("optional", opt.optional);
-  
+
       opt_wrapper.appendChild(opt_input);
-  
+
       if (opt.feedback) {
         let feedback = generate_option_feedback(
           opt,
@@ -1811,14 +1810,19 @@ function make_global_options(
       }
       target_form.appendChild(opt_wrapper);
       target_div.appendChild(target_form);
-    }
-    else if (opt.option_format === "per-host-toggle"){
+    } else if (opt.option_format === "per-host-toggle") {
       let toggle_form = document.createElement("div");
       toggle_form.classList.add("ct-form");
       toggle_form.setAttribute("opt-parent", opt.option_name);
+      toggle_form.id = opt.option_name + "-toggle_form";
 
-      //make_toggle_options(toggle_form, opt, role, groups_json);
-      make_per_host_toggle_options(toggle_form,opt,role,hosts_json,roles_json);
+      make_per_host_toggle_options(
+        toggle_form,
+        opt,
+        role,
+        hosts_json,
+        roles_json
+      );
 
       opt_input.type = opt.input_type;
       opt_input.classList.add("ct-input", "cd-field-checkbox");
@@ -1827,13 +1831,11 @@ function make_global_options(
       opt_input.setAttribute("group", role);
       opt_input.setAttribute("field", opt.option_name);
       opt_input.setAttribute("optional", opt.optional);
-      //opt_input.setAttribute("group-option", true);
       opt_input.setAttribute("global-option", true);
       opt_input.setAttribute("option_format", opt.option_format);
-      opt_input.checked =
-        options_json.hasOwnProperty(opt.option_name)
-          ? options_json[opt.option_name]
-          : opt.default_value;
+      opt_input.checked = options_json.hasOwnProperty(opt.option_name)
+        ? options_json[opt.option_name]
+        : opt.default_value;
       if (opt_input.checked) {
         toggle_form.classList.remove("hidden");
       } else {
@@ -1846,8 +1848,8 @@ function make_global_options(
           toggle_form.classList.remove("hidden");
         } else {
           toggle_form.classList.add("hidden");
+          update_btn.removeAttribute("disabled");
         }
-        update_btn.removeAttribute("disabled");
       });
 
       let opt_enable_wrapper = document.createElement("div");
@@ -1867,7 +1869,6 @@ function make_global_options(
       target_form.appendChild(opt_wrapper);
       target_div.appendChild(toggle_form);
     }
-
   }
 }
 
@@ -1920,6 +1921,7 @@ function make_per_host_options(target_div, host_list, role, hosts_json) {
       opt_input.setAttribute("field", opt.option_name);
       opt_input.setAttribute("optional", opt.optional);
       opt_input.setAttribute("host-option", true);
+      opt_input.setAttribute("option_format", opt.option_format);
 
       opt_wrapper.appendChild(opt_input);
 
@@ -2741,10 +2743,15 @@ function generate_object_fields(
   return sub_opt_wrapper;
 }
 
-function make_per_host_toggle_options(target_form, parent_opt, role, hosts_json,roles_json){
-  let host_list = roles_json[role]
-  console.log(host_list);
-  for( let i = 0; i < host_list.length; i++){
+function make_per_host_toggle_options(
+  target_form,
+  parent_opt,
+  role,
+  hosts_json,
+  roles_json
+) {
+  let host_list = roles_json[role];
+  for (let i = 0; i < host_list.length; i++) {
     let host_option_div = document.createElement("div");
     host_option_div.classList.add("panel", "panel-default", "cd-option-panel");
 
@@ -2760,39 +2767,48 @@ function make_per_host_toggle_options(target_form, parent_opt, role, hosts_json,
     for (let opt of parent_opt.toggle_options) {
       let opt_wrapper = document.createElement("div");
       opt_wrapper.classList.add("ct-validation-wrapper");
-  
+
       let opt_label = document.createElement("label");
       opt_label.classList.add("control-label");
       opt_label.setAttribute("for", opt.option_name);
       opt_label.innerText = (opt.optional ? "" : "* ") + opt.label;
-  
+
       let opt_input = document.createElement("input");
-      opt_input.setAttribute("opt-parent", parent_opt.option_name);
+      //opt_input.setAttribute("opt-parent", parent_opt.option_name);
       if (opt.option_format) {
         if (opt.option_format == "multi-device-path") {
           let button_div = document.createElement("div");
           button_div.classList.add("cd-textfield-wrapper");
-  
+
           opt_input = document.createElement("div");
-          opt_input.id = opt.option_name + host_list[i];
+          opt_input.id = opt.option_name + "-" + host_list[i];
           opt_input.value = opt.default_value;
           opt_input.classList.add("cd-div-button-positive", "fa", "fa-plus");
           opt_input.setAttribute("host-option", true);
           opt_input.setAttribute("group", role);
           opt_input.setAttribute("option_format", opt.option_format);
           opt_input.setAttribute("field", opt.option_name);
-  
+          opt_input.setAttribute("hostname", host_list[i]);
+          opt_input.setAttribute("opt-parent", parent_opt.option_name);
+          opt_input.setAttribute("toggle-div", target_form.id);
+
           let default_sub_opt_wrapper = document.createElement("div");
           default_sub_opt_wrapper.classList.add("cd-textfield-wrapper");
-  
+
           let default_path_field = document.createElement("input");
           default_path_field.classList.add("ct-input", "cd-field");
           default_path_field.type = "text";
           default_path_field.setAttribute("opt-parent", opt_input.id);
+          default_path_field.setAttribute("hostname", host_list[i]);
           default_path_field.id =
             opt_input.id + "-entry-" + btoa(String(Math.random()));
-          default_path_field.value = opt.default_path;
-  
+          default_path_field.value =
+            hosts_json.hasOwnProperty(host_list[i]) &&
+            hosts_json[host_list[i]].hasOwnProperty(opt.option_name) &&
+            hosts_json[host_list[i]][opt.option_name].length > 0
+              ? hosts_json[host_list[i]][opt.option_name][0]
+              : opt.default_path;
+
           let default_feedback = document.createElement("div");
           default_feedback.classList.add("cd-field-feedback");
           default_feedback.id = default_path_field.id + "-feedback";
@@ -2805,31 +2821,91 @@ function make_per_host_toggle_options(target_form, parent_opt, role, hosts_json,
               true
             );
           });
-  
+
           default_sub_opt_wrapper.appendChild(default_path_field);
           default_sub_opt_wrapper.appendChild(opt_input);
           opt_wrapper.appendChild(default_sub_opt_wrapper);
           opt_wrapper.appendChild(default_feedback);
-  
+          if (
+            hosts_json.hasOwnProperty(host_list[i]) &&
+            hosts_json[host_list[i]].hasOwnProperty(opt.option_name) &&
+            hosts_json[host_list[i]][opt.option_name].length > 1
+          ) {
+            for (
+              let j = 1;
+              j < hosts_json[host_list[i]][opt.option_name].length;
+              j++
+            ) {
+              let sub_opt_wrapper = document.createElement("div");
+              sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+
+              let new_path_field = document.createElement("input");
+              new_path_field.classList.add("ct-input", "cd-field");
+              new_path_field.type = "text";
+              new_path_field.setAttribute("opt-parent", opt_input.id);
+              new_path_field.setAttribute("hostname", host_list[i]);
+
+              new_path_field.id =
+                opt_input.id + "-entry-" + btoa(String(Math.random()));
+              new_path_field.value =
+                hosts_json[host_list[i]][opt.option_name][j];
+
+              let del_field_btn = document.createElement("div");
+              del_field_btn.classList.add(
+                "cd-host-list-entry-icon-del",
+                "fa",
+                "fa-times"
+              );
+
+              let feedback = document.createElement("div");
+              feedback.classList.add("cd-field-feedback");
+              feedback.id = new_path_field.id + "-feedback";
+              new_path_field.addEventListener("input", function () {
+                check_device_path_field(
+                  new_path_field.id,
+                  feedback.id,
+                  "global-options-btn",
+                  opt.option_name + "-" + host_list[i],
+                  true
+                );
+              });
+
+              del_field_btn.addEventListener("click", () => {
+                sub_opt_wrapper.remove();
+                feedback.remove();
+                document
+                  .getElementById("global-options-btn")
+                  .removeAttribute("disabled");
+              });
+
+              sub_opt_wrapper.appendChild(new_path_field);
+              sub_opt_wrapper.appendChild(del_field_btn);
+              opt_wrapper.appendChild(sub_opt_wrapper);
+              opt_wrapper.appendChild(feedback);
+            }
+          }
+
           opt_input.addEventListener("click", () => {
             let sub_opt_wrapper = document.createElement("div");
             sub_opt_wrapper.classList.add("cd-textfield-wrapper");
-  
+
             let new_path_field = document.createElement("input");
             new_path_field.classList.add("ct-input", "cd-field");
             new_path_field.type = "text";
             new_path_field.setAttribute("opt-parent", opt_input.id);
+            new_path_field.setAttribute("hostname", host_list[i]);
+
             new_path_field.id =
               opt_input.id + "-entry-" + btoa(String(Math.random()));
             new_path_field.value = opt.default_path;
-  
+
             let del_field_btn = document.createElement("div");
             del_field_btn.classList.add(
               "cd-host-list-entry-icon-del",
               "fa",
               "fa-times"
             );
-  
+
             let feedback = document.createElement("div");
             feedback.classList.add("cd-field-feedback");
             feedback.id = new_path_field.id + "-feedback";
@@ -2838,16 +2914,19 @@ function make_per_host_toggle_options(target_form, parent_opt, role, hosts_json,
                 new_path_field.id,
                 feedback.id,
                 "global-options-btn",
-                opt.option_name + host_list[i],
+                opt.option_name + "-" + host_list[i],
                 true
               );
             });
-  
+
             del_field_btn.addEventListener("click", () => {
               sub_opt_wrapper.remove();
               feedback.remove();
+              document
+                .getElementById("global-options-btn")
+                .removeAttribute("disabled");
             });
-  
+
             sub_opt_wrapper.appendChild(new_path_field);
             sub_opt_wrapper.appendChild(del_field_btn);
             opt_wrapper.appendChild(sub_opt_wrapper);
@@ -3439,6 +3518,9 @@ function update_options_request() {
   // host_request json.
   let options_request_json = {};
   let options_div = document.getElementById("ansible-config-options");
+  let ABORT = false;
+  let ABORT_MSG = "Error";
+
   let global_list = [
     ...options_div.querySelectorAll(':scope input[global-option="true"]'),
   ];
@@ -3452,27 +3534,72 @@ function update_options_request() {
   });
 
   let per_host_list = [
-    ...options_div.querySelectorAll(':scope input[host-option="true"]'),
+    ...options_div.querySelectorAll(':scope [host-option="true"]'),
   ];
 
   let host_request_json = {};
 
   per_host_list.forEach((element) => {
-    if (!host_request_json.hasOwnProperty(element.hostname)) {
+    if (!host_request_json.hasOwnProperty(element.getAttribute("hostname"))) {
       host_request_json[element.getAttribute("hostname")] = {
         hostname: element.getAttribute("hostname"),
       };
     }
-    if (element.type == "text") {
-      host_request_json[element.getAttribute("hostname")][
-        element.getAttribute("field")
-      ] = element.value;
-    } else if (element.type == "checkbox") {
-      host_request_json[element.getAttribute("hostname")][
-        element.getAttribute("field")
-      ] = element.checked ? true : false;
+    if (element.getAttribute("option_format") === "default") {
+      if (element.type == "text") {
+        host_request_json[element.getAttribute("hostname")][
+          element.getAttribute("field")
+        ] = element.value;
+      } else if (element.type == "checkbox") {
+        host_request_json[element.getAttribute("hostname")][
+          element.getAttribute("field")
+        ] = element.checked ? true : false;
+      }
+    } else if (element.getAttribute("option_format") === "multi-device-path") {
+      let host_d_path_list = [
+        ...options_div.querySelectorAll(`[opt-parent=${element.id}][hostname]`),
+      ];
+      if (host_d_path_list.length > 0) {
+        host_request_json[element.getAttribute("hostname")][
+          element.getAttribute("field")
+        ] = [];
+        host_d_path_list.forEach((dp_text) => {
+          if (
+            host_request_json[element.getAttribute("hostname")][
+              element.getAttribute("field")
+            ].indexOf(dp_text.value) == -1 &&
+            element.hasAttribute("opt-parent") &&
+            !document
+              .getElementById(element.getAttribute("toggle-div"))
+              .classList.contains("hidden") &&
+            dp_text.value != "/dev/disk/by-vdev/"
+          ) {
+            host_request_json[element.getAttribute("hostname")][
+              element.getAttribute("field")
+            ].push(dp_text.value);
+          } else if (
+            !document
+              .getElementById(element.getAttribute("toggle-div"))
+              .classList.contains("hidden") &&
+            (dp_text.value === "/dev/disk/by-vdev/" || dp_text.value === "")
+          ) {
+            dp_text.dispatchEvent(new Event("input"));
+            ABORT = true;
+            ABORT_MSG = "Fix device paths before proceeding.";
+          }
+        });
+      }
     }
   });
+  if (ABORT) {
+    show_snackbar_msg(
+      "Message: ",
+      ABORT_MSG,
+      "#bd3030",
+      "update-options-snackbar"
+    );
+    return;
+  }
 
   let group_request_json = {};
   let group_list = [...options_div.querySelectorAll('[group-option="true"]')];
@@ -3714,6 +3841,7 @@ function update_options_request() {
     }
     if (options_result_json) {
       check_for_parameter_change(options_result_json);
+      get_param_file_content();
       setup_main_menu();
       if (
         options_result_json.hasOwnProperty("old_file_content") &&
@@ -3721,6 +3849,7 @@ function update_options_request() {
         JSON.stringify(options_result_json["new_file_content"]["options"]) !=
           JSON.stringify(options_result_json["old_file_content"]["options"])
       ) {
+        get_param_file_content();
         show_snackbar_msg(
           "Message: ",
           "Global options have been updated",
@@ -3751,13 +3880,14 @@ function update_options_request() {
         msg_content = "Unexpected return value.";
       }
       if (host_result_json) {
+        get_param_file_content();
         check_for_parameter_change(host_result_json);
         setup_main_menu();
       }
       if (host_result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
-        msg_label = "Add Host: ";
-        msg_content = "Host Added Succcessfully.";
+        msg_label = "Per-host Option: ";
+        msg_content = "Host information updated.";
       } else {
         msg_color = "#bd3030";
         msg_label = "Error:";
@@ -3770,6 +3900,7 @@ function update_options_request() {
         JSON.stringify(host_result_json["new_file_content"]) !=
           JSON.stringify(host_result_json["old_file_content"])
       ) {
+        get_param_file_content();
         show_snackbar_msg(
           msg_label,
           msg_content,
@@ -3802,6 +3933,7 @@ function update_options_request() {
           }
           if (group_result_json) {
             check_for_parameter_change(group_result_json);
+            get_param_file_content();
             setup_main_menu();
           }
           if (group_result_json.hasOwnProperty("success_msg")) {
@@ -3819,16 +3951,15 @@ function update_options_request() {
             JSON.stringify(group_result_json["new_file_content"]["groups"]) !=
               JSON.stringify(group_result_json["old_file_content"]["groups"])
           ) {
-            {
-              show_snackbar_msg(
-                msg_label,
-                msg_content,
-                msg_color,
-                "general-snackbar"
-              );
-            }
+            get_param_file_content();
+            show_snackbar_msg(
+              msg_label,
+              msg_content,
+              msg_color,
+              "general-snackbar"
+            );
           }
-          get_param_file_content();
+          setup_main_menu();
         });
         group_proc.fail(function (ex, data) {
           console.log("group_proc (FAIL): ", data);
@@ -3858,7 +3989,7 @@ function update_options_request() {
         msg_content.innerHTML = "Unable to add host";
       }
     });
-    get_param_file_content();
+    //get_param_file_content();
     setup_main_menu();
   });
   options_proc.fail(function (ex, data) {
@@ -4168,8 +4299,6 @@ function update_warning_messages(current_deploy_state) {
     ];
   }
   return JSON.stringify(current_deploy_state_json);
-  //localStorage.setItem("ceph_deploy_state",JSON.stringify(current_deploy_state_json,null,4));
-  //sync_ceph_deploy_state();
 }
 
 function handle_warning_vars(
