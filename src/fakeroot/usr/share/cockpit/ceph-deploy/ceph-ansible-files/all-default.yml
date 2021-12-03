@@ -120,6 +120,7 @@ ceph_origin: repository
 ceph_repository: community
 
 offline_install: false
+offline_repo_server_ip: ""
 
 # REPOSITORY: COMMUNITY VERSION
 #

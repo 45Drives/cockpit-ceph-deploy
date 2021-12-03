@@ -150,11 +150,34 @@ let g_all_option_scheme = {
   all: {
     inventory_file: false,
     global: [
+      //{
+      //  option_name: "offline_install",
+      //  option_format: "default",
+      //  optional: true,
+      //  label: "offline_install",
+      //  feedback: false,
+      //  help: "",
+      //  input_type: "checkbox",
+      //  default_value: false,
+      //},
       {
         option_name: "offline_install",
-        option_format: "default",
+        option_format: "global-toggle",
+        toggle_options: [
+          {
+            option_name: "offline_repo_server_ip",
+            option_format: "default",
+            optional: false,
+            label: "offline_repo_server_ip",
+            feedback: true,
+            feedback_type: "ip",
+            help: "",
+            input_type: "text",
+            default_value: "",
+          },
+        ],
         optional: true,
-        label: "offline_install",
+        label: "Offline Install",
         feedback: false,
         help: "",
         input_type: "checkbox",
@@ -1742,8 +1765,18 @@ function update_options_info(
   next_btn.removeAttribute("disabled");
   required_list.forEach((element) => {
     if (element.value == "") {
-      next_btn.disabled = true;
-      next_btn.title = "To proceed, fill in required fields.";
+      if(element.getAttribute("opt-parent")){
+        let parent_div = options_div.querySelectorAll(`:scope div[opt-parent=${element.getAttribute("opt-parent")}]`);
+        console.log(parent_div[0].classList.contains("hidden"));
+        if(!parent_div[0].classList.contains("hidden")){
+          next_btn.disabled = true;
+          next_btn.title = "To proceed, fill in required fields.";
+        }
+      }
+      else{
+        next_btn.disabled = true;
+        next_btn.title = "To proceed, fill in required fields.";
+      }
     }
   });
 }
@@ -1868,6 +1901,63 @@ function make_global_options(
       opt_wrapper.appendChild(opt_enable_wrapper);
       target_form.appendChild(opt_wrapper);
       target_div.appendChild(toggle_form);
+    }
+    else if (opt.option_format === "global-toggle") {
+      let toggle_form = document.createElement("div");
+      toggle_form.classList.add("ct-form");
+      toggle_form.setAttribute("opt-parent", opt.option_name);
+      toggle_form.id = opt.option_name + "-toggle_form";
+
+      make_global_toggle_options(
+        toggle_form, opt, role, options_json
+      );
+
+      opt_input.type = opt.input_type;
+      opt_input.classList.add("ct-input", "cd-field-checkbox");
+      opt_input.setAttribute("aria-invalid", "false");
+      opt_input.id = opt.option_name;
+      opt_input.setAttribute("group", role);
+      opt_input.setAttribute("field", opt.option_name);
+      opt_input.setAttribute("optional", opt.optional);
+      opt_input.setAttribute("global-option", true);
+      opt_input.setAttribute("option_format", opt.option_format);
+      opt_input.checked = options_json.hasOwnProperty(opt.option_name)
+        ? options_json[opt.option_name]
+        : opt.default_value;
+      if (opt_input.checked) {
+        toggle_form.classList.remove("hidden");
+      } else {
+        toggle_form.classList.add("hidden");
+      }
+
+      opt_input.addEventListener("change", () => {
+        let update_btn = document.getElementById("global-options-btn");
+        if (opt_input.checked) {
+          toggle_form.classList.remove("hidden");
+        } else {
+          toggle_form.classList.add("hidden");
+          update_btn.removeAttribute("disabled");
+        }
+      });
+
+      let opt_enable_wrapper = document.createElement("div");
+      opt_enable_wrapper.classList.add("cd-checkbox-wrapper");
+      //opt_enable_wrapper.appendChild(opt_input);
+      opt_enable_wrapper.style.marginTop = "10px";
+
+      let enable_switch = document.createElement("label");
+      enable_switch.classList.add("cd-switch");
+      let slider = document.createElement("span");
+      slider.classList.add("cd-slider", "round");
+
+      enable_switch.appendChild(opt_input);
+      enable_switch.appendChild(slider);
+      opt_enable_wrapper.appendChild(enable_switch);
+      opt_wrapper.appendChild(opt_enable_wrapper);
+      target_form.appendChild(opt_wrapper);
+      target_div.appendChild(target_form);
+      target_form.appendChild(toggle_form);
+
     }
   }
 }
@@ -2944,6 +3034,65 @@ function make_per_host_toggle_options(
   }
 }
 
+function make_global_toggle_options(target_form, parent_opt, role, options_json) {
+  for (let opt of parent_opt.toggle_options) {
+    let opt_wrapper = document.createElement("div");
+    opt_wrapper.classList.add("ct-validation-wrapper");
+
+    let opt_label = document.createElement("label");
+    opt_label.classList.add("control-label");
+    opt_label.setAttribute("for", opt.option_name);
+    opt_label.innerText = (opt.optional ? "" : "* ") + opt.label;
+
+    let opt_input = document.createElement("input");
+    opt_input.setAttribute("opt-parent", parent_opt.option_name);
+    if (opt.option_format) {
+      if (opt.option_format == "default") {
+        if (opt.input_type === "text") {
+          opt_input.type = opt.input_type;
+          opt_input.classList.add("ct-input", "cd-field");
+          opt_input.value =
+            options_json.hasOwnProperty(opt.option_name) &&
+            options_json[opt.option_name] != ""
+              ? options_json[opt.option_name]
+              : opt.default_value;
+          opt_input.setAttribute("default_value",opt.default_value);
+        } else if (opt.input_type === "checkbox") {
+          opt_input.type = opt.input_type;
+          opt_input.classList.add("ct-input", "cd-field-checkbox");
+          opt_input.checked =
+            options_json.hasOwnProperty(opt.option_name)
+              ? options_json[opt.option_name]
+              : opt.default_value;
+          opt_input.setAttribute("default_value",opt.default_value);
+          opt_input.addEventListener("change", function () {
+            document
+              .getElementById("global-options-btn")
+              .removeAttribute("disabled");
+          });
+        }
+        opt_input.setAttribute("aria-invalid", "false");
+        opt_input.id = opt.option_name;
+        opt_input.setAttribute("group", role);
+        opt_input.setAttribute("field", opt.option_name);
+        opt_input.setAttribute("optional", opt.optional);
+        opt_input.setAttribute("option_format", opt.option_format);
+        opt_wrapper.appendChild(opt_input);
+        if (opt.feedback) {
+          let feedback = generate_option_feedback(
+            opt,
+            opt_input,
+            opt.option_name + "-feedback"
+          );
+          opt_wrapper.appendChild(feedback);
+        }
+      }
+    }
+    target_form.appendChild(opt_label);
+    target_form.appendChild(opt_wrapper);
+  }
+}
+
 function make_toggle_options(target_form, parent_opt, role, groups_json) {
   for (let opt of parent_opt.toggle_options) {
     let opt_wrapper = document.createElement("div");
@@ -3526,10 +3675,40 @@ function update_options_request() {
   ];
 
   global_list.forEach((element) => {
-    if (element.type == "text") {
-      options_request_json[element.id] = element.value;
-    } else if (element.type == "checkbox") {
-      options_request_json[element.id] = element.checked ? true : false;
+    if (element.getAttribute("option_format") && element.getAttribute("option_format") === "default"){
+      if (element.type == "text") {
+        options_request_json[element.id] = element.value;
+      } else if (element.type == "checkbox") {
+        options_request_json[element.id] = element.checked ? true : false;
+      }
+    }
+    else if (element.getAttribute("option_format") && element.getAttribute("option_format") === "global-toggle"){
+      if (element.type == "checkbox") {
+        options_request_json[element.id] = element.checked ? true : false;
+        let child_options = [
+          ...options_div.querySelectorAll(`input[opt-parent=${element.id}]`)
+        ];
+        child_options.forEach((g_opt) => {
+          if (g_opt.getAttribute("option_format") == "default"){
+            if (g_opt.type == "text") {
+              options_request_json[g_opt.id] = element.checked ? g_opt.value: g_opt.getAttribute("default_value");
+              console.log(options_request_json);
+              if(element.checked && g_opt.value == "" && g_opt.getAttribute("optional")){
+                g_opt.dispatchEvent(new Event("input"));
+                ABORT = true;
+                ABORT_MSG = "Fix invalid fields before proceeding";
+              }
+            } else if (g_opt.type == "checkbox") {
+              options_request_json[g_opt.id] = element.checked ? g_opt.checked : g_opt.getAttribute("default_value");
+            }
+          }
+        });
+
+      }
+    }else if (element.getAttribute("option_format") && element.getAttribute("option_format") === "per-host-toggle"){
+      if (element.type == "checkbox") {
+        options_request_json[element.id] = element.checked ? true : false;
+      }
     }
   });
 

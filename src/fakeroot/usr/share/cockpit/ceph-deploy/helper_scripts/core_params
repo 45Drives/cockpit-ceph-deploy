@@ -214,6 +214,7 @@ class Options:
     offline_install: bool = False
     block_db_size: str = "-1"
     dedicated_device_db: bool = False
+    offline_repo_server_ip: str = ""
 
     def load_dictionary(self, dict_variable: dict):
         ret_val = False
