@@ -1759,7 +1759,6 @@ function update_options_info(
         let parent_div = options_div.querySelectorAll(
           `:scope div[opt-parent=${element.getAttribute("opt-parent")}]`
         );
-        console.log(parent_div[0].classList.contains("hidden"));
         if (!parent_div[0].classList.contains("hidden")) {
           next_btn.disabled = true;
           next_btn.title = "To proceed, fill in required fields.";
@@ -1795,6 +1794,7 @@ function make_global_options(
 
     let opt_input = document.createElement("input");
     if (opt.option_format === "default") {
+      opt_input.setAttribute("option_format",opt.option_format);
       if (opt.input_type === "text") {
         // make a text field
         opt_input.type = opt.input_type;
@@ -3672,6 +3672,15 @@ function update_options_request() {
     ) {
       if (element.type == "text") {
         options_request_json[element.id] = element.value;
+        if (
+          element.value == "" &&
+          !element.getAttribute("optional") &&
+          !element.getAttribute("opt-parent")
+        ) {
+          element.dispatchEvent(new Event("input"));
+          ABORT = true;
+          ABORT_MSG = "Fix invalid fields before proceeding";
+        }
       } else if (element.type == "checkbox") {
         options_request_json[element.id] = element.checked ? true : false;
       }
@@ -3690,7 +3699,6 @@ function update_options_request() {
               options_request_json[g_opt.id] = element.checked
                 ? g_opt.value
                 : g_opt.getAttribute("default_value");
-              console.log(options_request_json);
               if (
                 element.checked &&
                 g_opt.value == "" &&
