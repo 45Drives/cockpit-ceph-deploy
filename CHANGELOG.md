@@ -1,4 +1,5 @@
-## Cockpit Ceph-Deploy 1.0.1-9
+## Cockpit Ceph-Deploy 1.0.2-1
 
-* added block_db_size in osd configuration options
-* moved the offline_install checkbox to a role-independent section of page
+* updated the ceph-ansible-45d dependency to require minimum version 5.2.6
+* added options to use dedicated device journaling for osd nodes
+* added options required to use offline repos

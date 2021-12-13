@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Dec 13 2021 Mark Hooper <mhooper@45drives.com> 1.0.2-1
+- updated the ceph-ansible-45d dependency to require minimum version 5.2.6
+- added options to use dedicated device journaling for osd nodes
+- added options required to use offline repos
 * Fri Nov 26 2021 Mark Hooper <mhooper@45drives.com> 1.0.1-9
 - added block_db_size in osd configuration options
 - moved the offline_install checkbox to a role-independent section of page
