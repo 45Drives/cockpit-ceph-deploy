@@ -754,7 +754,19 @@ let g_option_scheme = {
   rgwloadbalancers: {
     inventory_file: true,
     global: [],
-    unique: [],
+    unique: [
+      {
+        option_name: "virtual_ip_interface",
+        option_format: "default",
+        optional: true,
+        label: "virtual_ip_interface",
+        feedback: true,
+        feedback_type: "name",
+        help: "",
+        input_type: "text",
+        default_value: "",
+      },
+    ],
     group: [
       {
         option_name: "haproxy_frontend_port",

@@ -154,6 +154,7 @@ class Host:
     radosgw_address: str = ""
     monitor_interface: str = ""
     dedicated_devices: List = field(default_factory=lambda: [])
+    virtual_ip_interface: str = ""
 
     def load_dictionary(self, dict_variable: dict):
         ret_val = False
