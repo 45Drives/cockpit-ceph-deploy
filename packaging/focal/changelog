@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.2-2focal) focal; urgency=medium
+
+  * virtual ip interfaces for rgwloadbalancers can now be set on the host level
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 28 Apr 2022 06:21:52 -0300
+
 cockpit-ceph-deploy (1.0.2-1focal) focal; urgency=medium
 
   * updated the ceph-ansible-45d dependency to require minimum version 5.2.6
