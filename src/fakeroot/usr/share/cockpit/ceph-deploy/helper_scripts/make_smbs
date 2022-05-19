@@ -17,7 +17,7 @@ g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 g_smbs_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs.yml"
 g_smbs_default_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs-default.yml"
 g_smbs_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
-g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/smbs.yml"
+g_ansible_file_path = "/usr/share/samba-ansible/group_vars/smbs.yml"
 
 g_inventory_file_key = "smbs.yml"
 

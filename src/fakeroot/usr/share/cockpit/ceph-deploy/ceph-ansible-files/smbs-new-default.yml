@@ -1,0 +1,55 @@
+---
+# Update samba packages if already installed
+upgrade_samba_packages: true
+
+# Manage Firewall
+manage_firewall: true #leave alone
+
+cluster_member: true #always true
+
+# Roles
+domain_member: true #branches here
+
+##### ceph-deploy:active_directory_info:START #####
+# Join Method
+# join_method: sssd|winbind
+join_method: 'sssd'
+# Join Authorization
+# join_auth: kerberos|password
+join_auth: 'kerberos'
+join_user: ''
+join_password: ''
+# Domain Name
+realm: ''
+workgroup: ''
+auto_id_mapping: true
+enumerate_ids: false
+fully_qualified_names: false
+# Enable windows side permissions
+enable_windows_acl: true #configurable
+#only if ^ is true
+share_admins:
+  - "Domain Admins"
+
+##### ceph-deploy:active_directory_info:END #####
+
+
+
+
+
+# ctdb 
+# This varible is ignored when not a cluster member and NetBIOS name is set to the hostname of the server
+netbios_name: 'CTDBCLUSTER'
+server_string: '45Drives Samba Server'
+log_level: '0'
+
+##### ceph-deploy:ctdb_public_addresses:START #####
+ctdb_public_addresses:
+  - vip_address: '192.168.200.89'
+    vip_interface: 'enp59s0f0'
+    subnet_mask: '16'
+##### ceph-deploy:ctdb_public_addresses:END #####
+
+# backend_filesystem: cephfs|zfs|generic
+backend_filesystem: cephfs #always cephfs
+shared_storage_mountpoint: /mnt/cephfs #configurable but defaults to this

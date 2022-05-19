@@ -327,28 +327,6 @@ let g_option_scheme = {
             radio_value: "Active Directory Integration",
             radio_sub_options: [
               {
-                option_name: "samba_server_ad",
-                radio_option_name: "samba_server",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "samba_server",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: true,
-              },
-              {
-                option_name: "samba_cluster_ad",
-                radio_option_name: "samba_cluster",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "samba_cluster",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: true,
-              },
-              {
                 option_name: "domain_member_ad",
                 radio_option_name: "domain_member",
                 option_format: "fixed-checkbox",
@@ -365,6 +343,18 @@ let g_option_scheme = {
                 option_format: "sub_form",
                 sub_form_options: [
                   {
+                      option_name: "join_method",
+                      option_format: "default",
+                      optional: false,
+                      label: "join_method",
+                      feedback: true,
+                      feedback_type: "choice",
+                      feedback_choice_options: ["winbind", "sssd"],
+                      help: "",
+                      input_type: "text",
+                      default_value: "winbind",
+                  },
+                  {
                     option_name: "workgroup",
                     option_format: "default",
                     optional: true,
@@ -373,18 +363,6 @@ let g_option_scheme = {
                     help: "",
                     input_type: "text",
                     default_value: "",
-                  },
-                  {
-                    option_name: "idmap_range",
-                    option_format: "default",
-                    optional: true,
-                    label: "idmap_range",
-                    feedback: true,
-                    feedback_type: "fixed",
-                    feedback_choice_options: ["100000 - 999999"],
-                    help: "",
-                    input_type: "text",
-                    default_value: "100000 - 999999",
                   },
                   {
                     option_name: "realm",
@@ -397,48 +375,79 @@ let g_option_scheme = {
                     default_value: "",
                   },
                   {
-                    option_name: "winbind_enum_groups",
+                    option_name: "auto_id_mapping",
                     option_format: "default",
                     optional: true,
-                    label: "winbind_enum_groups",
-                    feedback: true,
-                    feedback_type: "fixed",
-                    feedback_choice_options: ["no"],
+                    label: "auto_id_mapping",
+                    feedback: false,
                     help: "",
-                    input_type: "text",
-                    default_value: "no",
+                    input_type: "checkbox",
+                    default_value: true,
                   },
                   {
-                    option_name: "winbind_enum_users",
+                    option_name: "enumerate_ids",
                     option_format: "default",
                     optional: true,
-                    label: "winbind_enum_users",
-                    feedback: true,
-                    feedback_type: "fixed",
-                    feedback_choice_options: ["no"],
+                    label: "enumerate_ids",
+                    feedback: false,
                     help: "",
-                    input_type: "text",
-                    default_value: "no",
+                    input_type: "checkbox",
+                    default_value: false,
                   },
                   {
-                    option_name: "domain_join_user",
+                    option_name: "join_auth",
+                    option_format: "default",
+                    optional: false,
+                    label: "join_auth",
+                    feedback: true,
+                    feedback_type: "choice",
+                    feedback_choice_options: ["kerberos", "password"],
+                    help: "",
+                    input_type: "text",
+                    default_value: "password",
+                  },
+                  {
+                    option_name: "join_user",
                     option_format: "default",
                     optional: true,
-                    label: "domain_join_user",
+                    label: "join_user",
                     feedback: false,
                     help: "",
                     input_type: "text",
                     default_value: "username",
                   },
                   {
-                    option_name: "domain_join_password",
+                    option_name: "join_password",
                     option_format: "default",
                     optional: true,
-                    label: "domain_join_password",
+                    label: "join_password",
                     feedback: false,
                     help: "",
                     input_type: "password",
                     default_value: "",
+                  },
+                  {
+                    option_name: "enable_windows_acl",
+                    option_format: "toggle_parent",
+                    toggle_options: [
+                      {
+                        option_name: "share_admins",
+                        option_format: "multi-str",
+                        optional: false,
+                        label: "share_admins",
+                        feedback: false,
+                        help: "",
+                        input_type: "button",
+                        default_value: "+",
+                        default_child_value: "Domain Admins"
+                      },
+                    ],
+                    optional: true,
+                    label: "Enable Windows ACL",
+                    feedback: false,
+                    help: "",
+                    input_type: "checkbox",
+                    default_value: false,
                   },
                 ],
                 optional: true,
@@ -494,45 +503,12 @@ let g_option_scheme = {
                 input_type: "button",
                 default_value: "+",
               },
-              {
-                option_name: "configure_shares_ad",
-                radio_option_name: "configure_shares",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "configure_shares",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: false,
-              },
             ],
           },
           {
             radio_id: "smb_local_users",
             radio_value: "Local Users",
             radio_sub_options: [
-              {
-                option_name: "samba_server_lu",
-                radio_option_name: "samba_server",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "samba_server",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: true,
-              },
-              {
-                option_name: "samba_cluster_lu",
-                radio_option_name: "samba_cluster",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "samba_cluster",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: true,
-              },
               {
                 option_name: "domain_member_lu",
                 radio_option_name: "domain_member",
@@ -589,18 +565,7 @@ let g_option_scheme = {
                 help: "",
                 input_type: "button",
                 default_value: "+",
-              },
-              {
-                option_name: "configure_shares_lu",
-                radio_option_name: "configure_shares",
-                option_format: "fixed-checkbox",
-                optional: true,
-                label: "configure_shares",
-                feedback: false,
-                help: "",
-                input_type: "checkbox",
-                default_value: false,
-              },
+              }
             ],
           },
         ],
@@ -2655,7 +2620,7 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
                     ? groups_json[role][opt.option_name][sub_opt.option_name]
                     : sub_opt.default_value;
               } else if (sub_opt.input_type === "checkbox") {
-                sub_opt_input.type = opt.input_type;
+                sub_opt_input.type = sub_opt.input_type;
                 sub_opt_input.classList.add("ct-input", "cd-field-checkbox");
                 sub_opt_input.checked =
                   groups_json.hasOwnProperty(role) &&
@@ -2693,6 +2658,62 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
               opt_wrapper.appendChild(sub_opt_label);
               opt_wrapper.appendChild(sub_opt_wrapper);
             }
+            else if(sub_opt.option_format == "toggle_parent"){
+              console.log("TOGGLE PARENT:",sub_opt);
+              let toggle_form = document.createElement("div");
+              toggle_form.classList.add("ct-form");
+              toggle_form.setAttribute("opt-parent", sub_opt.option_name);
+              toggle_form.style.width = "90%";
+              make_toggle_options(toggle_form, sub_opt, role, groups_json);
+              
+              sub_opt_input.type = sub_opt.input_type;
+              sub_opt_input.classList.add("ct-input", "cd-field-checkbox");
+              sub_opt_input.setAttribute("aria-invalid", "false");
+              sub_opt_input.id = sub_opt.option_name;
+              sub_opt_input.setAttribute("group", role);
+              sub_opt_input.setAttribute("field", sub_opt.option_name);
+              sub_opt_input.setAttribute("optional", sub_opt.optional);
+              sub_opt_input.setAttribute("group-option", true);
+              sub_opt_input.setAttribute("option_format", sub_opt.option_format);
+              sub_opt_input.checked =
+                groups_json.hasOwnProperty(role) &&
+                groups_json[role].hasOwnProperty(sub_opt.option_name)
+                  ? groups_json[role][sub_opt.option_name]
+                  : sub_opt.default_value;
+              if (sub_opt_input.checked) {
+                toggle_form.classList.remove("hidden");
+              } else {
+                toggle_form.classList.add("hidden");
+              }
+      
+              sub_opt_input.addEventListener("change", () => {
+                let update_btn = document.getElementById("global-options-btn");
+                if (sub_opt_input.checked) {
+                  toggle_form.classList.remove("hidden");
+                } else {
+                  toggle_form.classList.add("hidden");
+                }
+                update_btn.removeAttribute("disabled");
+              });
+      
+              let sub_opt_enable_wrapper = document.createElement("div");
+              sub_opt_enable_wrapper.classList.add("cd-checkbox-wrapper");
+              sub_opt_enable_wrapper.appendChild(sub_opt_input);
+              sub_opt_enable_wrapper.style.marginTop = "10px";
+      
+              let sub_enable_switch = document.createElement("label");
+              sub_enable_switch.classList.add("cd-switch");
+              let sub_slider = document.createElement("span");
+              sub_slider.classList.add("cd-slider", "round");
+      
+              sub_enable_switch.appendChild(sub_opt_input);
+              sub_enable_switch.appendChild(sub_slider);
+              sub_opt_enable_wrapper.appendChild(sub_enable_switch);
+              sub_opt_wrapper.appendChild(sub_opt_enable_wrapper);
+              sub_opt_wrapper.appendChild(toggle_form);
+              opt_wrapper.appendChild(sub_opt_label);
+              opt_wrapper.appendChild(sub_opt_wrapper);
+            } 
           }
         }
       } else if (opt.option_format == "fixed-checkbox") {
@@ -3301,7 +3322,93 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
           opt_wrapper.appendChild(sub_opt_wrapper);
           opt_wrapper.appendChild(feedback);
         });
-      } else if (opt.option_format == "default") {
+      }
+      else if (opt.option_format == "multi-str") {
+        let button_div = document.createElement("div");
+        button_div.classList.add("cd-textfield-wrapper");
+
+        opt_input = document.createElement("div");
+        opt_input.id = opt.option_name;
+        opt_input.value = opt.default_value;
+        opt_input.classList.add("cd-div-button-positive", "fa", "fa-plus");
+        opt_input.setAttribute("group-option", true);
+        opt_input.setAttribute("group", role);
+        opt_input.setAttribute("option_format", opt.option_format);
+        opt_input.setAttribute("field", opt.option_name);
+
+        let default_sub_opt_wrapper = document.createElement("div");
+        default_sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+
+        let default_str_field = document.createElement("input");
+        default_str_field.classList.add("ct-input", "cd-field");
+        default_str_field.type = "text";
+        default_str_field.setAttribute("opt-parent", opt_input.id);
+        default_str_field.id =
+          opt_input.id + "-entry-" + btoa(String(Math.random()));
+        default_str_field.value = opt.default_child_value;
+
+        //let default_feedback = document.createElement("div");
+        //default_feedback.classList.add("cd-field-feedback");
+        //default_feedback.id = default_ip_field.id + "-feedback";
+        //default_ip_field.addEventListener("input", function () {
+        //  check_ip_field(
+        //    default_ip_field.id,
+        //    default_feedback.id,
+        //    "global-options-btn",
+        //    opt.option_name,
+        //    true
+        //  );
+        //});
+
+        default_sub_opt_wrapper.appendChild(default_str_field);
+        default_sub_opt_wrapper.appendChild(opt_input);
+        opt_wrapper.appendChild(default_sub_opt_wrapper);
+        //opt_wrapper.appendChild(default_feedback);
+
+        opt_input.addEventListener("click", () => {
+          let sub_opt_wrapper = document.createElement("div");
+          sub_opt_wrapper.classList.add("cd-textfield-wrapper");
+
+          let new_str_field = document.createElement("input");
+          new_str_field.classList.add("ct-input", "cd-field");
+          new_str_field.type = "text";
+          new_str_field.setAttribute("opt-parent", opt_input.id);
+          new_str_field.id =
+            opt_input.id + "-entry-" + btoa(String(Math.random()));
+
+          let del_field_btn = document.createElement("div");
+          del_field_btn.classList.add(
+            "cd-host-list-entry-icon-del",
+            "fa",
+            "fa-times"
+          );
+
+          //let feedback = document.createElement("div");
+          //feedback.classList.add("cd-field-feedback");
+          //feedback.id = new_ip_field.id + "-feedback";
+          //new_ip_field.addEventListener("input", function () {
+          //  check_ip_field(
+          //    new_ip_field.id,
+          //    feedback.id,
+          //    "global-options-btn",
+          //    opt.option_name,
+          //    true
+          //  );
+          //});
+
+          del_field_btn.addEventListener("click", () => {
+            sub_opt_wrapper.remove();
+            //feedback.remove();
+          });
+
+          sub_opt_wrapper.appendChild(new_str_field);
+          sub_opt_wrapper.appendChild(del_field_btn);
+          opt_wrapper.appendChild(sub_opt_wrapper);
+          opt_wrapper.style.width = "90%";
+          //opt_wrapper.appendChild(feedback);
+        });
+      }
+      else if (opt.option_format == "default") {
         if (opt.input_type === "text") {
           opt_input.type = opt.input_type;
           opt_input.classList.add("ct-input", "cd-field");

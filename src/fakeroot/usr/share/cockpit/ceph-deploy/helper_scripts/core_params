@@ -32,13 +32,17 @@ from datetime import datetime
 
 @dataclass()
 class AdInfo:
+    join_method: str = ""
     workgroup: str = ""
-    idmap_range: str = "100000 - 999999"
     realm: str = ""
-    winbind_enum_groups: str = "no"
-    winbind_enum_users: str = "no"
-    domain_join_user: str = ""
-    domain_join_password: str = ""
+    auto_id_mapping: bool = True
+    enumerate_ids: bool = False
+    fully_qualified_names: bool = False
+    enable_windows_acl: bool = False
+    share_admins: List = field(default_factory=lambda: [])
+    join_auth: str = ""
+    join_user: str = ""
+    join_password: str = ""
 
     def load_dictionary(self, dict_variable: dict):
         ret_val = False
@@ -76,13 +80,9 @@ class CtdbPublicAddress:
 
 @dataclass()
 class Smbs:
-    
     smb_active_directory: bool = False
     smb_local_users: bool = False
-    samba_server: bool = True
-    samba_cluster: bool = True
     domain_member: bool = False
-    configure_shares: bool = False
     ctdb_public_addresses: List[CtdbPublicAddress] = field(default_factory=list)
     active_directory_info: AdInfo = field(default_factory=dict)
 
