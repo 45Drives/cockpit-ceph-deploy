@@ -343,16 +343,16 @@ let g_option_scheme = {
                 option_format: "sub_form",
                 sub_form_options: [
                   {
-                      option_name: "join_method",
-                      option_format: "default",
-                      optional: false,
-                      label: "join_method",
-                      feedback: true,
-                      feedback_type: "choice",
-                      feedback_choice_options: ["winbind", "sssd"],
-                      help: "",
-                      input_type: "text",
-                      default_value: "winbind",
+                    option_name: "join_method",
+                    option_format: "default",
+                    optional: false,
+                    label: "join_method",
+                    feedback: true,
+                    feedback_type: "choice",
+                    feedback_choice_options: ["winbind", "sssd"],
+                    help: "",
+                    input_type: "text",
+                    default_value: "winbind",
                   },
                   {
                     option_name: "workgroup",
@@ -396,35 +396,48 @@ let g_option_scheme = {
                   },
                   {
                     option_name: "join_auth",
-                    option_format: "default",
-                    optional: false,
+                    option_format: "group-radio",
+                    radio_options: [
+                      {
+                        radio_id: "join_auth_password",
+                        radio_value: "password",
+                        radio_sub_options: [
+                          {
+                            option_name: "join_user",
+                            option_format: "default",
+                            radio_option_name: "join_user",
+                            optional: false,
+                            label: "join_user",
+                            feedback: false,
+                            help: "",
+                            input_type: "text",
+                            default_value: "",
+                          },
+                          {
+                            option_name: "join_password",
+                            option_format: "default",
+                            radio_option_name: "join_password",
+                            optional: false,
+                            label: "join_password",
+                            feedback: false,
+                            help: "",
+                            input_type: "password",
+                            default_value: "",
+                          },
+                        ],
+                      },
+                      {
+                        radio_id: "join_auth_kerberos",
+                        radio_value: "kerberos",
+                        radio_sub_options: [],
+                      },
+                    ],
+                    optional: true,
                     label: "join_auth",
-                    feedback: true,
-                    feedback_type: "choice",
-                    feedback_choice_options: ["kerberos", "password"],
+                    feedback: false,
                     help: "",
-                    input_type: "text",
+                    input_type: "radio",
                     default_value: "password",
-                  },
-                  {
-                    option_name: "join_user",
-                    option_format: "default",
-                    optional: true,
-                    label: "join_user",
-                    feedback: false,
-                    help: "",
-                    input_type: "text",
-                    default_value: "username",
-                  },
-                  {
-                    option_name: "join_password",
-                    option_format: "default",
-                    optional: true,
-                    label: "join_password",
-                    feedback: false,
-                    help: "",
-                    input_type: "password",
-                    default_value: "",
                   },
                   {
                     option_name: "enable_windows_acl",
@@ -439,7 +452,7 @@ let g_option_scheme = {
                         help: "",
                         input_type: "button",
                         default_value: "+",
-                        default_child_value: "Domain Admins"
+                        default_child_value: "Domain Admins",
                       },
                     ],
                     optional: true,
@@ -565,7 +578,7 @@ let g_option_scheme = {
                 help: "",
                 input_type: "button",
                 default_value: "+",
-              }
+              },
             ],
           },
         ],
@@ -1771,7 +1784,7 @@ function make_global_options(
 
     let opt_input = document.createElement("input");
     if (opt.option_format === "default") {
-      opt_input.setAttribute("option_format",opt.option_format);
+      opt_input.setAttribute("option_format", opt.option_format);
       if (opt.input_type === "text") {
         // make a text field
         opt_input.type = opt.input_type;
@@ -2657,15 +2670,13 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
               }
               opt_wrapper.appendChild(sub_opt_label);
               opt_wrapper.appendChild(sub_opt_wrapper);
-            }
-            else if(sub_opt.option_format == "toggle_parent"){
-              console.log("TOGGLE PARENT:",sub_opt);
+            } else if (sub_opt.option_format == "toggle_parent") {
               let toggle_form = document.createElement("div");
               toggle_form.classList.add("ct-form");
               toggle_form.setAttribute("opt-parent", sub_opt.option_name);
               toggle_form.style.width = "90%";
               make_toggle_options(toggle_form, sub_opt, role, groups_json);
-              
+
               sub_opt_input.type = sub_opt.input_type;
               sub_opt_input.classList.add("ct-input", "cd-field-checkbox");
               sub_opt_input.setAttribute("aria-invalid", "false");
@@ -2674,7 +2685,10 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
               sub_opt_input.setAttribute("field", sub_opt.option_name);
               sub_opt_input.setAttribute("optional", sub_opt.optional);
               sub_opt_input.setAttribute("group-option", true);
-              sub_opt_input.setAttribute("option_format", sub_opt.option_format);
+              sub_opt_input.setAttribute(
+                "option_format",
+                sub_opt.option_format
+              );
               sub_opt_input.checked =
                 groups_json.hasOwnProperty(role) &&
                 groups_json[role].hasOwnProperty(sub_opt.option_name)
@@ -2685,7 +2699,7 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
               } else {
                 toggle_form.classList.add("hidden");
               }
-      
+
               sub_opt_input.addEventListener("change", () => {
                 let update_btn = document.getElementById("global-options-btn");
                 if (sub_opt_input.checked) {
@@ -2695,17 +2709,17 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
                 }
                 update_btn.removeAttribute("disabled");
               });
-      
+
               let sub_opt_enable_wrapper = document.createElement("div");
               sub_opt_enable_wrapper.classList.add("cd-checkbox-wrapper");
               sub_opt_enable_wrapper.appendChild(sub_opt_input);
               sub_opt_enable_wrapper.style.marginTop = "10px";
-      
+
               let sub_enable_switch = document.createElement("label");
               sub_enable_switch.classList.add("cd-switch");
               let sub_slider = document.createElement("span");
               sub_slider.classList.add("cd-slider", "round");
-      
+
               sub_enable_switch.appendChild(sub_opt_input);
               sub_enable_switch.appendChild(sub_slider);
               sub_opt_enable_wrapper.appendChild(sub_enable_switch);
@@ -2713,7 +2727,19 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
               sub_opt_wrapper.appendChild(toggle_form);
               opt_wrapper.appendChild(sub_opt_label);
               opt_wrapper.appendChild(sub_opt_wrapper);
-            } 
+            } else if (sub_opt.option_format == "group-radio") {
+              handle_group_radio_options(
+                opt_wrapper,
+                sub_opt_wrapper,
+                sub_opt,
+                sub_opt_input,
+                role,
+                groups_json,
+                opt.option_name
+              );
+              opt_wrapper.appendChild(sub_opt_label);
+              opt_wrapper.appendChild(sub_opt_wrapper);
+            }
           }
         }
       } else if (opt.option_format == "fixed-checkbox") {
@@ -2731,6 +2757,153 @@ function make_radio_options(radio_form, parent_radio, role, groups_json) {
         opt_wrapper.appendChild(opt_input);
       } else if (opt.option_format == "default") {
         if (opt.input_type === "text") {
+          opt_input.type = opt.input_type;
+          opt_input.classList.add("ct-input", "cd-field");
+          opt_input.value =
+            groups_json.hasOwnProperty(role) &&
+            groups_json[role].hasOwnProperty(opt.option_name) &&
+            groups_json[role][opt.option_name] != ""
+              ? groups_json[role][opt.option_name]
+              : opt.default_value;
+        } else if (opt.input_type === "checkbox") {
+          opt_input.type = opt.input_type;
+          opt_input.classList.add("ct-input", "cd-field-checkbox");
+          opt_input.checked =
+            groups_json.hasOwnProperty(role) &&
+            groups_json[role].hasOwnProperty(opt.option_name)
+              ? groups_json[role][opt.option_name]
+              : opt.default_value;
+          opt_input.addEventListener("change", function () {
+            document
+              .getElementById("global-options-btn")
+              .removeAttribute("disabled");
+          });
+        }
+        opt_input.setAttribute("aria-invalid", "false");
+        opt_input.id = opt.option_name;
+        opt_input.setAttribute("group", role);
+        opt_input.setAttribute("field", opt.radio_option_name);
+        opt_input.setAttribute("optional", opt.optional);
+        opt_input.setAttribute("group-option", true);
+        opt_input.setAttribute("option_format", opt.option_format);
+        opt_wrapper.appendChild(opt_input);
+        if (opt.feedback) {
+          let feedback = generate_option_feedback(
+            opt,
+            opt_input,
+            opt.option_name + "-feedback"
+          );
+          opt_wrapper.appendChild(feedback);
+        }
+      }
+    }
+    radio_form.appendChild(opt_label);
+    radio_form.appendChild(opt_wrapper);
+  }
+}
+
+function handle_group_radio_options(
+  target_div,
+  opt_wrapper,
+  opt,
+  opt_input,
+  role,
+  groups_json,
+  optparent
+) {
+  if (opt.option_format == "group-radio") {
+    opt_input = document.createElement("div");
+    opt_input.classList.add("cd-radio-row");
+    opt_input.id = opt.option_name;
+
+    let sub_opt_wrapper = document.createElement("div");
+    sub_opt_wrapper.classList.add("ct-validation-wrapper");
+
+    for (let radio_opt of opt.radio_options) {
+      let radio_input = document.createElement("input");
+      radio_input.type = "radio";
+      radio_input.id = radio_opt.radio_id;
+      radio_input.setAttribute("opt-parent", optparent);
+      radio_input.setAttribute("group-option", true);
+      radio_input.setAttribute("field", opt.option_name);
+      radio_input.setAttribute("group", role);
+      radio_input.setAttribute("option_format", opt.option_format);
+
+      radio_input.name = opt.option_name;
+      radio_input.value = radio_opt.radio_value;
+      let radio_label = document.createElement("label");
+      radio_label.setAttribute("for", radio_opt.radio_id);
+      radio_label.innerText = radio_opt.radio_value;
+      opt_input.appendChild(radio_input);
+      opt_input.appendChild(radio_label);
+
+      let radio_form = document.createElement("div");
+      radio_form.classList.add("ct-form");
+      radio_form.setAttribute("opt-parent", radio_input.id);
+      make_group_radio_options(radio_form, radio_opt, role, groups_json);
+      sub_opt_wrapper.appendChild(radio_form);
+
+      radio_input.checked =
+        groups_json.hasOwnProperty(role) &&
+        groups_json[role].hasOwnProperty(radio_opt.radio_id)
+          ? groups_json[role][radio_opt.radio_id]
+          : opt.default_value == radio_input.value;
+
+      if (radio_input.checked) {
+        radio_form.classList.remove("hidden");
+      } else {
+        radio_form.classList.add("hidden");
+      }
+
+      radio_input.addEventListener("change", () => {
+        let update_btn = document.getElementById("global-options-btn");
+        if (radio_input.checked) {
+          radio_form.classList.remove("hidden");
+        } else {
+          radio_form.classList.add("hidden");
+        }
+        let radio_btn_list = [
+          ...opt_input.querySelectorAll(`:scope input[name=${opt_input.id}]`),
+        ];
+        radio_btn_list.forEach((radio_btn) => {
+          if (radio_btn && radio_btn.id != radio_input.id) {
+            let div_to_hide = target_div.querySelector(
+              `:scope div[opt-parent="${radio_btn.id}"]`
+            );
+            if (div_to_hide) {
+              div_to_hide.classList.add("hidden");
+            }
+          }
+        });
+        update_btn.removeAttribute("disabled");
+      });
+    }
+    opt_input.id = opt.option_name;
+    opt_input.setAttribute("group", role);
+    opt_input.setAttribute("field", opt.option_name);
+    opt_input.setAttribute("optional", opt.optional);
+    opt_input.setAttribute("group-option", true);
+    opt_input.setAttribute("option_format", opt.option_format);
+    opt_wrapper.appendChild(opt_input);
+    opt_wrapper.appendChild(sub_opt_wrapper);
+  }
+}
+
+function make_group_radio_options(radio_form, parent_radio, role, groups_json) {
+  for (let opt of parent_radio.radio_sub_options) {
+    let opt_wrapper = document.createElement("div");
+    opt_wrapper.classList.add("ct-validation-wrapper");
+
+    let opt_label = document.createElement("label");
+    opt_label.classList.add("control-label");
+    opt_label.setAttribute("for", opt.option_name);
+    opt_label.innerText = (opt.optional ? "" : "* ") + opt.label;
+
+    let opt_input = document.createElement("input");
+    opt_input.setAttribute("opt-parent", parent_radio.radio_id);
+    if (opt.option_format) {
+      if (opt.option_format == "default") {
+        if (opt.input_type === "text" || opt.input_type === "password") {
           opt_input.type = opt.input_type;
           opt_input.classList.add("ct-input", "cd-field");
           opt_input.value =
@@ -3322,14 +3495,14 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
           opt_wrapper.appendChild(sub_opt_wrapper);
           opt_wrapper.appendChild(feedback);
         });
-      }
-      else if (opt.option_format == "multi-str") {
+      } else if (opt.option_format == "multi-str") {
         let button_div = document.createElement("div");
         button_div.classList.add("cd-textfield-wrapper");
 
         opt_input = document.createElement("div");
         opt_input.id = opt.option_name;
         opt_input.value = opt.default_value;
+        opt_input.setAttribute("opt-parent", parent_opt.option_name);
         opt_input.classList.add("cd-div-button-positive", "fa", "fa-plus");
         opt_input.setAttribute("group-option", true);
         opt_input.setAttribute("group", role);
@@ -3407,9 +3580,8 @@ function make_toggle_options(target_form, parent_opt, role, groups_json) {
           opt_wrapper.style.width = "90%";
           //opt_wrapper.appendChild(feedback);
         });
-      }
-      else if (opt.option_format == "default") {
-        if (opt.input_type === "text") {
+      } else if (opt.option_format == "default") {
+        if (opt.input_type === "text" || opt.input_type === "password") {
           opt_input.type = opt.input_type;
           opt_input.classList.add("ct-input", "cd-field");
           opt_input.value =
@@ -4031,6 +4203,7 @@ function update_options_request() {
                     `[opt-parent=${radio_sub_opt.id}]`
                   ),
                 ];
+                console.log("sub_form_list", sub_form_list);
                 group_request_json[element.getAttribute("group")][
                   radio_sub_opt.getAttribute("field")
                 ] = {};
@@ -4046,7 +4219,90 @@ function update_options_request() {
                         radio_sub_opt.getAttribute("field")
                       ][sub_form_entry.getAttribute("field")] =
                         sub_form_entry.value;
+                    } else if (sub_form_entry.type == "checkbox") {
+                      group_request_json[element.getAttribute("group")][
+                        radio_sub_opt.getAttribute("field")
+                      ][sub_form_entry.getAttribute("field")] =
+                        sub_form_entry.checked;
                     }
+                  } else if (
+                    sub_form_entry.getAttribute("option_format") ==
+                    "group-radio"
+                  ) {
+                    if (sub_form_entry.checked) {
+                      group_request_json[element.getAttribute("group")][
+                        radio_sub_opt.getAttribute("field")
+                      ][sub_form_entry.getAttribute("field")] =
+                        sub_form_entry.value;
+                      let group_radio_child_list = [
+                        ...options_div.querySelectorAll(
+                          `input[opt-parent="${sub_form_entry.id}"]`
+                        ),
+                      ];
+                      group_radio_child_list.forEach((group_radio_child) => {
+                        if (
+                          group_radio_child.getAttribute("type") == "text" ||
+                          group_radio_child.getAttribute("type") == "password"
+                        ) {
+                          group_request_json[element.getAttribute("group")][
+                            radio_sub_opt.getAttribute("field")
+                          ][group_radio_child.getAttribute("field")] =
+                            group_radio_child.value;
+                        }
+                      });
+                    } else {
+                      let group_radio_child_list = [
+                        ...options_div.querySelectorAll(
+                          `input[opt-parent="${sub_form_entry.id}"]`
+                        ),
+                      ];
+                      group_radio_child_list.forEach((group_radio_child) => {
+                        if (
+                          group_radio_child.getAttribute("type") == "text" ||
+                          group_radio_child.getAttribute("type") == "password"
+                        ) {
+                          group_request_json[element.getAttribute("group")][
+                            radio_sub_opt.getAttribute("field")
+                          ][group_radio_child.getAttribute("field")] = "";
+                        }
+                      });
+                    }
+                  } 
+                  else if (
+                    sub_form_entry.getAttribute("option_format") ==
+                    "toggle_parent"
+                  ) {
+                    group_request_json[element.getAttribute("group")][
+                      radio_sub_opt.getAttribute("field")
+                    ][sub_form_entry.getAttribute("field")] = sub_form_entry.checked;
+                    if(sub_form_entry.checked){
+                      let toggled_entries = [
+                        ...options_div.querySelectorAll(
+                          `[opt-parent="${sub_form_entry.id}"][group-option=true]`
+                        ),
+                      ];
+                      toggled_entries.forEach((toggle_opt)=>{
+                        if(toggle_opt.getAttribute("option_format") == "multi-str"){
+                          let multi_str_values = [];
+                          let multi_str_entries = [
+                            ...options_div.querySelectorAll(
+                              `input[opt-parent="${toggle_opt.id}"]`
+                            ),
+                          ];
+                          multi_str_entries.forEach((str_entry)=>{
+                            if(str_entry.value){
+                              multi_str_values.push(str_entry.value);
+                            }
+                          });
+                          group_request_json[element.getAttribute("group")][
+                            radio_sub_opt.getAttribute("field")
+                          ][toggle_opt.getAttribute("field")] = multi_str_values;
+                        }
+                      });
+                    }
+                  }
+                  else {
+                    console.log("remaining sub form entry:", sub_form_entry);
                   }
                 });
               } else if (
@@ -4222,6 +4478,7 @@ function update_options_request() {
       }
       if (JSON.stringify(group_request_json) != "{}") {
         //update group options if there are options to update
+        console.log("GROUP_REQUEST_JSON", group_request_json);
         var group_spawn_args = [
           "/usr/share/cockpit/ceph-deploy/helper_scripts/core_params",
           "-g",
