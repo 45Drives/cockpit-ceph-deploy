@@ -1,3 +1,11 @@
+cockpit-ceph-deploy (1.0.3-1focal) focal; urgency=medium
+
+  * Added required options for deploying samba using new features from samba-ansible
+  * Added a verbose option to ansible_runner
+  * updated helper scripts for handling new samba parameters
+
+ -- Mark Hooper <mhooper@45drives.com>  Wed, 01 Jun 2022 09:00:23 -0300
+
 cockpit-ceph-deploy (1.0.2-2focal) focal; urgency=medium
 
   * virtual ip interfaces for rgwloadbalancers can now be set on the host level

@@ -41,7 +41,7 @@ ansible_commands = {
         "purge":["deploy_core","deploy_cephfs","deploy_dashboard"]
     },
     "remove_smb": {
-        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-samba.yml",
+        "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts infrastructure-playbooks/purge-smb.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
         "time_stamp": None,
@@ -168,9 +168,29 @@ def update_ceph_playbook_state(cmd):
     state_file.close()
 
 
-def run_ansible_command(cmd):
-    split_command = shlex.split(ansible_commands[cmd]["command"])
+def run_ansible_command(cmd,verbose_flag,force_flag):
+    verbose_str = " -vvv" if verbose_flag else ""
+    split_command = shlex.split(ansible_commands[cmd]["command"]+verbose_str)
     command = None
+
+    if force_flag == True:
+        print("\tansible_runner: Force Flag Used")
+        print("\tUsing the force option will only pretend that a command was run successfully.")
+        sel = input("Are you sure that you want to do this? (y/n): ")
+        if sel in ["y","Y"]:
+            print("forcing command: {c}".format(c=ansible_commands[cmd]["command"]))
+            ansible_commands[cmd]["result"] = 0
+            ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
+            update_ceph_playbook_state(cmd)
+            if len(ansible_commands[cmd]["purge"]) > 0 and ansible_commands[cmd]["result"] == 0:
+                for affected_playbook in ansible_commands[cmd]["purge"]:
+                    if affected_playbook in ansible_commands.keys():
+                        remove_ceph_playbook_state_entry(affected_playbook)
+            sys.exit(0)
+        else:
+            print("exiting..")
+            sys.exit(0)
+    
     try:
         command = subprocess.run(
             split_command,
@@ -233,10 +253,12 @@ def main():
 
     parser = OptionParser()
     parser.add_option("-c","--command",action="store",dest="command",default=None, help="The ansible command to run. \nvalid commands:\n{c}".format(c=cmd_lst_str))
+    parser.add_option("-v","--verbose",action="store_true",dest="verbose",default=False,help="runs the ansible playbook using -vvv flag")
+    parser.add_option("-f","--force", action="store_true", dest="force",default=False,help="skips running the playbook, forces a success result.")
     (options, args) = parser.parse_args()
 
     if options.command != None and options.command in ansible_commands.keys():
-        run_ansible_command(options.command)
+        run_ansible_command(options.command,options.verbose,options.force)
 
 
 if __name__ == "__main__":

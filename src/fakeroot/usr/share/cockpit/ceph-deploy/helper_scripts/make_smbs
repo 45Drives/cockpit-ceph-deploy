@@ -17,7 +17,7 @@ g_param_file_dir = "/usr/share/cockpit/ceph-deploy/params"
 g_smbs_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs.yml"
 g_smbs_default_file_path = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files/smbs-default.yml"
 g_smbs_file_dir = "/usr/share/cockpit/ceph-deploy/ceph-ansible-files"
-g_ansible_file_path = "/usr/share/samba-ansible/group_vars/smbs.yml"
+g_ansible_file_path = "/usr/share/ceph-ansible/group_vars/smbs.yml"
 
 g_inventory_file_key = "smbs.yml"
 
@@ -84,14 +84,19 @@ def make_smbs_file(smbs_dict, default_path, path, dir, ansible_path):
         smbs_file_content = smbs_file_content.replace(start_tag + section_to_replace + end_tag, start_tag + "\n" + end_tag)
     else:
         # we need to put the active_directory_info object in .yml syntax
-        new_content = start_tag + "active_directory_info:\n"
+        new_content = start_tag + "#active directory variables - (ceph-deploy)\n"
         for field in smbs_dict["active_directory_info"].keys():
-            if(smbs_dict["active_directory_info"][field] not in ["yes", "no"]):
-                new_content += "  {f}: \"{v}\"\n".format(
-                    f=field, v=smbs_dict["active_directory_info"][field])
+            if field == "share_admins":
+                new_content += "{f}:\n".format(f=field)
+                for entry in smbs_dict["active_directory_info"][field]:
+                    new_content += "  - \"{e}\"\n".format(e=entry)
             else:
-                new_content += "  {f}: {v}\n".format(
-                    f=field, v=smbs_dict["active_directory_info"][field])
+                if isinstance(smbs_dict["active_directory_info"][field], bool):
+                    new_content += "{f}: {v}\n".format(f=field, v=json.dumps(smbs_dict["active_directory_info"][field]))
+                elif isinstance(smbs_dict["active_directory_info"][field], str):
+                    comment = "#" if (len(smbs_dict["active_directory_info"][field]) == 0) else ""
+                    new_content += "{c}{f}: \'{v}\'\n".format(
+                        c=comment, f=field, v=smbs_dict["active_directory_info"][field])
         new_content += end_tag
         smbs_file_content = smbs_file_content.replace(start_tag +
             section_to_replace + end_tag, new_content)

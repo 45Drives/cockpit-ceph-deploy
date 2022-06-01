@@ -83,6 +83,7 @@ class Smbs:
     smb_active_directory: bool = False
     smb_local_users: bool = False
     domain_member: bool = False
+    shared_storage_mountpoint: str = "/mnt/cephfs"
     ctdb_public_addresses: List[CtdbPublicAddress] = field(default_factory=list)
     active_directory_info: AdInfo = field(default_factory=dict)
 
@@ -276,6 +277,8 @@ def get_default_params():
 
 
 def load_param_file():
+    global g_param_file_path
+    global g_param_file_dir
     # check to see if file needs to be created.
     if not os.path.exists(g_param_file_path):
         # file doesn't exist
