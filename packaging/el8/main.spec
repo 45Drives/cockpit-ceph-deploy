@@ -79,7 +79,7 @@ fi
 %postun
 if [ $1 == 0 ];then
     rm -rf /usr/share/cockpit/ceph-deploy
-    rm /usr/bin/ansible_runner
+    rm -f /usr/bin/ansible_runner
 fi
 
 %files
@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Jun 02 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-2
+- added -f flag to postun script (el8 and ubuntu)
 * Wed Jun 01 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-1
 - Added required options for deploying samba using new features from samba-ansible
 - Added a verbose option to ansible_runner

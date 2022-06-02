@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.3-2focal) focal; urgency=medium
+
+  * added -f flag to postun script (el8 and ubuntu)
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 02 Jun 2022 09:46:08 -0300
+
 cockpit-ceph-deploy (1.0.3-1focal) focal; urgency=medium
 
   * Added required options for deploying samba using new features from samba-ansible
