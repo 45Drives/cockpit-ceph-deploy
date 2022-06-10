@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-3
+- added a prerun option when deploying smb with kerberos in ansible_runner
 * Thu Jun 02 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-2
 - added -f flag to postun script (el8 and ubuntu)
 * Wed Jun 01 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-1

@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.3-2
+## Cockpit Ceph-Deploy 1.0.3-3
 
-* added -f flag to postun script (el8 and ubuntu)
+* added a prerun option when deploying smb with kerberos in ansible_runner
