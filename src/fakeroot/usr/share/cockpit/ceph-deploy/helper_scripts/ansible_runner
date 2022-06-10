@@ -125,6 +125,7 @@ ansible_commands = {
         "purge":["deploy_dashboard"]
     },
     "deploy_smb":{
+        "prerun": "ansible-playbook -i /usr/share/ceph-ansible/hosts kerberos_init.yml",
         "command": "ansible-playbook -i /usr/share/ceph-ansible/hosts samba.yml",
         "cwd": "/usr/share/ceph-ansible",
         "result": None,
@@ -215,6 +216,50 @@ def run_ansible_command(cmd,verbose_flag,force_flag):
             if affected_playbook in ansible_commands.keys():
                 remove_ceph_playbook_state_entry(affected_playbook)
 
+def get_prerun_conditions(cmd):
+    if cmd == "deploy_smb":
+        param_file = open("/usr/share/cockpit/ceph-deploy/params/core_params.json","r")
+        params = json.load(param_file)
+        param_file.close()
+        if params.get("groups").get("smbs").get("domain_member") != None and params.get("groups").get("smbs").get("active_directory_info").get("join_auth") == "kerberos":
+            return True
+        return False
+    return False
+
+def prerun_ansible_command(cmd,verbose_flag):
+    if not get_prerun_conditions(cmd):
+        return True
+    
+    verbose_str = " -vvv" if verbose_flag else ""
+    split_command = shlex.split(ansible_commands[cmd]["prerun"]+verbose_str)
+    command = None
+    
+    try:
+        command = subprocess.run(
+            split_command,
+            cwd=ansible_commands[cmd]["cwd"],
+            stdout=sys.stdout,
+            stderr=sys.stdout,
+            universal_newlines=True,
+            bufsize=1
+        )
+    except KeyboardInterrupt as ki:
+        ansible_commands[cmd]["result"] = 1
+        ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
+        update_ceph_playbook_state(cmd)
+        sys.exit(0)
+        
+
+    if command.returncode != 0:
+        # prerun failed
+        ansible_commands[cmd]["result"] = command.returncode
+        ansible_commands[cmd]["time_stamp"] = datetime.today().strftime("%Y-%m-%d-%H-%M")
+        update_ceph_playbook_state(cmd)
+        sys.exit(0)
+    else:
+        # prerun success
+        return True
+
 
 def remove_ceph_playbook_state_entry(cmd):
     state_file_path = "/usr/share/cockpit/ceph-deploy/state/playbook_state.json"
@@ -258,6 +303,8 @@ def main():
     (options, args) = parser.parse_args()
 
     if options.command != None and options.command in ansible_commands.keys():
+        if "prerun" in ansible_commands[options.command].keys():
+            prerun_ansible_command(options.command, options.verbose)
         run_ansible_command(options.command,options.verbose,options.force)
 
 
