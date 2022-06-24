@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.3-4focal) focal; urgency=medium
+
+  * updated query selector for multi-device-path options
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 24 Jun 2022 12:59:13 -0300
+
 cockpit-ceph-deploy (1.0.3-3focal) focal; urgency=medium
 
   * added a prerun option when deploying smb with kerberos in ansible_runner

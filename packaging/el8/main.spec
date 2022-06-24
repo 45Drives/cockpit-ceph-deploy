@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jun 24 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-4
+- updated query selector for multi-device-path options
 * Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-3
 - added a prerun option when deploying smb with kerberos in ansible_runner
 * Thu Jun 02 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-2

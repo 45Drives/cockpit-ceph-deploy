@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.3-3
+## Cockpit Ceph-Deploy 1.0.3-4
 
-* added a prerun option when deploying smb with kerberos in ansible_runner
+* updated query selector for multi-device-path options
