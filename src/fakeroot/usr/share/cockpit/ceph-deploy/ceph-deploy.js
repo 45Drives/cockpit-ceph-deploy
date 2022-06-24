@@ -4080,7 +4080,7 @@ function update_options_request() {
       }
     } else if (element.getAttribute("option_format") === "multi-device-path") {
       let host_d_path_list = [
-        ...options_div.querySelectorAll(`[opt-parent=${element.id}][hostname]`),
+        ...options_div.querySelectorAll(`[opt-parent="${element.id}"][hostname]`),
       ];
       if (host_d_path_list.length > 0) {
         host_request_json[element.getAttribute("hostname")][
