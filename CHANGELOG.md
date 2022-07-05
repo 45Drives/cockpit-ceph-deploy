@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.3-4
+## Cockpit Ceph-Deploy 1.0.3-5
 
-* updated query selector for multi-device-path options
+* added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface

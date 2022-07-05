@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.3-5focal) focal; urgency=medium
+
+  * added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface
+
+ -- Mark Hooper <mhooper@45drives.com>  Tue, 05 Jul 2022 13:58:27 -0300
+
 cockpit-ceph-deploy (1.0.3-4focal) focal; urgency=medium
 
   * updated query selector for multi-device-path options

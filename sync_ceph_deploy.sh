@@ -1,4 +1,4 @@
-TEST_SERVER_A="rockinator1"
+TEST_SERVER_A="ubuntuosd1"
 COCKPIT_MODULE="ceph-deploy"
 
 # Test Server A

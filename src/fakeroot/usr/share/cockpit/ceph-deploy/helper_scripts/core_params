@@ -106,6 +106,7 @@ class Nfss:
     nfs_active_passive: bool = False
     ceph_nfs_floating_ip_address: str = ""
     ceph_nfs_floating_ip_cidr: str = ""
+    ceph_nfs_floating_ip_interface: str = ""
     ceph_nfs_rados_backend_driver: str = ""
 
     def load_dictionary(self, dict_variable: dict):

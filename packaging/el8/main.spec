@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Tue Jul 05 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-5
+- added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface
 * Fri Jun 24 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-4
 - updated query selector for multi-device-path options
 * Fri Jun 10 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-3

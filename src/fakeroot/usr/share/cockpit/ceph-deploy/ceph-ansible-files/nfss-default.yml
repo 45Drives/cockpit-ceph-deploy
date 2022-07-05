@@ -88,6 +88,7 @@ pcmk_user: hacluster
 
 ceph_nfs_floating_ip_address: '192.168.122.41'
 ceph_nfs_floating_ip_cidr: '16'
+ceph_nfs_floating_ip_interface: 'eno1'
 
 
 ####################
