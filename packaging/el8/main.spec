@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 1.0.4-2
+- updated dependencies to include samba-ansible >= 1.1.3  and ceph-ansible-45d >=
+  5.3.2
+- released to 45drives stable repo
 * Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 1.0.4-1
 - updated samba configuration options to work with samba-ansible package
 - updated dependencies to include samba-ansible and ceph-ansible-45d >= 5.3.1

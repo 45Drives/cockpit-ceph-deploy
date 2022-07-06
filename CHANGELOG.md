@@ -1,5 +1,4 @@
-## Cockpit Ceph-Deploy 1.0.4-1
+## Cockpit Ceph-Deploy 1.0.4-2
 
-* updated samba configuration options to work with samba-ansible package
-* updated dependencies to include samba-ansible and ceph-ansible-45d >= 5.3.1
-* added new field for floating ip interface when configuring nfs
+* updated dependencies to include samba-ansible >= 1.1.3  and ceph-ansible-45d >= 5.3.2
+* released to 45drives stable repo
