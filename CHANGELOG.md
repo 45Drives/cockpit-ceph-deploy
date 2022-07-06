@@ -1,3 +1,5 @@
-## Cockpit Ceph-Deploy 1.0.3-5
+## Cockpit Ceph-Deploy 1.0.4-1
 
-* added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface
+* updated samba configuration options to work with samba-ansible package
+* updated dependencies to include samba-ansible and ceph-ansible-45d >= 5.3.1
+* added new field for floating ip interface when configuring nfs

@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 1.0.4-1
+- updated samba configuration options to work with samba-ansible package
+- updated dependencies to include samba-ansible and ceph-ansible-45d >= 5.3.1
+- added new field for floating ip interface when configuring nfs
 * Tue Jul 05 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-5
 - added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface
 * Fri Jun 24 2022 Mark Hooper <mhooper@45drives.com> 1.0.3-4

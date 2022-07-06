@@ -1,3 +1,11 @@
+cockpit-ceph-deploy (1.0.4-1focal) focal; urgency=medium
+
+  * updated samba configuration options to work with samba-ansible package
+  * updated dependencies to include samba-ansible and ceph-ansible-45d >= 5.3.1
+  * added new field for floating ip interface when configuring nfs
+
+ -- Mark Hooper <mhooper@45drives.com>  Wed, 06 Jul 2022 06:05:44 -0300
+
 cockpit-ceph-deploy (1.0.3-5focal) focal; urgency=medium
 
   * added option for nfss to set the interface used for floating ip. ceph_nfs_floating_ip_interface
