@@ -1772,7 +1772,11 @@ function update_options_info(
         let parent_div = options_div.querySelectorAll(
           `:scope div[opt-parent=${element.getAttribute("opt-parent")}]`
         );
-        if (!parent_div[0].classList.contains("hidden")) {
+        if (!parent_div[0].classList.contains("hidden") && !parent_div[0].getAttribute("opt-parent")){
+          next_btn.disabled = true;
+          next_btn.title = "To proceed, fill in required fields.";
+          console.log(element);
+        }else if(!get_top_opt_parent_hidden_status(element)){
           next_btn.disabled = true;
           next_btn.title = "To proceed, fill in required fields.";
         }
@@ -1782,6 +1786,17 @@ function update_options_info(
       }
     }
   });
+}
+
+function get_top_opt_parent_hidden_status(ele){
+  let opt_parent = document.getElementById(ele.getAttribute("opt-parent"));
+  while(opt_parent.getAttribute("opt-parent")){
+    opt_parent = document.getElementById(opt_parent.getAttribute("opt-parent"));
+  }
+  let target_div = document.querySelector(
+    `:scope div.ct-form[opt-parent=${opt_parent.getAttribute("id")}]`
+  );
+  return target_div.classList.contains("hidden");
 }
 
 function make_global_options(
