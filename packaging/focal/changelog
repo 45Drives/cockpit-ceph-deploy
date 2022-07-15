@@ -1,3 +1,10 @@
+cockpit-ceph-deploy (1.0.4-3focal) focal; urgency=medium
+
+  * fixed bug that prevented clicking next button when hidden required fields left
+    blank.
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 15 Jul 2022 06:54:21 -0300
+
 cockpit-ceph-deploy (1.0.4-2focal) focal; urgency=medium
 
   * updated dependencies to include samba-ansible >= 1.1.3  and ceph-ansible-45d

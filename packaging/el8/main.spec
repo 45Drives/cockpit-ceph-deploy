@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri Jul 15 2022 Mark Hooper <mhooper@45drives.com> 1.0.4-3
+- fixed bug that prevented clicking next button when hidden required fields left
+  blank.
 * Wed Jul 06 2022 Mark Hooper <mhooper@45drives.com> 1.0.4-2
 - updated dependencies to include samba-ansible >= 1.1.3  and ceph-ansible-45d >=
   5.3.2
