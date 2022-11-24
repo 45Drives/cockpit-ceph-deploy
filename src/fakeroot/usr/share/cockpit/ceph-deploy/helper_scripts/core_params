@@ -108,6 +108,8 @@ class Nfss:
     ceph_nfs_floating_ip_cidr: str = ""
     ceph_nfs_floating_ip_interface: str = ""
     ceph_nfs_rados_backend_driver: str = ""
+    shared_storage_mountpoint: str = ""
+    ceph_nfs_server: str = ""
 
     def load_dictionary(self, dict_variable: dict):
         ret_val = False

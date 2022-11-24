@@ -608,6 +608,29 @@ let g_option_scheme = {
     unique: [],
     group: [
       {
+        option_name: "ceph_nfs_server",
+        option_format: "default",
+        optional: false,
+        label: "ceph_nfs_server",
+        feedback: true,
+        feedback_type: "choice",
+        feedback_choice_options: ["kernel", "ganesha"],
+        help: "",
+        input_type: "text",
+        default_value: "kernel",
+      },
+      {
+        option_name: "shared_storage_mountpoint",
+        option_format: "default",
+        optional: false,
+        label: "shared_storage_mountpoint",
+        feedback: true,
+        feedback_type: "path",
+        help: "",
+        input_type: "text",
+        default_value: "/mnt/nfsgw",
+      },
+      {
         option_name: "nfs_configuration",
         option_format: "radio",
         radio_options: [

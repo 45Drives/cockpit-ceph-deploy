@@ -117,7 +117,7 @@ upgrade_ceph_packages: False
 ###########
 ceph_repository_type: community
 ceph_origin: repository
-ceph_repository: community
+ceph_repository: custom
 
 offline_install: false
 offline_repo_server_ip: ""
@@ -126,14 +126,17 @@ offline_repo_server_ip: ""
 #
 # Enabled when ceph_repository == 'community'
 #
-ceph_mirror: http://download.ceph.com
-ceph_stable_key: https://download.ceph.com/keys/release.asc
-ceph_stable_release: octopus
-ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
+#ceph_mirror: http://download.ceph.com
+#ceph_stable_key: https://download.ceph.com/keys/release.asc
+#ceph_stable_release: octopus
+#ceph_stable_repo: "{{ ceph_mirror }}/debian-{{ ceph_stable_release }}"
+#
+#nfs_ganesha_stable: true # use stable repos for nfs-ganesha
+#nfs_ganesha_stable_branch: V3.3-stable
+#nfs_ganesha_stable_deb_repo: "{{ ceph_mirror }}/nfs-ganesha/deb-{{ nfs_ganesha_stable_branch }}/{{ ceph_stable_release }}"
 
-nfs_ganesha_stable: true # use stable repos for nfs-ganesha
-nfs_ganesha_stable_branch: V3.3-stable
-nfs_ganesha_stable_deb_repo: "{{ ceph_mirror }}/nfs-ganesha/deb-{{ nfs_ganesha_stable_branch }}/{{ ceph_stable_release }}"
+ceph_custom_repo: "{% if ansible_facts['os_family'] == 'Debian' %}https://ceph.repo.45drives.com/octopus/debian{% elif ansible_facts['os_family'] == 'RedHat' %}https://ceph.repo.45drives.com/octopus/rhel/el8/ceph_45d.repo{% endif %}"
+ceph_custom_key: "https://repo.45drives.com/key/gpg.asc"
 
 ######################
 # CEPH CONFIGURATION #
