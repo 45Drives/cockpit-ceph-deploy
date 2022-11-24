@@ -714,7 +714,7 @@ let g_option_scheme = {
         feedback: false,
         help: "",
         input_type: "radio",
-        default_value: "Active-Active",
+        default_value: "Active-Passive",
       },
     ],
   },

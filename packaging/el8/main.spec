@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu Nov 24 2022 Mark Hooper <mhooper@45drives.com> 1.0.5-2
+- set the default nfs configuration to be Active-Passive
 * Thu Nov 24 2022 Mark Hooper <mhooper@45drives.com> 1.0.5-1
 - updated ceph-ansible-45d dependency to version 5.3.4
 - modified default templates for all.yml and nfss.yml
