@@ -1,3 +1,15 @@
+cockpit-ceph-deploy (1.0.5-3focal) focal; urgency=medium
+
+  * updated ceph-ansible-45d dependency to version 5.3.4
+  * modified default templates for all.yml and nfss.yml
+  * added ceph_nfs_server and mountpoint options when configuring kernel mounted
+    nfs to UI
+  * set the default nfs configuration to be Active-Passive
+  * removed ansible dependency, offloading that to ceph-ansible-45d
+  * removed prerelease flag for latest build
+
+ -- Mark Hooper <mhooper@45drives.com>  Wed, 14 Dec 2022 10:18:17 -0400
+
 cockpit-ceph-deploy (1.0.5-2focal) focal; urgency=medium
 
   * set the default nfs configuration to be Active-Passive
