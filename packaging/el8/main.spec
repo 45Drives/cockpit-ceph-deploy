@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-2
+- updated default template for all.yml
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-1
 - added option to use dmcrypt for osds
 - updated css

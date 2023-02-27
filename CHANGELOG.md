@@ -1,4 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.6-1
+## Cockpit Ceph-Deploy 1.0.6-2
 
-* added option to use dmcrypt for osds
-* updated css
+* updated default template for all.yml
