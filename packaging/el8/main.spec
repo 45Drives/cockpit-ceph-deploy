@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-4
+- Added option to encrypt osd devices using dmcrypt to the UI
+- osds.yml will now be generated through the ceph-deploy UI
+- removed depreciated hybrid_cluster field from UI
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-3
 - removed hybrid_cluster option from UI
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-2

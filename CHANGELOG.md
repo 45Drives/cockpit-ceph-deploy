@@ -1,3 +1,5 @@
-## Cockpit Ceph-Deploy 1.0.6-3
+## Cockpit Ceph-Deploy 1.0.6-4
 
-* removed hybrid_cluster option from UI
+* Added option to encrypt osd devices using dmcrypt to the UI
+* osds.yml will now be generated through the ceph-deploy UI
+* removed depreciated hybrid_cluster field from UI
