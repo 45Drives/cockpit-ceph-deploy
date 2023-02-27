@@ -42,7 +42,7 @@ let g_deploy_step_id_lut = {
   },
   "deploy-step-core": {
     step_name: "Ceph Core",
-    inventory_files: ["hosts", "all.yml"],
+    inventory_files: ["hosts", "all.yml","osds.yml"],
     purge_playbooks: ["remove_core"],
     roles: ["osds", "mons", "mgrs"],
   },
@@ -144,6 +144,14 @@ let g_inventory_file_vars = {
     next_button_id: "ansible-config-inv-nxt",
     show_listener: show_smbs_file,
   },
+  "osds.yml": {
+    file_content_div_id: "osds-file-content",
+    show_button_id: "show-osds-file-btn",
+    generate_button_id: "generate-osds-file-btn",
+    default_content_div: "inv-file-osds-default",
+    next_button_id: "ansible-config-inv-nxt",
+    show_listener: show_osds_file,
+  },
 };
 
 let g_all_option_scheme = {
@@ -229,7 +237,7 @@ let g_option_scheme = {
     group: [],
   },
   osds: {
-    inventory_file: false,
+    inventory_file: true,
     global: [
       {
         option_name: "public_network",
@@ -299,7 +307,18 @@ let g_option_scheme = {
       },
     ],
     unique: [],
-    group: [],
+    group: [
+      {
+        option_name: "dmcrypt",
+        option_format: "default",
+        optional: true,
+        label: "Encrypt OSD devices using dmcrypt",
+        feedback: false,
+        help: "",
+        input_type: "checkbox",
+        default_value: false,
+      }
+    ],
   },
   metrics: {
     inventory_file: false,
@@ -1585,6 +1604,10 @@ function modify_inventory_file_requirement(role, add_requirement) {
     smbs: {
       file_name: "smbs.yml",
       div_id: "smbs-inv-panel",
+    },
+    osds: {
+      file_name: "osds.yml",
+      div_id: "osds-inv-panel",
     },
   };
 
@@ -5119,6 +5142,18 @@ function show_smbs_file() {
   }
 }
 
+function show_osds_file() {
+  let osds_file_content = document.getElementById("osds-file-content");
+  let show_button = document.getElementById("show-osds-file-btn");
+  if (osds_file_content && osds_file_content.classList.contains("hidden")) {
+    osds_file_content.classList.remove("hidden");
+    show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+  } else {
+    osds_file_content.classList.add("hidden");
+    show_button.innerHTML = '<i class="fas fa-eye"></i>';
+  }
+}
+
 /**
  * hides/unhides the host-file-content div, and updates the icon on the show button.
  */
@@ -5415,6 +5450,69 @@ function generate_rgwloadbalancers_file() {
       });
       rgwlb_file_content_proc.fail(function (ex, data) {
         console.log("rgwlb_file_content_proc (FAIL): ", data);
+      });
+    } else {
+      msg_color = "#bd3030";
+      msg_label = "Error:";
+      msg_content = "Unexpected return value.";
+    }
+    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+  });
+}
+
+function generate_osds_file() {
+  var spawn_args = [
+    "/usr/share/cockpit/ceph-deploy/helper_scripts/make_osds",
+  ];
+  var result_json = null;
+  var generate_osds_file_proc = cockpit.spawn(spawn_args, {
+    superuser: "require",
+  });
+  generate_osds_file_proc.done(function (data) {
+    let msg_color = "";
+    let msg_label = "";
+    let msg_content = "";
+    try {
+      result_json = JSON.parse(data);
+    } catch (e) {
+      msg_color = "#bd3030";
+      msg_label = "Error:";
+      msg_content = "Unexpected return value.";
+    }
+    if (result_json.hasOwnProperty("success_msg")) {
+      msg_color = "#20a030";
+      msg_label = "Message: ";
+      msg_content = result_json.success_msg;
+      var osds_file_content_proc = cockpit.spawn(["cat", result_json.path], {
+        superuser: "require",
+      });
+      osds_file_content_proc.done(function (data) {
+        document.getElementById("osds-file-content").innerText = data;
+        document
+          .getElementById("osds-file-content")
+          .classList.remove("hidden");
+        let show_button = document.getElementById("show-osds-file-btn");
+        show_button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        show_button.classList.remove("hidden");
+        show_button.addEventListener("click", show_osds_file);
+        document.getElementById("generate-osds-file-btn").innerHTML =
+          "Generate Again";
+        document
+          .getElementById("inv-file-osds-default")
+          .classList.add("hidden");
+        update_localStorage_inv_file_requirements(
+          "osds.yml",
+          data,
+          true
+        );
+        if (inventory_file_generation_completed_check()) {
+          document
+            .getElementById("ansible-config-inv-nxt")
+            .removeAttribute("disabled");
+        }
+      });
+      osds_file_content_proc.fail(function (ex, data) {
+        console.log("osds_file_content_proc (FAIL): ", data);
       });
     } else {
       msg_color = "#bd3030";
@@ -5951,6 +6049,9 @@ function setup_buttons() {
   document
     .getElementById("generate-smbs-file-btn")
     .addEventListener("click", generate_smbs_file);
+  document
+    .getElementById("generate-osds-file-btn")
+    .addEventListener("click", generate_osds_file);
   document
     .getElementById("ansible-ping-btn")
     .addEventListener("click", ansible_ping);

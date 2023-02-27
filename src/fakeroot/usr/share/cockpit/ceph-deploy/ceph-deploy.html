@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <!--
+<!--
     Cockpit Ceph Deploy - A cockpit module for configuring ceph using 45drives Ansible Playbooks.
     Copyright (C) 2021 Mark Hooper <mhooper@45drives.com>
     
@@ -16,1605 +16,1278 @@
     You should have received a copy of the GNU General Public License
     along with Cockpit Ceph Deploy.  If not, see <https://www.gnu.org/licenses/>.
 -->
-  <html lang="en">
-    <head>
-      <title>Ceph Deploy</title>
-      <meta charset="utf-8" />
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, shrink-to-fit=no"
-      />
-      <link href="../base1/cockpit.css" type="text/css" rel="stylesheet" />
-      <link rel="stylesheet" href="ceph-deploy.css" type="text/css" />
-      <link href="fontawesome/css/all.min.css" rel="stylesheet" />
-      <script src="../base1/cockpit.js"></script>
-      <script src="../manifests.js"></script>
-      <script src="../*/po.js"></script>
-      <script defer src="ceph-deploy.js"></script>
-    </head>
+<html lang="en">
 
-    <body>
-      <div id="ceph-deploy-content">
-        <div id="cd-main-menu">
-          <div class="cd-top-nav-button-group">
-            <div class="nav-btn-group">
-              <div class="cd-main-nav" id="main-menu-link" title="main menu">
+<head>
+  <title>Ceph Deploy</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link href="../base1/cockpit.css" type="text/css" rel="stylesheet" />
+  <link rel="stylesheet" href="ceph-deploy.css" type="text/css" />
+  <link href="fontawesome/css/all.min.css" rel="stylesheet" />
+  <script src="../base1/cockpit.js"></script>
+  <script src="../manifests.js"></script>
+  <script src="../*/po.js"></script>
+  <script defer src="ceph-deploy.js"></script>
+</head>
+
+<body>
+  <div id="ceph-deploy-content">
+    <div id="cd-main-menu">
+      <div class="cd-top-nav-button-group">
+        <div class="nav-btn-group">
+          <div class="cd-main-nav" id="main-menu-link" title="main menu">
+          </div>
+          <div class="nav-toggle">
+            <i class="fas fa-sun" id="houston-theme-icon"></i>
+            <div class="horizontal-spacer-sm"></div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-theme" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="cd-tree-menu" class="cd-tree-grid">
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block ">
+            <div id="deploy-step-preconfig" class="cd-step">
+              <div class="cd-step-title">Pre-Configuration</div>
+              <div class="cd-step-status" title="ready">
+                <i class="fas fa-lock-open"></i>
               </div>
-              <div class="nav-toggle">
-                <i class="fas fa-sun" id="houston-theme-icon"></i>
-                <div class="horizontal-spacer-sm"></div>
-                <label class="switch">
-                  <input type="checkbox" id="toggle-theme" />
-                  <span class="slider round"></span>
-                </label>
+              <div class="cd-deploy-step-start-btn" for="step-preconfig" title="start">
+                <i class="fas fa-arrow-circle-right"></i>
               </div>
             </div>
           </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
 
-          <div id="cd-tree-menu" class="cd-tree-grid">
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block ">
-                    <div id="deploy-step-preconfig" class="cd-step">
-                        <div class="cd-step-title">Pre-Configuration</div>
-                        <div class="cd-step-status" title="ready">
-                          <i class="fas fa-lock-open"></i>
-                        </div>
-                        <div
-                          class="cd-deploy-step-start-btn"
-                          for="step-preconfig"
-                          title="start"
-                        >
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__arrow-down"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
 
-            <div>
-                <div class="cd-menu-block"></div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-ansible-config" class="cd-step">
+              <div class="cd-step-title">Ansible Configuration</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-ansible-config" title="start">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
             </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__arrow-down"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
+          </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
 
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-ansible-config" class="cd-step">
-                        <div class="cd-step-title">Ansible Configuration</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div
-                          class="cd-deploy-step-start-btn"
-                          for="step-ansible-config"
-                          title="start"
-                        >
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__arrow-down"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
 
-            <div>
-                <div class="cd-menu-block"></div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-core" class="cd-step">
+              <div class="cd-step-title">Ceph Core</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-core">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
             </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__arrow-down"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-core" class="cd-step">
-                        <div class="cd-step-title">Ceph Core</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-core">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
+          </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
 
 
-            <div>
-                <div class="cd-menu-block cd-menu-block__arrow-left-down"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-gap"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__fork-3"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-gap"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-right-down"></div>
-            </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__arrow-left-down"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-gap"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__fork-3"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-gap"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-right-down"></div>
+        </div>
 
 
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-cephfs" class="cd-step">
-                        <div class="cd-step-title">CephFS</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-cephfs">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-cephfs" class="cd-step">
+              <div class="cd-step-title">CephFS</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-cephfs">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
             </div>
-            <div>
-                <div class="cd-menu-block"></div>
+          </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-rgw" class="cd-step">
+              <div class="cd-step-title">RGW Service</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-rgw">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
             </div>
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-rgw" class="cd-step">
-                        <div class="cd-step-title">RGW Service</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-rgw">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__arrow-down"></div>
-            </div>
-            
+          </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__arrow-down"></div>
+        </div>
 
-            <div>
-                <div class="cd-menu-block cd-menu-block__fork-2"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__arrow-down"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-iscsi" class="cd-step">
-                        <div class="cd-step-title">ISCSI Service</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-iscsi">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
 
-            <div>
-                <div class="cd-tree-grid-double">
-                    <div>
-                        <div class="cd-menu-block">
-                            <div id="deploy-step-nfs" class="cd-step">
-                                <div class="cd-step-title">NFS</div>
-                                <div
-                                  class="cd-step-status"
-                                  title="locked: complete required steps to unlock."
-                                >
-                                  <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="cd-deploy-step-start-btn" for="step-nfs">
-                                  <i class="fas fa-arrow-circle-right"></i>
-                                </div>
-                              </div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="cd-menu-block ">
-                            <div id="deploy-step-smb" class="cd-step">
-                                <div class="cd-step-title">SMB</div>
-                                <div
-                                  class="cd-step-status"
-                                  title="locked: complete required steps to unlock."
-                                >
-                                  <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="cd-deploy-step-start-btn" for="step-smb">
-                                  <i class="fas fa-arrow-circle-right"></i>
-                                </div>
-                              </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block ">
-                    <div id="deploy-step-rgwlb" class="cd-step">
-                        <div class="cd-step-title">Load Balancing</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-rgwlb">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-down"></div>
-            </div>
-
-            <div>
-                <div class="cd-menu-block cd-menu-block__join-2"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-down"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-down"></div>
-            </div>
-
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-down-right"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-gap"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__join-3"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-gap"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block cd-menu-block__bar-down-left"></div>
-            </div>
-
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block">
-                    <div id="deploy-step-dashboard" class="cd-step">
-                        <div class="cd-step-title">Dashboard</div>
-                        <div
-                          class="cd-step-status"
-                          title="locked: complete required steps to unlock."
-                        >
-                          <i class="fas fa-lock"></i>
-                        </div>
-                        <div class="cd-deploy-step-start-btn" for="step-dashboard">
-                          <i class="fas fa-arrow-circle-right"></i>
-                        </div>
-                      </div>
-                </div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
-            </div>
-            <div>
-                <div class="cd-menu-block"></div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__fork-2"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__arrow-down"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-iscsi" class="cd-step">
+              <div class="cd-step-title">ISCSI Service</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-iscsi">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- PRE-CONFIGURATION -->
-        <div id="step-preconfig" class="hidden" for="deploy-step-preconfig">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-preconfig">
-              <div class="progress-bar-main-back" title="main menu">
+        <div>
+          <div class="cd-tree-grid-double">
+            <div>
+              <div class="cd-menu-block">
+                <div id="deploy-step-nfs" class="cd-step">
+                  <div class="cd-step-title">NFS</div>
+                  <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                    <i class="fas fa-lock"></i>
+                  </div>
+                  <div class="cd-deploy-step-start-btn" for="step-nfs">
+                    <i class="fas fa-arrow-circle-right"></i>
+                  </div>
+                </div>
               </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">Pre-Configuration</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Requirements
+            </div>
+            <div>
+              <div class="cd-menu-block ">
+                <div id="deploy-step-smb" class="cd-step">
+                  <div class="cd-step-title">SMB</div>
+                  <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                    <i class="fas fa-lock"></i>
+                  </div>
+                  <div class="cd-deploy-step-start-btn" for="step-smb">
+                    <i class="fas fa-arrow-circle-right"></i>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="cd-block" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Pre-configuration Requirements
-                </h3>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block ">
+            <div id="deploy-step-rgwlb" class="cd-step">
+              <div class="cd-step-title">Load Balancing</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
               </div>
-              <div class="cd-panel-body">
-                <p class="preconfig-heading">
-                  Please ensure that the following network steps are completed
-                  before proceeding:
-                </p>
-                <ul>
-                  <li class="preconfig-step">
-                    <i class="fa fa-sitemap"></i> Each host should be able to
-                    ping all other hosts using a hostname.
-                  </li>
-                  <li class="preconfig-step">
-                    <i class="fa fa-wrench"></i> Any bonds that are required
-                    have already been configured and tested.
-                  </li>
-                  <li class="preconfig-step">
-                    <i class="fa fa-key"></i> ssh keys have been generated on
-                    the administrator node and passwordless ssh to all hosts is
-                    working.
-                  </li>
-                </ul>
-                <p class="preconfig-heading">
-                  Once these requirements are met, click "Done" to complete this
-                  step and return to the main menu.
-                </p>
+              <div class="cd-deploy-step-start-btn" for="step-rgwlb">
+                <i class="fas fa-arrow-circle-right"></i>
               </div>
             </div>
           </div>
-          <div class="cd-step-bottom-nav-group-right">
-            <button
-              type="button"
-              class="btn btn-primary cd-deploy-step-done-btn"
-              for="step-preconfig"
-            >
-              Done
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-down"></div>
+        </div>
+
+        <div>
+          <div class="cd-menu-block cd-menu-block__join-2"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-down"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-down"></div>
+        </div>
+
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-down-right"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-gap"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__join-3"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-gap"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block cd-menu-block__bar-down-left"></div>
+        </div>
+
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block">
+            <div id="deploy-step-dashboard" class="cd-step">
+              <div class="cd-step-title">Dashboard</div>
+              <div class="cd-step-status" title="locked: complete required steps to unlock.">
+                <i class="fas fa-lock"></i>
+              </div>
+              <div class="cd-deploy-step-start-btn" for="step-dashboard">
+                <i class="fas fa-arrow-circle-right"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+        <div>
+          <div class="cd-menu-block"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRE-CONFIGURATION -->
+    <div id="step-preconfig" class="hidden" for="deploy-step-preconfig">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-preconfig">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">Pre-Configuration</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Requirements
+          </div>
+        </div>
+      </div>
+      <div class="cd-block" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Pre-configuration Requirements
+            </h3>
+          </div>
+          <div class="cd-panel-body">
+            <p class="preconfig-heading">
+              Please ensure that the following network steps are completed
+              before proceeding:
+            </p>
+            <ul>
+              <li class="preconfig-step">
+                <i class="fa fa-sitemap"></i> Each host should be able to
+                ping all other hosts using a hostname.
+              </li>
+              <li class="preconfig-step">
+                <i class="fa fa-wrench"></i> Any bonds that are required
+                have already been configured and tested.
+              </li>
+              <li class="preconfig-step">
+                <i class="fa fa-key"></i> ssh keys have been generated on
+                the administrator node and passwordless ssh to all hosts is
+                working.
+              </li>
+            </ul>
+            <p class="preconfig-heading">
+              Once these requirements are met, click "Done" to complete this
+              step and return to the main menu.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="cd-step-bottom-nav-group-right">
+        <button type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-preconfig">
+          Done
+        </button>
+      </div>
+    </div>
+
+    <!-- ANSIBLE CONFIGURATION -->
+    <div id="step-ansible-config" class="hidden" for="deploy-step-ansible-config">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-ansible-config">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">Ansible Configuration</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Hosts & Roles
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-step" data-progress-bar-idx="1">
+            Additional Options
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-step" data-progress-bar-idx="2">
+            Inventory File Generation
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-step" data-progress-bar-idx="3">
+            Ping Test
+          </div>
+        </div>
+      </div>
+      <!-- ANSIBLE-CONFIGURATION: STEP 0 -->
+      <div class="hidden" data-step-content-idx="0">
+        <!-- HOST INFORMATION -->
+        <div class="cd-block">
+          <div class="panel panel-default cd-panel">
+            <div class="cd-row cd-panel-heading" id="step-1-0-panel-heading">
+              <h3 class="panel-title cd-row-child" id="step-1-0-panel-title">
+                Ansible Configuration: Host Information
+              </h3>
+              <div class="cd-row-right cd-row-child cd-panel-nav">
+                <i id="step-1-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle"
+                  for="ansible-config-1-1-body"></i>
+              </div>
+            </div>
+            <div class="cd-panel-body" id="ansible-config-1-1-body">
+              <p class="cd-para" id="cd-host-placeholder">
+                No hosts have been configured. Click the "+New Host" button
+                to add a new host.
+              </p>
+
+              <div class="cd-host-box" id="cd-host-box">
+                <div class="cd-host-list-header-row">
+                  <div class="cd-host-list-header-text">hostname</div>
+                  <div class="cd-host-list-header-icon"></div>
+                  <div class="cd-host-list-header-icon"></div>
+                </div>
+                <div class="cd-host-list" id="cd-host-list"></div>
+              </div>
+              <div class="cd-row-right cd-row-child">
+                <button class="btn active btn-primary" id="new-host-btn">
+                  <span class="button-symbol">+</span>New Host
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ROLE ASSIGNMENT -->
+        <div class="cd-block">
+          <div class="panel panel-default cd-panel">
+            <div class="cd-row cd-panel-heading">
+              <h3 class="panel-title cd-row-child">
+                Ansible Configuration: Role Assignment
+              </h3>
+              <div class="cd-row-right cd-row-child cd-panel-nav">
+                <i id="step-1-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle"
+                  for="ansible-config-1-2-body"></i>
+              </div>
+            </div>
+            <div id="ansible-config-1-2-body" class="cd-panel-body">
+              <p class="cd-para" id="cd-role-placeholder">
+                Add at least one host in order to assign roles.
+              </p>
+              <div id="role-content" class="hidden">
+                <div id="role-div"></div>
+
+                <div class="cd-row-right cd-row-child">
+                  <button class="btn active btn-primary" id="update-roles-btn" disabled>
+                    Update Roles
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-ansible-config">
+            Prev
+          </button>
+          <button id="ansible-config-hosts-and-roles-nxt" type="button" class="btn btn-primary cd-deploy-step-next-btn"
+            for="step-ansible-config">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- ANSIBLE-CONFIGURATION: STEP 1 -->
+      <!-- GLOBAL OPTIONS -->
+      <div class="cd-block step-ansible-config hidden" data-step-content-idx="1">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Additional Options
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-1-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle"
+                for="ansible-config-options-panel-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-options-panel-body" class="cd-panel-body">
+            <div id="ansible-config-options" class="cd-panel-body">
+              <p class="cd-para">Ceph Core: (mons,mgrs,osds,metrics)</p>
+              <div class="ct-form" id="core-options"></div>
+              <p class="cd-para">RADOS Options:</p>
+
+              <div class="ct-form" id="rgw-options"></div>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="global-options-btn" disabled>
+                Update Options
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="1">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-ansible-config">
+            Prev
+          </button>
+          <button id="ansible-config-add-options-nxt" type="button" class="btn btn-primary cd-deploy-step-next-btn"
+            for="step-ansible-config">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- ANSIBLE-CONFIGURATION: STEP 2-->
+
+      <div class="cd-block step-ansible-config hidden" data-step-content-idx="2">
+        <!-- HOSTS -->
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation - hosts
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-2-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle"
+                for="ansible-config-hosts-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-hosts-body" class="cd-panel-body">
+            <div id="inv-file-hosts-default">
+              <p class="cd-para">
+                Click "Generate" to generate the hosts inventory file
+                (/usr/share/ceph-ansible/hosts)
+              </p>
+            </div>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-host-file-btn">
+                Generate
+              </button>
+            </div>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-host-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <pre id="host-file-content" class="hidden">
+  Click "Generate" to create and display the "hosts" file content.
+  </pre>
+          </div>
+        </div>
+        <!-- ALL.YML -->
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation - all.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-2-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-all-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-all-body" class="cd-panel-body">
+            <p class="cd-para" id="inv-file-all-default">
+              Click "Generate" to generate all.yml using the
+              (/usr/share/ceph-ansible/group_vars/all.yml)
+            </p>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-all-file-btn">
+                Generate
+              </button>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-all-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <pre id="all-file-content" class="hidden">
+    Click "Generate" to create and display the "all.yml" file content.
+    </pre>
+          </div>
+        </div>
+
+        <!-- RGWLOADBALANCERS.YML -->
+        <div class="panel panel-default cd-panel hidden" id="rgwloadbalancers-inv-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation -
+              rgwloadbalancers.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="rgwlb-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-rgwlb-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-rgwlb-body" class="cd-panel-body">
+            <p class="cd-para" id="inv-file-rgwlb-default">
+              Click "Generate" to generate remaining inventory files
+              (/usr/share/ceph-ansible/group_vars/rgwloadbalancers.yml)
+            </p>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-rgwlb-file-btn">
+                Generate
+              </button>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-rgwlb-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <pre id="rgwlb-file-content" class="hidden">
+            Click "Generate" to create and display the "rgwloadbalancers.yml" file content.
+            </pre>
+          </div>
+        </div>
+
+        <!-- NFSS.YML -->
+        <div class="panel panel-default cd-panel hidden" id="nfss-inv-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation - nfss.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="nfss-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-nfss-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-nfss-body" class="cd-panel-body">
+            <p class="cd-para" id="inv-file-nfss-default">
+              Click "Generate" to generate the nfss.yml inventory file
+              (/usr/share/ceph-ansible/group_vars/nfss.yml)
+            </p>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-nfss-file-btn">
+                Generate
+              </button>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-nfss-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <pre id="nfss-file-content" class="hidden">
+                      Click "Generate" to create and display the "nfss.yml" file content.
+                      </pre>
+          </div>
+        </div>
+        <!-- SMBS.YML -->
+        <div class="panel panel-default cd-panel hidden" id="smbs-inv-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation - smbs.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="smbs-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-smbs-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-smbs-body" class="cd-panel-body">
+            <p class="cd-para" id="inv-file-smbs-default">
+              Click "Generate" to generate the smbs.yml inventory file
+              (/usr/share/ceph-ansible/group_vars/smbs.yml)
+            </p>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-smbs-file-btn">
+                Generate
+              </button>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-smbs-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <pre id="smbs-file-content" class="hidden">
+                                          Click "Generate" to create and display the "smbs.yml" file content.
+                                          </pre>
+          </div>
+        </div>
+        <!-- OSDS.YML -->
+        <div class="panel panel-default cd-panel hidden" id="osds-inv-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Inventory File Generation -
+              osds.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="osds-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-osds-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-osds-body" class="cd-panel-body">
+            <p class="cd-para" id="inv-file-osds-default">
+              Click "Generate" to generate remaining inventory files
+              (/usr/share/ceph-ansible/group_vars/osds.yml)
+            </p>
+
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="generate-osds-file-btn">
+                Generate
+              </button>
+            </div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary hidden" id="show-osds-file-btn">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <pre id="osds-file-content" class="hidden">
+                      Click "Generate" to create and display the "osds.yml" file content.
+                      </pre>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="2">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-ansible-config">
+            Prev
+          </button>
+          <button id="ansible-config-inv-nxt" type="button" class="btn btn-primary cd-deploy-step-next-btn"
+            for="step-ansible-config">
+            Next
+          </button>
+        </div>
+      </div>
+      <!-- ANSIBLE-CONFIGURATION: STEP 3 -->
+      <div class="cd-block step-ansible-config hidden" data-step-content-idx="3">
+        <!-- PING TEST-->
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ansible Configuration: Ping Test
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-2-2-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="ansible-config-4-body"></i>
+            </div>
+          </div>
+          <div id="ansible-config-4-body" class="cd-panel-body">
+            <p class="cd-para">
+              Click "Run" to test Ansible Connectivity using Ansible Ping.
+            </p>
+            <div id="terminal-ping-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-ping-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="3">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-ansible-config">
+            Prev
+          </button>
+          <button id="ping_all" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-ansible-config"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPLOY CORE -->
+    <div id="step-core" class="hidden" for="deploy-step-core">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-core">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">Ceph Core</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (device-alias.yml)
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-step" data-progress-bar-idx="1">
+            Playbook (core.yml)
+          </div>
+        </div>
+      </div>
+      <!-- DEVICE ALIAS PLAYBOOK -->
+      <div class="cd-block step-core hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              CEPH Core Deployment: Step 1 - Ansible Playbook -
+              device-alias.yml (/usr/share/ceph-ansible/device-alias.yml)
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-3-0-panel-body"></i>
+            </div>
+          </div>
+          <div id="step-3-0-panel-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to run the device-alias.yml playbook
+            </p>
+            <div id="terminal-device-alias-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-device-alias-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="1">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-core">
+            Prev
+          </button>
+          <button id="device_alias" type="button" class="btn btn-primary cd-deploy-step-next-btn" for="step-core"
+            disabled>
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- CORE PLAYBOOK -->
+      <div class="cd-block step-core hidden" data-step-content-idx="1">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              CEPH Core Deployment: Step 2 - Ansible Playbook - core.yml
+              (/usr/share/ceph-ansible/core.yml)
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-1-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="step-3-1-panel-body"></i>
+            </div>
+          </div>
+          <div id="step-3-1-panel-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the core.yml playbook
+            </p>
+            <div id="terminal-core-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-core-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="1">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-core">
+            Prev
+          </button>
+          <button id="deploy_core" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-core"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CEPHFS -->
+    <div id="step-cephfs" class="hidden" for="deploy-step-cephfs">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-cephfs">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">CephFS</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (cephfs.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-cephfs hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              CephFS: Ansible Playbook - /usr/share/ceph-ansible/cephfs.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="cephfs-step-1-body"></i>
+            </div>
+          </div>
+          <div id="cephfs-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the cephfs.yml playbook
+            </p>
+            <div id="terminal-cephfs-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-cephfs-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-cephfs">
+            Prev
+          </button>
+          <button id="deploy_cephfs" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-cephfs"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RGW -->
+    <div id="step-rgw" class="hidden" for="deploy-step-rgw">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-rgw">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">RGW</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (radosgw.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-rgw hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              RADOS Gateway: Ansible Playbook -
+              /usr/share/ceph-ansible/radosgw.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="rgw-step-1-body"></i>
+            </div>
+          </div>
+          <div id="rgw-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the radosgw.yml playbook
+            </p>
+            <div id="terminal-radosgw-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-radosgw-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-rgw">
+            Prev
+          </button>
+          <button id="deploy_radosgw" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-rgw"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ISCSI -->
+    <div id="step-iscsi" class="hidden" for="deploy-step-iscsi">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-iscsi">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">ISCSI</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (iscsi.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-iscsi hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              ISCSI: Ansible Playbook - /usr/share/ceph-ansible/iscsi.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="iscsi-step-1-body"></i>
+            </div>
+          </div>
+          <div id="iscsi-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the iscsi.yml playbook
+            </p>
+            <div id="terminal-iscsi-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-iscsi-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-iscsi">
+            Prev
+          </button>
+          <button id="deploy_iscsi" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-iscsi"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RGWLOADBALANCERS -->
+    <div id="step-rgwlb" class="hidden" for="deploy-step-rgwlb">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-rgwlb">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">RGWLB</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (radosgw-lb.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-rgwlb hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Radosgw-lb: Ansible Playbook -
+              /usr/share/ceph-ansible/radosgw-lb.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="rgwlb-step-1-body"></i>
+            </div>
+          </div>
+          <div id="rgwlb-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the radosgw-lb.yml playbook
+            </p>
+            <div id="terminal-rgwlb-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-rgwlb-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-rgwlb">
+            Prev
+          </button>
+          <button id="deploy_rgwlb" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-rgwlb"
+            disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NFS -->
+    <div id="step-nfs" class="hidden" for="deploy-step-nfs">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-nfs">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">NFS</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (nfss.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-nfs hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              NFS: Ansible Playbook - /usr/share/ceph-ansible/nfs.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="nfs-step-1-body"></i>
+            </div>
+          </div>
+          <div id="nfs-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the nfs.yml playbook
+            </p>
+            <div id="terminal-nfs-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-nfs-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-nfs">
+            Prev
+          </button>
+          <button id="deploy_nfs" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-nfs" disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMB -->
+    <div id="step-smb" class="hidden" for="deploy-step-smb">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-smb">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">SMB</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (smbs.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-smb hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Samba: Ansible Playbook - /usr/share/ceph-ansible/smbs.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="smb-step-1-body"></i>
+            </div>
+          </div>
+          <div id="smb-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the smbs.yml playbook
+            </p>
+            <div id="terminal-smb-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-smb-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-smb">
+            Prev
+          </button>
+          <button id="deploy_smb" type="button" class="btn btn-primary cd-deploy-step-done-btn" for="step-smb" disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CEPH-DASHBOARD -->
+    <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
+      <div class="cd-top-nav-button-group">
+        <div class="cd-progress-bar" id="progress-bar-step-dashboard">
+          <div class="progress-bar-main-back" title="main menu">
+          </div>
+          <div class="progress-step-divider">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+          <div class="progress-bar-title">Ceph Dashboard</div>
+          <div class="progress-step progress-current-step" data-progress-bar-idx="0">
+            Playbook (dashboard.yml)
+          </div>
+        </div>
+      </div>
+      <div class="cd-block step-dashboard hidden" data-step-content-idx="0">
+        <div class="panel panel-default cd-panel">
+          <div class="cd-row cd-panel-heading">
+            <h3 class="panel-title cd-row-child">
+              Ceph Dashboard: Ansible Playbook -
+              /usr/share/ceph-ansible/dashboard.yml
+            </h3>
+            <div class="cd-row-right cd-row-child cd-panel-nav">
+              <i id="step-3-0-panel-show" class="fas fa-angle-up cd-panel-vis-toggle" for="dashboard-step-1-body"></i>
+            </div>
+          </div>
+          <div id="dashboard-step-1-body" class="cd-panel-body">
+            <p class="cd-para">
+              click "run" to perform the dashboard.yml playbook
+            </p>
+            <div id="terminal-dashboard-iframe"></div>
+            <div class="cd-row-right cd-row-child">
+              <button class="btn active btn-primary" id="ansible-dashboard-btn">
+                Run
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="cd-step-bottom-nav-group" data-nav-idx="0">
+          <button type="button" class="btn btn-primary cd-deploy-step-prev-btn" for="step-dashboard">
+            Prev
+          </button>
+          <button id="deploy_dashboard" type="button" class="btn btn-primary cd-deploy-step-done-btn"
+            for="step-dashboard" disabled>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Menus -->
+
+    <!-- Add Host Modal Menu -->
+    <div id="add-host-modal" class="modal" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close" id="close-add-host">&times;</span>
+            <h4 class="modal-title" id="add-host-modal-title">
+              Add New Host
+            </h4>
+          </div>
+          <div class="modal-body">
+            <div class="ct-form">
+              <label class="control-label" for="new-hostname-field">hostname</label>
+              <div class="ct-validation-wrapper">
+                <input class="ct-input cd-field" type="text" aria-invalid="false" id="new-hostname-field" />
+                <div class="cd-field-feedback" id="new-hostname-field-feedback"></div>
+              </div>
+            </div>
+
+            <div class="cd-row cd-result-msg" id="add-host-result-msg">
+              <h3 class="cd-field-label" id="add-host-result-msg-label"></h3>
+              <div class="cd-text-output" id="add-host-result-msg-content"></div>
+            </div>
+          </div>
+
+          <div class="modal-footer cd-row-right">
+            <button type="button" class="button-fallback-default pf-c-button pf-m-secondary" id="cancel-add-host">
+              Cancel
+            </button>
+            <button type="button" class="button-fallback-primary pf-c-button pf-m-primary" id="continue-add-host">
+              Add
             </button>
           </div>
         </div>
-
-        <!-- ANSIBLE CONFIGURATION -->
-        <div
-          id="step-ansible-config"
-          class="hidden"
-          for="deploy-step-ansible-config"
-        >
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-ansible-config">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">Ansible Configuration</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Hosts & Roles
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-step" data-progress-bar-idx="1">
-                Additional Options
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-step" data-progress-bar-idx="2">
-                Inventory File Generation
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-step" data-progress-bar-idx="3">
-                Ping Test
-              </div>
-            </div>
-          </div>
-          <!-- ANSIBLE-CONFIGURATION: STEP 0 -->
-          <div class="hidden" data-step-content-idx="0">
-            <!-- HOST INFORMATION -->
-            <div class="cd-block">
-              <div class="panel panel-default cd-panel">
-                <div
-                  class="cd-row cd-panel-heading"
-                  id="step-1-0-panel-heading"
-                >
-                  <h3
-                    class="panel-title cd-row-child"
-                    id="step-1-0-panel-title"
-                  >
-                    Ansible Configuration: Host Information
-                  </h3>
-                  <div class="cd-row-right cd-row-child cd-panel-nav">
-                    <i
-                      id="step-1-0-panel-show"
-                      class="fas fa-angle-up cd-panel-vis-toggle"
-                      for="ansible-config-1-1-body"
-                    ></i>
-                  </div>
-                </div>
-                <div class="cd-panel-body" id="ansible-config-1-1-body">
-                  <p class="cd-para" id="cd-host-placeholder">
-                    No hosts have been configured. Click the "+New Host" button
-                    to add a new host.
-                  </p>
-
-                  <div class="cd-host-box" id="cd-host-box">
-                    <div class="cd-host-list-header-row">
-                      <div class="cd-host-list-header-text">hostname</div>
-                      <div class="cd-host-list-header-icon"></div>
-                      <div class="cd-host-list-header-icon"></div>
-                    </div>
-                    <div class="cd-host-list" id="cd-host-list"></div>
-                  </div>
-                  <div class="cd-row-right cd-row-child">
-                    <button class="btn active btn-primary" id="new-host-btn">
-                      <span class="button-symbol">+</span>New Host
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- ROLE ASSIGNMENT -->
-            <div class="cd-block">
-              <div class="panel panel-default cd-panel">
-                <div class="cd-row cd-panel-heading">
-                  <h3 class="panel-title cd-row-child">
-                    Ansible Configuration: Role Assignment
-                  </h3>
-                  <div class="cd-row-right cd-row-child cd-panel-nav">
-                    <i
-                      id="step-1-1-panel-show"
-                      class="fas fa-angle-up cd-panel-vis-toggle"
-                      for="ansible-config-1-2-body"
-                    ></i>
-                  </div>
-                </div>
-                <div id="ansible-config-1-2-body" class="cd-panel-body">
-                  <p class="cd-para" id="cd-role-placeholder">
-                    Add at least one host in order to assign roles.
-                  </p>
-                  <div id="role-content" class="hidden">
-                    <div id="role-div"></div>
-
-                    <div class="cd-row-right cd-row-child">
-                      <button
-                        class="btn active btn-primary"
-                        id="update-roles-btn"
-                        disabled
-                      >
-                        Update Roles
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
-              >
-                Prev
-              </button>
-              <button
-                id="ansible-config-hosts-and-roles-nxt"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-ansible-config"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- ANSIBLE-CONFIGURATION: STEP 1 -->
-          <!-- GLOBAL OPTIONS -->
-          <div
-            class="cd-block step-ansible-config hidden"
-            data-step-content-idx="1"
-          >
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Additional Options
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-1-2-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-options-panel-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-options-panel-body" class="cd-panel-body">
-                <div id="ansible-config-options" class="cd-panel-body">
-                  <p class="cd-para">Ceph Core: (mons,mgrs,osds,metrics)</p>
-                  <div class="ct-form" id="core-options"></div>
-                  <p class="cd-para">RADOS Options:</p>
-
-                  <div class="ct-form" id="rgw-options"></div>
-                </div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="global-options-btn"
-                    disabled
-                  >
-                    Update Options
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="1">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
-              >
-                Prev
-              </button>
-              <button
-                id="ansible-config-add-options-nxt"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-ansible-config"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- ANSIBLE-CONFIGURATION: STEP 2-->
-
-          <div
-            class="cd-block step-ansible-config hidden"
-            data-step-content-idx="2"
-          >
-            <!-- HOSTS -->
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation - hosts
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-2-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-hosts-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-hosts-body" class="cd-panel-body">
-                <div id="inv-file-hosts-default">
-                  <p class="cd-para">
-                    Click "Generate" to generate the hosts inventory file
-                    (/usr/share/ceph-ansible/hosts)
-                  </p>
-                </div>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-host-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-host-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-                <pre id="host-file-content" class="hidden">
-  Click "Generate" to create and display the "hosts" file content.
-  </pre
-                >
-              </div>
-            </div>
-            <!-- ALL.YML -->
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation - all.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-2-1-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-all-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-all-body" class="cd-panel-body">
-                <p class="cd-para" id="inv-file-all-default">
-                  Click "Generate" to generate all.yml using the
-                  (/usr/share/ceph-ansible/group_vars/all.yml)
-                </p>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-all-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-all-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-
-                <pre id="all-file-content" class="hidden">
-    Click "Generate" to create and display the "all.yml" file content.
-    </pre
-                >
-              </div>
-            </div>
-
-            <!-- RGWLOADBALANCERS.YML -->
-            <div
-              class="panel panel-default cd-panel hidden"
-              id="rgwloadbalancers-inv-panel"
-            >
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation -
-                  rgwloadbalancers.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="rgwlb-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-rgwlb-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-rgwlb-body" class="cd-panel-body">
-                <p class="cd-para" id="inv-file-rgwlb-default">
-                  Click "Generate" to generate remaining inventory files
-                  (/usr/share/ceph-ansible/group_vars/rgwloadbalancers.yml)
-                </p>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-rgwlb-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-rgwlb-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-
-                <pre id="rgwlb-file-content" class="hidden">
-            Click "Generate" to create and display the "rgwloadbalancers.yml" file content.
-            </pre
-                >
-              </div>
-            </div>
-
-            <!-- NFSS.YML -->
-            <div
-              class="panel panel-default cd-panel hidden"
-              id="nfss-inv-panel"
-            >
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation - nfss.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="nfss-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-nfss-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-nfss-body" class="cd-panel-body">
-                <p class="cd-para" id="inv-file-nfss-default">
-                  Click "Generate" to generate the nfss.yml inventory file
-                  (/usr/share/ceph-ansible/group_vars/nfss.yml)
-                </p>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-nfss-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-nfss-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-
-                <pre id="nfss-file-content" class="hidden">
-                      Click "Generate" to create and display the "nfss.yml" file content.
-                      </pre
-                >
-              </div>
-            </div>
-            <!-- SMBS.YML -->
-            <div
-              class="panel panel-default cd-panel hidden"
-              id="smbs-inv-panel"
-            >
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Inventory File Generation - smbs.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="smbs-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-smbs-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-smbs-body" class="cd-panel-body">
-                <p class="cd-para" id="inv-file-smbs-default">
-                  Click "Generate" to generate the smbs.yml inventory file
-                  (/usr/share/ceph-ansible/group_vars/smbs.yml)
-                </p>
-
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="generate-smbs-file-btn"
-                  >
-                    Generate
-                  </button>
-                </div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary hidden"
-                    id="show-smbs-file-btn"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-
-                <pre id="smbs-file-content" class="hidden">
-                                          Click "Generate" to create and display the "smbs.yml" file content.
-                                          </pre
-                >
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="2">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
-              >
-                Prev
-              </button>
-              <button
-                id="ansible-config-inv-nxt"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-ansible-config"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-          <!-- ANSIBLE-CONFIGURATION: STEP 3 -->
-          <div
-            class="cd-block step-ansible-config hidden"
-            data-step-content-idx="3"
-          >
-            <!-- PING TEST-->
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ansible Configuration: Ping Test
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-2-2-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="ansible-config-4-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="ansible-config-4-body" class="cd-panel-body">
-                <p class="cd-para">
-                  Click "Run" to test Ansible Connectivity using Ansible Ping.
-                </p>
-                <div id="terminal-ping-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-ping-btn">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="3">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-ansible-config"
-              >
-                Prev
-              </button>
-              <button
-                id="ping_all"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-ansible-config"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- DEPLOY CORE -->
-        <div id="step-core" class="hidden" for="deploy-step-core">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-core">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">Ceph Core</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (device-alias.yml)
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-step" data-progress-bar-idx="1">
-                Playbook (core.yml)
-              </div>
-            </div>
-          </div>
-          <!-- DEVICE ALIAS PLAYBOOK -->
-          <div class="cd-block step-core hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  CEPH Core Deployment: Step 1 - Ansible Playbook -
-                  device-alias.yml (/usr/share/ceph-ansible/device-alias.yml)
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="step-3-0-panel-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="step-3-0-panel-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to run the device-alias.yml playbook
-                </p>
-                <div id="terminal-device-alias-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="ansible-device-alias-btn"
-                  >
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="1">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-core"
-              >
-                Prev
-              </button>
-              <button
-                id="device_alias"
-                type="button"
-                class="btn btn-primary cd-deploy-step-next-btn"
-                for="step-core"
-                disabled
-              >
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- CORE PLAYBOOK -->
-          <div class="cd-block step-core hidden" data-step-content-idx="1">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  CEPH Core Deployment: Step 2 - Ansible Playbook - core.yml
-                  (/usr/share/ceph-ansible/core.yml)
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-1-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="step-3-1-panel-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="step-3-1-panel-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the core.yml playbook
-                </p>
-                <div id="terminal-core-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-core-btn">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="1">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-core"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_core"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-core"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- CEPHFS -->
-        <div id="step-cephfs" class="hidden" for="deploy-step-cephfs">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-cephfs">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">CephFS</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (cephfs.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-cephfs hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  CephFS: Ansible Playbook - /usr/share/ceph-ansible/cephfs.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="cephfs-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="cephfs-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the cephfs.yml playbook
-                </p>
-                <div id="terminal-cephfs-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="ansible-cephfs-btn"
-                  >
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-cephfs"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_cephfs"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-cephfs"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- RGW -->
-        <div id="step-rgw" class="hidden" for="deploy-step-rgw">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-rgw">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">RGW</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (radosgw.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-rgw hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  RADOS Gateway: Ansible Playbook -
-                  /usr/share/ceph-ansible/radosgw.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="rgw-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="rgw-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the radosgw.yml playbook
-                </p>
-                <div id="terminal-radosgw-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="ansible-radosgw-btn"
-                  >
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-rgw"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_radosgw"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-rgw"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ISCSI -->
-        <div id="step-iscsi" class="hidden" for="deploy-step-iscsi">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-iscsi">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">ISCSI</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (iscsi.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-iscsi hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  ISCSI: Ansible Playbook - /usr/share/ceph-ansible/iscsi.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="iscsi-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="iscsi-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the iscsi.yml playbook
-                </p>
-                <div id="terminal-iscsi-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-iscsi-btn">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-iscsi"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_iscsi"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-iscsi"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- RGWLOADBALANCERS -->
-        <div id="step-rgwlb" class="hidden" for="deploy-step-rgwlb">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-rgwlb">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">RGWLB</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (radosgw-lb.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-rgwlb hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Radosgw-lb: Ansible Playbook -
-                  /usr/share/ceph-ansible/radosgw-lb.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="rgwlb-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="rgwlb-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the radosgw-lb.yml playbook
-                </p>
-                <div id="terminal-rgwlb-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-rgwlb-btn">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-rgwlb"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_rgwlb"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-rgwlb"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- NFS -->
-        <div id="step-nfs" class="hidden" for="deploy-step-nfs">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-nfs">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">NFS</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (nfss.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-nfs hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  NFS: Ansible Playbook - /usr/share/ceph-ansible/nfs.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="nfs-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="nfs-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the nfs.yml playbook
-                </p>
-                <div id="terminal-nfs-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button class="btn active btn-primary" id="ansible-nfs-btn">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-nfs"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_nfs"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-nfs"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-                <!-- SMB -->
-                <div id="step-smb" class="hidden" for="deploy-step-smb">
-                  <div class="cd-top-nav-button-group">
-                    <div class="cd-progress-bar" id="progress-bar-step-smb">
-                      <div class="progress-bar-main-back" title="main menu">
-                      </div>
-                      <div class="progress-step-divider">
-                        <i class="fas fa-chevron-right"></i>
-                      </div>
-                      <div class="progress-bar-title">SMB</div>
-                      <div
-                        class="progress-step progress-current-step"
-                        data-progress-bar-idx="0"
-                      >
-                        Playbook (smbs.yml)
-                      </div>
-                    </div>
-                  </div>
-                  <div class="cd-block step-smb hidden" data-step-content-idx="0">
-                    <div class="panel panel-default cd-panel">
-                      <div class="cd-row cd-panel-heading">
-                        <h3 class="panel-title cd-row-child">
-                          Samba: Ansible Playbook - /usr/share/ceph-ansible/smbs.yml
-                        </h3>
-                        <div class="cd-row-right cd-row-child cd-panel-nav">
-                          <i
-                            id="step-3-0-panel-show"
-                            class="fas fa-angle-up cd-panel-vis-toggle"
-                            for="smb-step-1-body"
-                          ></i>
-                        </div>
-                      </div>
-                      <div id="smb-step-1-body" class="cd-panel-body">
-                        <p class="cd-para">
-                          click "run" to perform the smbs.yml playbook
-                        </p>
-                        <div id="terminal-smb-iframe"></div>
-                        <div class="cd-row-right cd-row-child">
-                          <button class="btn active btn-primary" id="ansible-smb-btn">
-                            Run
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-                      <button
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-prev-btn"
-                        for="step-smb"
-                      >
-                        Prev
-                      </button>
-                      <button
-                        id="deploy_smb"
-                        type="button"
-                        class="btn btn-primary cd-deploy-step-done-btn"
-                        for="step-smb"
-                        disabled
-                      >
-                        Done
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-        <!-- CEPH-DASHBOARD -->
-        <div id="step-dashboard" class="hidden" for="deploy-step-dashboard">
-          <div class="cd-top-nav-button-group">
-            <div class="cd-progress-bar" id="progress-bar-step-dashboard">
-              <div class="progress-bar-main-back" title="main menu">
-              </div>
-              <div class="progress-step-divider">
-                <i class="fas fa-chevron-right"></i>
-              </div>
-              <div class="progress-bar-title">Ceph Dashboard</div>
-              <div
-                class="progress-step progress-current-step"
-                data-progress-bar-idx="0"
-              >
-                Playbook (dashboard.yml)
-              </div>
-            </div>
-          </div>
-          <div class="cd-block step-dashboard hidden" data-step-content-idx="0">
-            <div class="panel panel-default cd-panel">
-              <div class="cd-row cd-panel-heading">
-                <h3 class="panel-title cd-row-child">
-                  Ceph Dashboard: Ansible Playbook -
-                  /usr/share/ceph-ansible/dashboard.yml
-                </h3>
-                <div class="cd-row-right cd-row-child cd-panel-nav">
-                  <i
-                    id="step-3-0-panel-show"
-                    class="fas fa-angle-up cd-panel-vis-toggle"
-                    for="dashboard-step-1-body"
-                  ></i>
-                </div>
-              </div>
-              <div id="dashboard-step-1-body" class="cd-panel-body">
-                <p class="cd-para">
-                  click "run" to perform the dashboard.yml playbook
-                </p>
-                <div id="terminal-dashboard-iframe"></div>
-                <div class="cd-row-right cd-row-child">
-                  <button
-                    class="btn active btn-primary"
-                    id="ansible-dashboard-btn"
-                  >
-                    Run
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="cd-step-bottom-nav-group" data-nav-idx="0">
-              <button
-                type="button"
-                class="btn btn-primary cd-deploy-step-prev-btn"
-                for="step-dashboard"
-              >
-                Prev
-              </button>
-              <button
-                id="deploy_dashboard"
-                type="button"
-                class="btn btn-primary cd-deploy-step-done-btn"
-                for="step-dashboard"
-                disabled
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Modal Menus -->
-
-        <!-- Add Host Modal Menu -->
-        <div id="add-host-modal" class="modal" role="dialog">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <span class="close" id="close-add-host">&times;</span>
-                <h4 class="modal-title" id="add-host-modal-title">
-                  Add New Host
-                </h4>
-              </div>
-              <div class="modal-body">
-                <div class="ct-form">
-                  <label class="control-label" for="new-hostname-field"
-                    >hostname</label
-                  >
-                  <div class="ct-validation-wrapper">
-                    <input
-                      class="ct-input cd-field"
-                      type="text"
-                      aria-invalid="false"
-                      id="new-hostname-field"
-                    />
-                    <div
-                      class="cd-field-feedback"
-                      id="new-hostname-field-feedback"
-                    ></div>
-                  </div>
-                </div>
-
-                <div class="cd-row cd-result-msg" id="add-host-result-msg">
-                  <h3
-                    class="cd-field-label"
-                    id="add-host-result-msg-label"
-                  ></h3>
-                  <div
-                    class="cd-text-output"
-                    id="add-host-result-msg-content"
-                  ></div>
-                </div>
-              </div>
-
-              <div class="modal-footer cd-row-right">
-                <button
-                  type="button"
-                  class="button-fallback-default pf-c-button pf-m-secondary"
-                  id="cancel-add-host"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  class="button-fallback-primary pf-c-button pf-m-primary"
-                  id="continue-add-host"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="snackbar"></div>
-        <div id="add-host-snackbar"></div>
-        <div id="update-roles-snackbar"></div>
-        <div id="update-options-snackbar"></div>
-        <div id="general-snackbar"></div>
       </div>
-    </body>
-  </html>
+    </div>
+
+    <div id="snackbar"></div>
+    <div id="add-host-snackbar"></div>
+    <div id="update-roles-snackbar"></div>
+    <div id="update-options-snackbar"></div>
+    <div id="general-snackbar"></div>
+  </div>
+</body>
+
+</html>
+
 </html>

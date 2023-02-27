@@ -124,6 +124,23 @@ class Nfss:
             print(json.dumps(error_msg, indent=4))
         return ret_val
 
+@dataclass()
+class Osds:
+    dmcrypt: bool = False
+
+    def load_dictionary(self, dict_variable: dict):
+        ret_val = False
+        if isinstance(dict_variable, dict):
+            for key in dict_variable.keys():
+                if key in asdict(self).keys():
+                    if type(dict_variable[key]) == type(getattr(self, key)):
+                        setattr(self, key, dict_variable[key])
+                        ret_val = True
+        else:
+            error_msg = {"error_msg": "unable to load dictionary."}
+            print(json.dumps(error_msg, indent=4))
+        return ret_val
+
 
 @dataclass()
 class Rgwloadbalancers:
@@ -357,6 +374,11 @@ def load_groups(group_string):
                     smbs = Smbs()
                     smbs.load_dictionary(groups_obj[groupname])
                     valid_group_dict = asdict(smbs)
+                    groups_dict[groupname] = copy.deepcopy(valid_group_dict)
+                elif groupname == "osds":
+                    osds = Osds()
+                    osds.load_dictionary(groups_obj[groupname])
+                    valid_group_dict = asdict(osds)
                     groups_dict[groupname] = copy.deepcopy(valid_group_dict)
             else:
                 error_msg = {

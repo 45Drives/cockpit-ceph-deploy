@@ -318,6 +318,12 @@ input:checked + .cd-slider:before {
 }
 
 /* content containers */
+.panel-title {
+    font-weight: bold;
+    color: inherit;
+    font-size: 16px;
+}
+
 .cd-block {
 	margin-left: 10px;
 	padding: 8px 8px 8px 8px;
@@ -362,6 +368,12 @@ input:checked + .cd-slider:before {
     background-color: var(--panel);
 }
 
+.cd-option-panel {
+    margin-left: 1.5rem;
+    color: var(--font);
+    background-color: var(--panel);
+}
+
 .cd-panel-heading {
     background-color: var(--container-header);
     padding: 10px 15px;
@@ -370,6 +382,7 @@ input:checked + .cd-slider:before {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     color: var(--font);
+    font-weight: bold;
 }
 
 .cd-host-box {
@@ -595,6 +608,7 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 .ct-form {
+    margin-left: 1.5rem;
     align-self: start;
     display: grid;
     grid-gap: 0.5rem 1.5rem;
@@ -980,6 +994,17 @@ th,td {
 }
 
 #smbs-file-content {
+    font-size: small;
+    overflow-y: scroll;
+    max-height: 600px;
+    min-height: 50px;
+    background-color: var(--container-header);
+    color: var(--font);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+#osds-file-content {
     font-size: small;
     overflow-y: scroll;
     max-height: 600px;
