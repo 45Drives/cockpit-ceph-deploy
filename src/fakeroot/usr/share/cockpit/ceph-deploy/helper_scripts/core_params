@@ -232,7 +232,6 @@ class Options:
     radosgw_frontend_type: str = ""
     radosgw_civetweb_num_threads: str = ""
     radosgw_civetweb_options: str = "num_threads=\{\{ radosgw_civetweb_num_threads \}\}"
-    hybrid_cluster: bool = False
     offline_install: bool = False
     block_db_size: str = "-1"
     dedicated_device_db: bool = False

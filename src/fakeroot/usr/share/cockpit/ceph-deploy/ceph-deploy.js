@@ -262,16 +262,6 @@ let g_option_scheme = {
         default_value: "",
       },
       {
-        option_name: "hybrid_cluster",
-        option_format: "default",
-        optional: true,
-        label: "hybrid_cluster",
-        feedback: false,
-        help: "",
-        input_type: "checkbox",
-        default_value: false,
-      },
-      {
         option_name: "block_db_size",
         option_format: "default",
         optional: true,
