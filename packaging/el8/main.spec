@@ -89,6 +89,9 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-1
+- added option to use dmcrypt for osds
+- updated css
 * Wed Dec 14 2022 Mark Hooper <mhooper@45drives.com> 1.0.5-3
 - updated ceph-ansible-45d dependency to version 5.3.4
 - modified default templates for all.yml and nfss.yml

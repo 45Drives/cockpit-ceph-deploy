@@ -1,3 +1,10 @@
+cockpit-ceph-deploy (1.0.6-1focal) focal; urgency=medium
+
+  * added option to use dmcrypt for osds
+  * updated css
+
+ -- Mark Hooper <mhooper@45drives.com>  Mon, 27 Feb 2023 09:18:28 -0400
+
 cockpit-ceph-deploy (1.0.5-3focal) focal; urgency=medium
 
   * updated ceph-ansible-45d dependency to version 5.3.4
