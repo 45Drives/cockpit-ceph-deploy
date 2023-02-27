@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-3
+- removed hybrid_cluster option from UI
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-2
 - updated default template for all.yml
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-1

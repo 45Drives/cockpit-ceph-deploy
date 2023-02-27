@@ -1,3 +1,3 @@
-## Cockpit Ceph-Deploy 1.0.6-2
+## Cockpit Ceph-Deploy 1.0.6-3
 
-* updated default template for all.yml
+* removed hybrid_cluster option from UI
