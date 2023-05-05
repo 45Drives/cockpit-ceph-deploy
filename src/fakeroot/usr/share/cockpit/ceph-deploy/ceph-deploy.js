@@ -428,10 +428,11 @@ let g_option_scheme = {
                             radio_option_name: "join_user",
                             optional: false,
                             label: "join_user",
-                            feedback: false,
+                            feedback: true,
+                            feedback_type: "required_text",
                             help: "",
                             input_type: "text",
-                            default_value: "",
+                            default_value: ""
                           },
                           {
                             option_name: "join_password",
@@ -439,7 +440,8 @@ let g_option_scheme = {
                             radio_option_name: "join_password",
                             optional: false,
                             label: "join_password",
-                            feedback: false,
+                            feedback: true,
+                            feedback_type:"required_text",
                             help: "",
                             input_type: "password",
                             default_value: "",
@@ -1073,19 +1075,26 @@ let g_ceph_deploy_default_state = {
  * @param {string} msg_label
  * @param {string} msg_content
  * @param {string} msg_color
- * @param {string} id
  */
-function show_snackbar_msg(msg_label, msg_content, msg_color, id) {
-  var snackbar = document.getElementById(id);
+function show_snackbar_msg(msg_label, msg_content, msg_color) {
+  var snackbar = document.getElementById("snackbar");
+  const snackbar_msg = document.createElement("div");
+  snackbar_msg.classList.add("snackbar-msg");
   if (snackbar != null) {
-    snackbar.innerHTML = msg_label + msg_content;
-    snackbar.style.backgroundColor = msg_color;
-    snackbar.className = "show";
+    snackbar_msg.innerHTML = msg_label + msg_content;
+    snackbar_msg.style.backgroundColor = msg_color;
+    snackbar_msg.classList.add("show");
+    snackbar.appendChild(snackbar_msg);
     setTimeout(function () {
-      snackbar.className = snackbar.className.replace("show", "");
+      snackbar_msg.className = snackbar_msg.className.replace("show", "slide-out");
+      setTimeout(function () {
+        snackbar.removeChild(snackbar_msg);
+      }, 2000);
     }, 5000);
+
   }
 }
+
 
 /**
  * obtains the "houston-theme-state" from local storage and sets the state accordingly.
@@ -1162,8 +1171,8 @@ function add_host_request() {
       }
       if (result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
-        msg_label = "Add Host: ";
-        msg_content = "Host Added Succcessfully.";
+        msg_label = "Host Added: ";
+        msg_content = hostname;
         check_for_parameter_change(result_json);
       } else {
         msg_color = "#bd3030";
@@ -1172,7 +1181,7 @@ function add_host_request() {
       }
       hide_modal_dialog("add-host-modal");
       get_param_file_content();
-      show_snackbar_msg(msg_label, msg_content, msg_color, "add-host-snackbar");
+      show_snackbar_msg(msg_label, msg_content, msg_color);
     });
     proc.fail(function (ex, data) {
       document.getElementById("add-host-result-msg").style.display = "block";
@@ -1254,11 +1263,11 @@ function check_name_field(
     return false;
   } else if (
     field_text.length > 0 &&
-    !field_text.match(/^[a-z_][a-z0-9_.-]*[$]?$/)
+    !field_text.match(/^[a-z0-9_][a-z0-9_.-]*[$]?$/)
   ) {
     button.disabled = true;
     var invalid_chars = [];
-    if (field_text[0].match(/[^a-z_]/))
+    if (field_text[0].match(/[^a-z0-9_]/))
       invalid_chars.push("'" + field_text[0] + "'");
     for (let char of field_text.slice(1, -1))
       if (char.match(/[^a-z0-9_.-]/)) invalid_chars.push("'" + char + "'");
@@ -1268,6 +1277,35 @@ function check_name_field(
       label_name +
       " contains invalid characters: \n" +
       invalid_chars.join(", ");
+    return false;
+  }
+  button.disabled = false;
+  return true;
+}
+
+/**
+ * Checks to see if the text entered in a field is non-empty
+ * @param {string} name_field_id
+ * @param {string} feedback_field_id
+ * @param {string} button_id
+ * @param {string} label_name
+ * @param {boolean} required_flag
+ * @returns {boolean}
+ */
+function check_required_text_field(
+  name_field_id,
+  feedback_field_id,
+  button_id,
+  label_name,
+  required_flag
+) {
+  var field_text = document.getElementById(name_field_id).value;
+  var button = document.getElementById(button_id);
+  var info_message = document.getElementById(feedback_field_id);
+  info_message.innerText = " ";
+  if (field_text.length === 0 && required_flag) {
+    button.disabled = true;
+    info_message.innerText = label_name + " cannot be empty.";
     return false;
   }
   button.disabled = false;
@@ -1811,10 +1849,10 @@ function update_options_info(
         if (!parent_div[0].classList.contains("hidden") && !parent_div[0].getAttribute("opt-parent")){
           next_btn.disabled = true;
           next_btn.title = "To proceed, fill in required fields.";
-          console.log(element);
         }else if(!get_top_opt_parent_hidden_status(element)){
-          next_btn.disabled = true;
-          next_btn.title = "To proceed, fill in required fields.";
+          console.log("I HAD TO DISABLE THE NEXT BUTTON CAUSE OF THIS GUY TOO! ",element);
+            next_btn.disabled = true;
+            next_btn.title = "To proceed, fill in required fields.";
         }
       } else {
         next_btn.disabled = true;
@@ -1826,13 +1864,18 @@ function update_options_info(
 
 function get_top_opt_parent_hidden_status(ele){
   let opt_parent = document.getElementById(ele.getAttribute("opt-parent"));
+  let immediate_parent = document.getElementById(ele.getAttribute("opt-parent"));
+  opt_parent.getAttribute("option_format") != "group-radio"
   while(opt_parent.getAttribute("opt-parent")){
     opt_parent = document.getElementById(opt_parent.getAttribute("opt-parent"));
   }
-  let target_div = document.querySelector(
+  let top_div = document.querySelector(
     `:scope div.ct-form[opt-parent=${opt_parent.getAttribute("id")}]`
   );
-  return target_div.classList.contains("hidden");
+  let imm_div = document.querySelector(
+    `:scope div.ct-form[opt-parent=${immediate_parent.getAttribute("id")}]`
+  );
+  return top_div.classList.contains("hidden") || imm_div.classList.contains("hidden");
 }
 
 function make_global_options(
@@ -2537,7 +2580,19 @@ function generate_option_feedback(opt, opt_input, id) {
         !opt.optional
       );
     });
-  } else if (opt.feedback_type === "num") {
+  } 
+  else if (opt.feedback_type === "required_text") {
+    opt_input.addEventListener("input", function () {
+      check_required_text_field(
+        opt_input.id,
+        feedback.id,
+        "global-options-btn",
+        opt.option_name,
+        !opt.optional
+      );
+    });
+  }
+  else if (opt.feedback_type === "num") {
     opt_input.addEventListener("input", function () {
       check_num_field(
         opt_input.id,
@@ -3783,7 +3838,7 @@ function get_param_file_content() {
       msg_color = "#bd3030";
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
-      show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+      show_snackbar_msg(msg_label, msg_content, msg_color);
     }
     hide_modal_dialog("add-host-modal");
   });
@@ -3792,7 +3847,7 @@ function get_param_file_content() {
     var msg_color = "#bd3030";
     var msg_label = "Error:";
     var msg_content = "Unable to load parameter file.";
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -3825,8 +3880,8 @@ function remove_host(hostname) {
     }
     if (result_json.hasOwnProperty("success_msg")) {
       msg_color = "#20a030";
-      msg_label = "Remove Host: ";
-      msg_content = result_json.success_msg;
+      msg_label = "Removed Host: ";
+      msg_content = hostname;
       check_for_parameter_change(result_json);
     } else {
       msg_color = "#bd3030";
@@ -3834,7 +3889,7 @@ function remove_host(hostname) {
       msg_content = "Unexpected return value.";
     }
     get_param_file_content();
-    show_snackbar_msg(msg_label, msg_content, msg_color, "add-host-snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
   proc.fail(function (ex, data) {
     var msg_label = "Error: ";
@@ -3850,7 +3905,7 @@ function remove_host(hostname) {
     } else {
       msg_content = "Unable to remove host";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "add-host-snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -4014,10 +4069,9 @@ function update_role_request() {
         check_for_parameter_change(add_result_json);
       }
       show_snackbar_msg(
-        "Message: ",
-        "Roles have been updated.",
-        "#20a030",
-        "update-roles-snackbar"
+        "",
+        "Role Assignment Updated",
+        "#20a030"
       );
       get_param_file_content();
     });
@@ -4026,8 +4080,7 @@ function update_role_request() {
       show_snackbar_msg(
         "Error: ",
         "Failed to add role(s)",
-        "#bd3030",
-        "update-roles-snackbar"
+        "#bd3030"
       );
     });
   });
@@ -4036,8 +4089,7 @@ function update_role_request() {
     show_snackbar_msg(
       "Error: ",
       "Failed to remove role(s)",
-      "#bd3030",
-      "update-roles-snackbar"
+      "#bd3030"
     );
   });
 }
@@ -4181,8 +4233,7 @@ function update_options_request() {
     show_snackbar_msg(
       "Message: ",
       ABORT_MSG,
-      "#bd3030",
-      "update-options-snackbar"
+      "#bd3030"
     );
     return;
   }
@@ -4520,10 +4571,9 @@ function update_options_request() {
       ) {
         get_param_file_content();
         show_snackbar_msg(
-          "Message: ",
-          "Global options have been updated",
-          "#20a030",
-          "update-options-snackbar"
+          "",
+          "Global options updated",
+          "#20a030"
         );
       }
     }
@@ -4555,8 +4605,8 @@ function update_options_request() {
       }
       if (host_result_json.hasOwnProperty("success_msg")) {
         msg_color = "#20a030";
-        msg_label = "Per-host Option: ";
-        msg_content = "Host information updated.";
+        msg_label = "";
+        msg_content = "Per-Host Options Updated";
       } else {
         msg_color = "#bd3030";
         msg_label = "Error:";
@@ -4573,8 +4623,7 @@ function update_options_request() {
         show_snackbar_msg(
           msg_label,
           msg_content,
-          msg_color,
-          "add-host-snackbar"
+          msg_color
         );
       }
       if (JSON.stringify(group_request_json) != "{}") {
@@ -4607,8 +4656,8 @@ function update_options_request() {
           }
           if (group_result_json.hasOwnProperty("success_msg")) {
             msg_color = "#20a030";
-            msg_label = "Group Settings: ";
-            msg_content = "Group Settings Updated.";
+            msg_label = "";
+            msg_content = "Group Options Updated";
           } else {
             msg_color = "#bd3030";
             msg_label = "Error:";
@@ -4624,8 +4673,7 @@ function update_options_request() {
             show_snackbar_msg(
               msg_label,
               msg_content,
-              msg_color,
-              "general-snackbar"
+              msg_color
             );
           }
           setup_main_menu();
@@ -4635,8 +4683,7 @@ function update_options_request() {
           show_snackbar_msg(
             "Error: ",
             "Failed to modify global options",
-            "#bd3030",
-            "update-roles-snackbar"
+            "#bd3030"
           );
           console.log("group_proc (FAIL): ", ex);
         });
@@ -4666,8 +4713,7 @@ function update_options_request() {
     show_snackbar_msg(
       "Error: ",
       "Failed to modify global options",
-      "#bd3030",
-      "update-roles-snackbar"
+      "#bd3030"
     );
   });
 }
@@ -5165,15 +5211,50 @@ function show_host_file() {
  * create the inventory files required for each host in /usr/share/ceph-ansible/host_vars/
  */
 function generate_host_file() {
+  let msg_color = "";
+  let msg_label = "";
+  let msg_content = "";
   var spawn_args = ["/usr/share/cockpit/ceph-deploy/helper_scripts/make_hosts"];
   var result_json = null;
   var generate_host_file_proc = cockpit.spawn(spawn_args, {
     superuser: "require",
   });
+
+  generate_host_file_proc.catch(function (exception,data) {
+    console.log(exception);
+    console.log(data);
+    if(data != null){
+      // there might be json output here.
+      try {
+        result_json = JSON.parse(data);
+      } catch (e) {
+        show_snackbar_msg(
+          "Error: ",
+           exception.message,
+           "#bd3030"
+           );
+      }
+      if (result_json.hasOwnProperty("error_msg")) {
+        show_snackbar_msg(
+          "Error: ",
+           exception.message,
+           "#bd3030"
+           );
+        show_snackbar_msg(
+          "Error: ",
+           result_json.error_msg,
+           "#bd3030"
+           );
+      }
+    }else{
+      show_snackbar_msg(
+        "Error: ",
+         exception.message,
+         "#bd3030"
+         );
+    }
+  });
   generate_host_file_proc.done(function (data) {
-    let msg_color = "";
-    let msg_label = "";
-    let msg_content = "";
     try {
       result_json = JSON.parse(data);
     } catch (e) {
@@ -5216,8 +5297,9 @@ function generate_host_file() {
       msg_color = "#bd3030";
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
+      console.log("error_message: ",result.json.error_msg);
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5273,7 +5355,7 @@ function generate_all_file() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5328,7 +5410,7 @@ function generate_nfss_file() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5383,7 +5465,7 @@ function generate_smbs_file() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5446,7 +5528,7 @@ function generate_rgwloadbalancers_file() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5509,7 +5591,7 @@ function generate_osds_file() {
       msg_label = "Error:";
       msg_content = "Unexpected return value.";
     }
-    show_snackbar_msg(msg_label, msg_content, msg_color, "snackbar");
+    show_snackbar_msg(msg_label, msg_content, msg_color);
   });
 }
 
@@ -5557,8 +5639,7 @@ function update_playbook_state(content) {
           show_snackbar_msg(
             "Playbook (" + playbook + "): ",
             "Completed Successfully",
-            "#20a030",
-            "snackbar"
+            "#20a030"
           );
         }
       } else if (content.hasOwnProperty(playbook)) {
@@ -5574,8 +5655,7 @@ function update_playbook_state(content) {
           show_snackbar_msg(
             "Playbook (" + playbook + "):",
             "Unsuccessful",
-            "#bd3030",
-            "snackbar"
+            "#bd3030"
           );
         }
       }
