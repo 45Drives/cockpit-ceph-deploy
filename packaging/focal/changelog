@@ -1,3 +1,11 @@
+cockpit-ceph-deploy (1.0.6-5focal) focal; urgency=medium
+
+  * fixed UI bug when selecting kerberos as AD join method for Samba
+  * System hostname regex updated to allow a numeric 1st character
+  * updated message display to cascade from the top right corner of UI
+
+ -- Mark Hooper <mhooper@45drives.com>  Fri, 05 May 2023 12:20:52 -0300
+
 cockpit-ceph-deploy (1.0.6-4focal) focal; urgency=medium
 
   * Added option to encrypt osd devices using dmcrypt to the UI

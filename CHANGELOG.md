@@ -1,5 +1,5 @@
-## Cockpit Ceph-Deploy 1.0.6-4
+## Cockpit Ceph-Deploy 1.0.6-5
 
-* Added option to encrypt osd devices using dmcrypt to the UI
-* osds.yml will now be generated through the ceph-deploy UI
-* removed depreciated hybrid_cluster field from UI
+* fixed UI bug when selecting kerberos as AD join method for Samba
+* System hostname regex updated to allow a numeric 1st character
+* updated message display to cascade from the top right corner of UI

@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Fri May 05 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-5
+- fixed UI bug when selecting kerberos as AD join method for Samba
+- System hostname regex updated to allow a numeric 1st character
+- updated message display to cascade from the top right corner of UI
 * Mon Feb 27 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-4
 - Added option to encrypt osd devices using dmcrypt to the UI
 - osds.yml will now be generated through the ceph-deploy UI
