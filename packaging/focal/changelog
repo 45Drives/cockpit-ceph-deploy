@@ -1,3 +1,11 @@
+cockpit-ceph-deploy (1.0.6-6focal) focal; urgency=medium
+
+  * updated template for all.yml to use updated grafana docker image 9.5.1
+  * updated template for all.yml to use updated prometheus image 2.43.1
+  * updated ceph-ansible-45d dependency to minimum version of 5.3.8
+
+ -- Mark Hooper <mhooper@45drives.com>  Thu, 11 May 2023 10:25:03 -0300
+
 cockpit-ceph-deploy (1.0.6-5focal) focal; urgency=medium
 
   * fixed UI bug when selecting kerberos as AD join method for Samba

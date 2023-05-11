@@ -1,5 +1,5 @@
-## Cockpit Ceph-Deploy 1.0.6-5
+## Cockpit Ceph-Deploy 1.0.6-6
 
-* fixed UI bug when selecting kerberos as AD join method for Samba
-* System hostname regex updated to allow a numeric 1st character
-* updated message display to cascade from the top right corner of UI
+* updated template for all.yml to use updated grafana docker image 9.5.1
+* updated template for all.yml to use updated prometheus image 2.43.1
+* updated ceph-ansible-45d dependency to minimum version of 5.3.8

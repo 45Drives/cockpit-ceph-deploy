@@ -89,6 +89,10 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Thu May 11 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-6
+- updated template for all.yml to use updated grafana docker image 9.5.1
+- updated template for all.yml to use updated prometheus image 2.43.1
+- updated ceph-ansible-45d dependency to minimum version of 5.3.8
 * Fri May 05 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-5
 - fixed UI bug when selecting kerberos as AD join method for Samba
 - System hostname regex updated to allow a numeric 1st character
