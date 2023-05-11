@@ -592,7 +592,7 @@ grafana_admin_password: admin
 #grafana_key: ''
 # When using https, please fill with a hostname for which grafana_crt is valid.
 #grafana_server_fqdn: ''
-grafana_container_image: "docker.io/grafana/grafana:5.4.3"
+grafana_container_image: "docker.io/grafana/grafana:9.5.1"
 grafana_container_cpu_period: 100000
 grafana_container_cpu_cores: 2
 # container_memory is in GB
@@ -618,7 +618,7 @@ grafana_plugins:
   - grafana-piechart-panel
 grafana_allow_embedding: True
 grafana_port: 3000
-prometheus_container_image: "docker.io/prom/prometheus:v2.7.2"
+prometheus_container_image: "docker.io/prom/prometheus:v2.43.1"
 prometheus_container_cpu_period: 100000
 prometheus_container_cpu_cores: 2
 # container_memory is in GB
