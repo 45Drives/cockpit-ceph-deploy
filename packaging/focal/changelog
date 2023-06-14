@@ -1,3 +1,9 @@
+cockpit-ceph-deploy (1.0.6-7focal) focal; urgency=medium
+
+  * Updated default OS tuning parameters used in all.yml template
+
+ -- Mark Hooper <mhooper@45drives.com>  Wed, 14 Jun 2023 06:42:18 -0300
+
 cockpit-ceph-deploy (1.0.6-6focal) focal; urgency=medium
 
   * updated template for all.yml to use updated grafana docker image 9.5.1

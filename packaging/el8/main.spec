@@ -89,6 +89,8 @@ fi
 /usr/share/cockpit/ceph-deploy/*
 
 %changelog
+* Wed Jun 14 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-7
+- Updated default OS tuning parameters used in all.yml template
 * Thu May 11 2023 Mark Hooper <mhooper@45drives.com> 1.0.6-6
 - updated template for all.yml to use updated grafana docker image 9.5.1
 - updated template for all.yml to use updated prometheus image 2.43.1
