@@ -3,8 +3,8 @@ A cockpit module that deploys Ceph, Samba, NFS, ISCSI and more on 45Drives Hardw
 [![Ceph Deploy Tutorial](http://img.youtube.com/vi/ZsQp1vmn22M/0.jpg)](http://www.youtube.com/watch?v=ZsQp1vmn22M)
 
 ## Supported Operating Systems
-Rocky Linux
-Ubuntu 20.04.2.0 LTS (Focal Fossa)
+- [Rocky Linux 8.x](https://rockylinux.org/download/)
+- [Ubuntu 20.04.2.0 LTS (Focal Fossa)](https://mirror.csclub.uwaterloo.ca/ubuntu-releases/22.04.2/)
 
 # Installation 
 ## Rocky Linux
