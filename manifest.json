@@ -2,7 +2,7 @@
     "schema_version": "45D_AP_V2.0",
     "name": "cockpit-ceph-deploy",
     "title": "Cockpit Ceph-Deploy",
-    "stable": false,
+    "stable": true,
     "version": "1.0.6",
     "build_number": "7",
     "author": "Mark Hooper <mhooper@45drives.com>",
